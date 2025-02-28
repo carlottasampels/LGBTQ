@@ -1,0 +1,539 @@
+---
+title: "01 data_creation"
+author: ""
+date: "21/02/2025"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	cache = FALSE,
+	comment = NA,
+	prompt = FALSE)
+```
+
+
+Clear global environment prior to initiation
+```{r Clear global environment}
+remove(list = ls())
+```
+
+Read in file with path to ilovedata channel on Teams
+Ensure that your credentials directory is correctly located
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+Add the add_numeric function - used to convert character variables into numeric variables.
+Add the sumscores function - used to generate sumscores
+Add the package_check function - used to install and load dependencies
+```{r Read in functions}
+source(file = paste0(ilovedata_scripts, "functions/add_numeric.R"))
+source(file = paste0(ilovedata_scripts, "functions/remove_duplicates.R"))
+source(file = paste0(ilovedata_scripts, "functions/sumscores.R"))
+source(file = paste0(ilovedata_scripts, "functions/package_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/imp_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
+```
+
+Load packages
+
+```{r Load packages}
+library(summarytools)
+library(tidyverse)
+```
+
+Retrieve the recent date
+
+```{r Recent date}
+date = Sys.Date()
+date
+```
+
+# Join questionnaires
+
+## Rds files to read in
+
+-   age_glad_clean.rds
+
+-   employment_glad_clean.rds
+
+-   ethnicity_glad_clean.rds
+
+-   gad7_glad_clean.rds
+
+-   highest_education_glad_clean.rds
+
+-   mhd_glad_clean.rds
+
+-   phq9_glad_clean.rds
+
+-   sex_gender_sexuality_glad_clean.rds
+
+
+## File path
+```{r}
+data_path <- filepath_data_raw
+```
+
+
+## Read file names of rds files
+
+```{r Read file names of rds files}
+files <- dir(
+  path = data_path, # Folder with cleaned data for this project (copied from ilovedata)
+  pattern = "*rds"
+  )
+files
+```
+
+## Join rds files together
+
+```{r join all data}
+dat <- files %>%
+  map(~ read_rds(file.path(data_path, .))) %>%
+  map(~ select(., -startDate, -endDate)) %>%
+  reduce(full_join, by = c("ID", "sample"))
+```
+
+## Check for duplicates
+
+```{r Check for duplicates}
+dat %>% group_by(ID) %>% filter(n()>1) %>% summarize(n=n())
+```
+
+## Variable names
+```{r}
+dat %>% names
+```
+
+
+
+The tibble has no duplicates.
+
+# Vectors
+
+## GAD7 items vector
+
+```{r gad7_items vector}
+gad7_items_numeric <-
+  c(
+  "gad7.feeling_nervous_anxious_or_on_edge_numeric",
+  "gad7.control_worrying_stop_numeric",
+  "gad7.worrying_too_much_about_different_things_numeric",
+  "gad7.trouble_relaxing_numeric",
+  "gad7.sit_restless_hard_numeric",
+  "gad7.becoming_easily_annoyed_or_irritable_numeric",
+  "gad7.awful_feeling_afraid_happen_numeric"
+  )
+```
+
+## PHQ9 items vector
+
+```{r phq9_items}
+phq9_items_numeric <-
+  c(
+  "phq9.dead_hurting_thoughts_numeric",
+  "phq9.feeling_bad_failure_family_numeric",
+  "phq9.feeling_down_depressed_or_hopeless_numeric",
+  "phq9.feeling_tired_or_having_little_energy_numeric",
+  "phq9.little_interest_or_pleasure_in_doing_things_numeric",
+  "phq9.moving_fidgety_noticed_opposite_numeric",
+  "phq9.poor_appetite_or_overeating_numeric",
+  "phq9.staying_asleep_sleeping_trouble_numeric",
+  "phq9.trouble_concentrating_reading_newspaper_numeric"
+  )
+
+phq9_items <-
+  c(
+  "phq9.dead_hurting_thoughts",
+  "phq9.feeling_bad_failure_family",
+  "phq9.feeling_down_depressed_or_hopeless",
+  "phq9.feeling_tired_or_having_little_energy",
+  "phq9.little_interest_or_pleasure_in_doing_things",
+  "phq9.moving_fidgety_noticed_opposite",
+  "phq9.poor_appetite_or_overeating",
+  "phq9.staying_asleep_sleeping_trouble",
+  "phq9.trouble_concentrating_reading_newspaper"
+  )
+```
+
+# dat_gad7
+
+```{r dat_gad7}
+dat_gad7 <- dat %>%
+  select(
+    all_of(gad7_items_numeric)
+  ) %>%
+  as.data.frame()
+
+dat_gad7 %>% names
+```
+# dat_phq9
+
+```{r dat_phq9}
+dat_phq9 <- dat %>%
+  select(
+    all_of(phq9_items_numeric)
+  ) %>%
+  as.data.frame()
+
+dat_phq9 %>% names
+```
+
+# Gender
+
+## Inspection
+```{r Gender inspection}
+dat %>%
+  select(dem.which_gender_do_you_identify_with, dem.do_you_identify_as_transgender) %>%
+  freq()
+```
+
+
+## Recoding
+```{r Gender recoding}
+dat <- dat %>%
+  mutate(
+    gender = case_when(
+      dem.which_gender_do_you_identify_with == "Self-define" ~ "Self-define",
+      dem.which_gender_do_you_identify_with == "Non-binary" ~ "Non-binary",
+      dem.which_gender_do_you_identify_with == "Male" & dem.do_you_identify_as_transgender == "No" ~ "Cis man",
+      dem.which_gender_do_you_identify_with == "Male" & dem.do_you_identify_as_transgender == "Yes" ~ "Trans man",
+      dem.which_gender_do_you_identify_with == "Female" & dem.do_you_identify_as_transgender == "No" ~ "Cis woman",
+      dem.which_gender_do_you_identify_with == "Female" & dem.do_you_identify_as_transgender == "Yes" ~ "Trans woman"
+    ) %>% forcats::fct_infreq()
+  )
+```
+
+
+```{r Gender check}
+dat %>%
+  freq(gender)
+```
+
+# Age 
+```{r Age inspection}
+dat %>%
+  freq(dem.dob_age)
+```
+
+
+```{r Recoding negative age values}
+dat <- dat %>%
+  mutate(
+    age =
+      case_when(
+        dem.dob_age < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+        dem.how_old_are_you_now.txt < 0 ~ NA_real_,
+        !is.na(dem.dob_age) ~ dem.dob_age,
+        !is.na(dem.how_old_are_you_now.txt) ~ dem.how_old_are_you_now.txt,
+        TRUE ~ NA_real_
+        )
+    )
+```
+
+
+```{r Age after recoding}
+dat %>%
+  freq(age)
+```
+
+
+# Ethnicity
+
+```{r Ethnicity inspection}
+dat %>%
+  freq(dem.what_is_your_ethnic_origin)
+```
+
+
+```{r Ethnicity recoding}
+dat <- dat %>%
+  mutate(
+    ethnicity =
+      case_when(
+        dem.what_is_your_ethnic_origin %in% c(
+          "Prefer not to say",
+          "Don't know",
+          "Seen but not answered") ~ NA_character_, 
+        dem.what_is_your_ethnic_origin %in% c("Asian or Asian British", "Arab") ~
+          "Asian, Asian British, Arab",
+        TRUE ~ as.character(dem.what_is_your_ethnic_origin)
+      ) %>% forcats::fct_infreq()
+  )
+```
+
+
+```{r Ethnicity checking}
+dat %>%
+  freq(ethnicity)
+```
+
+```{r Sexual orientation inspection}
+dat %>%
+  freq(dem.what_is_your_sexual_orientation)
+```
+
+# Sexual orientation
+
+The "Other" category should be kept depending on research question
+and available data. In this case, no one answered "Other".
+
+```{r Sexual orientation recoding}
+dat <- dat %>%
+  mutate(
+    sexual_orientation =
+      if_else(
+        condition = dem.what_is_your_sexual_orientation %in%
+          c("Prefer not to answer",
+          "Don't know",
+          "Seen but not answered",
+          "Other"
+          ), 
+        true = NA_character_, 
+        false = as.character(dem.what_is_your_sexual_orientation),
+        missing = NA_character_
+      ) %>% forcats::fct_infreq()
+  )
+```
+
+
+```{r Sexual orientation checking}
+dat %>%
+  freq(sexual_orientation)
+```
+
+# Highest education
+
+
+```{r Highest education finegrained inspection}
+dat %>%
+  summarytools::freq(dem.highest_education_finegrained)
+```
+
+```{r Highest education collapsed inspection}
+dat %>%
+  summarytools::freq(dem.highest_education_collapsed)
+```
+
+
+## Cross table with employment
+
+```{r Cross table employment education}
+dat %>%
+  gtsummary::tbl_cross(
+    row = dem.what_is_your_current_employment_status,
+    col = dem.highest_education_finegrained, percent = "row")
+```
+
+
+
+# PHQ9
+
+```{r Inspect phq variables to create binary phq suicidality measure}
+dat %>%
+  select(contains("phq9.")) %>%
+  names
+```
+
+## Calculate Cronbach's alpha
+
+```{r alpha}
+alpha_results <- psych::alpha(
+  x = dat_phq9,
+  n.iter = 1000, 
+  use = "pairwise.complete.obs"#,
+  #  check.keys = TRUE,  # This is to take into account those variables that are reverse coded/negatively related.
+  )
+
+alpha_results
+```
+
+
+```{r}
+ltm::cronbach.alpha(
+  data = dat_phq9,
+  CI = TRUE,
+  na.rm = TRUE)
+```
+
+
+
+Inspect phq9.dead_hurting_thoughts_numeric
+
+```{r Inspect phq9.dead_hurting_thoughts_numeric}
+dat %>%
+  summarytools::freq(
+    phq9.dead_hurting_thoughts_numeric
+  )
+```
+
+## Binary Q9 suicide
+
+Thoughts that you would be better off dead, or of hurting yourself in some way?
+Not at all
+Several days
+More than half the days
+Nearly every day
+
+-777 Seen but not answered
+We are recoding -777 to NA as only 71 (90) GLAD participants have seen but not answered the question. 
+
+```{r Create binary phq suicidality measure numeric}
+dat <- dat %>%
+  mutate(
+    phq.Q9_suicidality_binary_numeric =
+      recode_factor(
+        phq9.dead_hurting_thoughts_numeric,
+        `-777` = NA_real_,
+        `0` = 0,
+        `1` = 1,
+        `2` = 1,
+        `3` = 1
+        )
+    )
+
+dat %>%
+  summarytools::freq(phq.Q9_suicidality_binary_numeric,
+    cumul = FALSE,
+    round.digits = 1
+    )
+```
+
+
+```{r PHQ9 suicidality binary factor}
+dat <- dat %>%
+  mutate(
+    phq.Q9_suicidality_binary =
+      recode_factor(
+        phq.Q9_suicidality_binary_numeric,
+        `0` = "No suicidality",
+        `1` = "Any suicidality"
+        )
+    )
+
+dat %>%
+  summarytools::freq(phq.Q9_suicidality_binary,
+    cumul = FALSE,
+    round.digits = 1
+    )
+```
+
+
+
+# Mental Health Diagnoses
+
+
+```{r mhd inspection}
+dat %>%
+  select(
+    contains("mhd.")
+  ) %>%
+  names
+```
+
+
+## Psychiatric diagnoses selection
+
+Psychiatric disorders vectors
+```{r Psychiatric disorders vectors}
+psy_dx_factors <- c(
+  "mhd.mdd",
+  "mhd.gad",
+  "mhd.social_anxiety",
+  "mhd.specific_phobia_",
+  "mhd.agoraphobia",
+  "mhd.panic_disorder",
+  "mhd.panic_attacks",
+  "mhd.bipolar_disorder"
+)
+
+psy_dx_numeric <- c(
+  "mhd.mdd_numeric",
+  "mhd.gad_numeric",
+  "mhd.social_anxiety_numeric",
+  "mhd.specific_phobia_numeric",
+  "mhd.agoraphobia_numeric",
+  "mhd.panic_disorder_numeric",
+  "mhd.panic_attacks_numeric",
+  "mhd.ptsd_numeric",
+  "mhd.ocd_numeric",
+  "mhd.bipolar_disorder_numeric"
+)
+```
+
+Drop empty levels
+
+```{r Psy Dx Inspect }
+dat_psy_dx <- dat %>%
+  select(
+    all_of(psy_dx_factors)
+  ) %>%
+  mutate(across(where(is.factor), fct_drop))
+```
+
+
+```{r Psy Dx check}
+dat_psy_dx %>%
+  summarytools::freq()
+```
+
+
+# Selection of variables
+
+```{r Columns in last data object}
+dat %>%
+  names
+```
+
+
+```{r vector for selected variables}
+dat_rds <- dat %>%
+  select(
+    "ID",
+    "gad7.sum_score",
+    all_of(gad7_items_numeric),
+    
+    "phq9.sum_score", 
+    "phq.Q9_suicidality_binary_numeric", # Suicidality
+    "phq.Q9_suicidality_binary",
+    all_of(phq9_items_numeric),
+    all_of(phq9_items),
+    
+    "gender",
+    "age",
+    "ethnicity",
+    "sexual_orientation",
+    "dem.highest_education_finegrained",
+    "dem.highest_education_collapsed",
+  ) %>%
+  bind_cols(
+    dat_psy_dx
+  )
+
+dat_rds %>% 
+  names
+```
+
+
+# Write rds file after variable creation
+
+```{r Write rds file after variable creation}
+write_rds(
+  x = dat_rds,
+  file = paste0(filepath_cleaned_data,"dat_variable_creation", date, ".rds")
+                )
+```
