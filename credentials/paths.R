@@ -7,3 +7,7 @@ filepath_glad_cleaned <- "C:/Users/carlo/King's College London/MT-TNG BioResourc
 filepath_data_raw <- "C:/Users/carlo/King's College London/MT-TNG BioResource EDIT - ilovedata - ilovedata/LGBTQ/data_raw"
 
 filepath_cleaned_data <- "C:/Users/carlo/King's College London/MT-TNG BioResource EDIT - ilovedata - ilovedata/LGBTQ/data/"
+
+filepath_plots <- "C:/Users/carlo/Documents/work/LGBTQ/plots"
+
+LGBTQ_folder <- "C:/Users/carlo/Documents/work/LGBTQ/"

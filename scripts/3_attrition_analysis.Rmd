@@ -1,0 +1,195 @@
+---
+title: "Attrition analysis"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Clear Global Environment
+
+```{r clear global environment}
+rm(list = ls(all.names = TRUE)) 
+```
+
+Set current date
+
+```{r current date}
+date <- Sys.Date()
+```
+
+Read in file with path to ilovedata channel on Teams Ensure that your
+credentials directory is correctly located
+
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+Add the add_numeric function - used to convert character variables into
+numeric variables. Add the sumscores function - used to generate
+sumscores Add the package_check function - used to install and load
+dependencies
+
+```{r Read in functions}
+source(file = paste0(ilovedata_scripts, "functions/add_numeric.R"))
+source(file = paste0(ilovedata_scripts, "functions/remove_duplicates.R"))
+source(file = paste0(ilovedata_scripts, "functions/sumscores.R"))
+source(file = paste0(ilovedata_scripts, "functions/package_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/imp_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
+```
+
+Install necessary packages
+
+```{r install packages}
+#install.packages("knitr")
+#install.packages("summarytools")
+#install.packages("tidyverse")
+#install.packages("gt")
+```
+
+Load necessary packages
+
+```{r load packages}
+library(knitr)
+library(summarytools)
+library(gtsummary)
+library(officer)
+library(gt)
+library(tidyverse)
+```
+
+# Create output folder
+
+```{r Create plot output folder}
+#dir.create(paste0(bddtrauma_folder, "tables/"))
+dir.create(paste0(LGBTQ_folder, "tables/", date))
+```
+
+# Read in data
+
+```{r read in raw_data}
+dat <- readRDS(
+  file = paste0(filepath_cleaned_data,"dat_consented_attrition", date, ".rds")
+  )
+```
+
+# Sample size before attrition
+
+```{r sample size}
+nrow(dat)
+```
+
+Total sample size: 46768
+
+# Variable names
+
+```{r Variables}
+dat %>% names
+```
+
+# Number of included
+
+```{r}
+dat %>%
+  summarytools::freq(
+    present
+  )
+```
+
+# Table
+
+```{r}
+attrition_table <- dat %>%
+  select(
+    age,
+    gender,
+    ethnicity,
+    sexual_orientation,
+    height_m,
+    bmi,
+    dem.highest_education_collapsed,
+    phq9.sum_score,
+    mhd.mdd,
+    mhd.gad,
+    mhd.social_anxiety,
+    mhd.specific_phobia_,
+    mhd.agoraphobia,
+    mhd.panic_disorder,
+    mhd.panic_attacks,
+    mhd.bipolar_disorder,
+    mhd.bdd,
+    mhd.an,
+    mhd.atypical_an,
+    mhd.bn,
+    mhd.bed,
+    present
+  ) %>%
+  tbl_summary(
+    by = present,
+    label = list(
+      gender = "Patient's gender",
+      age = "Age [years]",
+      ethnicity = "Ethnicity",
+      sexual_orientation = "Sexual orientation",
+      height_m = "Height [m]",
+      bmi = "BMI [kg/m2]",
+      dem.highest_education_collapsed = "Highest education",
+      phq9.sum_score = "PHQ9 score",
+      mhd.personality_disorder = "Personality disorder",
+      mhd.mdd = "Major depressive disorder",
+      mhd.gad = "Generalised anxiety disorder",
+      mhd.social_anxiety = "Social Anxiety",
+      mhd.specific_phobia_ = "Specific phobia",
+      mhd.agoraphobia = "Agoraphobia",
+      mhd.panic_disorder = "Panic disorder",
+      mhd.panic_attacks = "Panic attacks",
+      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.bdd = "Body dysmorphic disorder",
+      mhd.an = "Anorexia nervosa", 
+      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.bn = "Bulimia nervosa",
+      mhd.bed = "Binge-eating disorder"
+    ),
+    missing_text = "Not answered"
+  ) %>%
+#  add_difference() %>%
+  modify_caption("**Supplementary Table SXX. Attrition analysis**") %>%
+  bold_labels() #%>%
+  #as_gt() %>%
+
+attrition_table
+```
+
+## Save as word document
+
+```{r Save as word}
+sect_properties <- prop_section(
+  page_size =
+    page_size(
+      orient = "portrait",
+      width = 8.3,
+      height = 11.7),
+  type = "continuous",
+  page_margins = page_mar()
+)
+attrition_table %>%
+  gtsummary::as_flex_table() %>%
+  flextable::save_as_docx(
+    values = NULL,
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_attrition_", date, ".docx"),
+    pr_section = sect_properties
+      )
+```

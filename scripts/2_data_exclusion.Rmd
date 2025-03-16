@@ -1,0 +1,652 @@
+---
+title: "data_exclusion"
+author: "Paula Adamopoulos, Christopher Huebel, Helena Davies"
+date: "15/03/2025"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Setup
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment=NA,
+                      prompt=FALSE,
+                      cache=FALSE)
+```
+
+## Clear workspace
+
+```{r Clear worksapce}
+rm(list = ls())
+```
+
+
+Read in file with path to ilovedata channel on Teams
+Ensure that your credentials directory is correctly located
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+
+Add the add_numeric function - used to convert character variables into numeric variables.
+Add the sumscores function - used to generate sumscores
+Add the package_check function - used to install and load dependencies
+```{r Read in functions}
+source(file = paste0(ilovedata_scripts, "functions/add_numeric.R"))
+source(file = paste0(ilovedata_scripts, "functions/remove_duplicates.R"))
+source(file = paste0(ilovedata_scripts, "functions/sumscores.R"))
+source(file = paste0(ilovedata_scripts, "functions/package_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/imp_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
+```
+
+
+## Install packages
+
+```{r Install packages}
+#install.packages("ggformula")
+#install.packages("tidyverse")
+```
+
+## Load packages
+
+```{r Load packages}
+library(openxlsx)
+library(gtsummary)
+library(ggconsort)
+library(tidyverse)
+```
+
+## Retrieve the recent date
+
+```{r Recent date}
+date = Sys.Date()
+date
+```
+
+## Read in data
+
+```{r Read in data}
+dat <- read_rds(
+  file = paste0(filepath_cleaned_data,"dat_variable_creation", date, ".rds"))
+```
+
+
+Psychiatric diagnoses
+```{r Psychiatric diagnoses vector}
+psy_dx_factors <- c(
+  "mhd.mdd",
+  "mhd.gad",
+  "mhd.social_anxiety",
+  "mhd.specific_phobia_",
+  "mhd.agoraphobia",
+  "mhd.panic_disorder",
+  "mhd.panic_attacks",
+  "mhd.bipolar_disorder",
+  "mhd.bdd",
+  "mhd.an",
+  "mhd.atypical_an",
+  "mhd.bn",
+  "mhd.bed"
+)
+```
+
+Analysis variables vector
+
+```{r}
+analysis_variables_vector <- c(
+  "phq9.sum_score", 
+  "phq.Q9_suicidality_binary_numeric", # Suicidality
+  "phq.Q9_suicidality_binary",
+  "gender",
+  "age",
+  "bmi",
+  "height_m",
+  "ethnicity",
+  "sexual_orientation",
+  "dem.highest_education_collapsed",
+  psy_dx_factors
+)
+```
+
+
+# Exclusion criteria
+
+## Exclusion table
+
+-555 'Not applicable' response from participant
+-666 Implausible response/value
+-777 Seen but not answered
+-888 Don't know
+-999 Prefer not to answer/Prefer not to say
+
+```{r Exclusion table demographics exposure outcome}
+dat %>%
+  select(
+    age,
+    gender,
+    ethnicity,
+    sexual_orientation,
+    height_m,
+    bmi,
+    dem.highest_education_collapsed,
+    phq9.sum_score,
+  "mhd.mdd",
+  "mhd.gad",
+  "mhd.social_anxiety",
+  "mhd.specific_phobia_",
+  "mhd.agoraphobia",
+  "mhd.panic_disorder",
+  "mhd.panic_attacks",
+  "mhd.bipolar_disorder",
+  "mhd.bdd",
+  "mhd.an",
+  "mhd.atypical_an",
+  "mhd.bn",
+  "mhd.bed"
+) %>%
+  gtsummary::tbl_summary()
+```
+
+
+# Study cohorts
+
+
+```{r}
+study_cohorts <- 
+  dat %>%
+  cohort_start("Consented") %>%
+  # Define cohorts using named expressions --------------------
+  # Notice that you can use previously defined cohorts in subsequent steps
+  cohort_define(
+    consented = .full,
+    
+    nogender = .full %>%
+      drop_na(gender),
+    
+    missing_gender = anti_join(
+      x = .full,
+      y =  nogender,
+      by = "ID"),
+    
+    nogender.noage = nogender %>%
+      drop_na(age),
+    
+     missing_age = anti_join(
+      x = nogender,
+      y =  nogender.noage,
+      by = "ID"),
+    
+    nogender.noage.noethnicity =
+      nogender.noage %>%
+      drop_na(ethnicity),
+    
+    missing_ethnicity = anti_join(
+      x = nogender.noage,
+      y =  nogender.noage.noethnicity,
+      by = "ID"),
+    
+    nogender.noage.noethnicity.nosexuality =
+      nogender.noage.noethnicity %>%
+      drop_na(sexual_orientation),
+    
+    missing_sexuality = anti_join(
+      x = nogender.noage.noethnicity,
+      y =  nogender.noage.noethnicity.nosexuality,
+      by = "ID"),
+
+    
+    nogender.noage.noethnicity.nosexuality.nobmiheight =
+      nogender.noage.noethnicity.nosexuality %>%
+      drop_na(
+        bmi,
+        height_m
+        ),
+    
+    missing_bmiheight = anti_join(
+      x = nogender.noage.noethnicity.nosexuality,
+      y =  nogender.noage.noethnicity.nosexuality.nobmiheight,
+      by = "ID"),
+    
+    nogender.noage.noethnicity.nosexuality.nobmiheight.noedu =
+      nogender.noage.noethnicity.nosexuality.nobmiheight %>%
+      drop_na(dem.highest_education_collapsed),
+    
+    missing_edu = anti_join(
+      nogender.noage.noethnicity.nosexuality.nobmiheight,
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu,
+      by = "ID"),
+    
+    nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd = 
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu %>%
+      drop_na(
+        psy_dx_factors
+        ),
+    
+    missing_mhd = anti_join(
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu,
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd,
+      by = "ID")
+    
+  ) %>%
+  # Provide text labels for subsamples ---------------------------
+  cohort_label(
+    consented =
+      "Consented",
+    nogender =
+      "With gender",
+    nogender.noage =
+      "With gender, age",
+    nogender.noage.noethnicity =
+      "With gender, age, ethnicity",
+    nogender.noage.noethnicity.nosexuality =
+      "With gender, age, ethnicity, sexuality",
+    nogender.noage.noethnicity.nosexuality.nobmiheight =
+      "With gender, age, ethnicity, sexuality, BMI, height",
+    nogender.noage.noethnicity.nosexuality.nobmiheight.noedu =
+      "With gender, age, ethnicity, sexuality, BMI, height, education",
+    nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd =
+      "With gender, age, ethnicity, sexuality, BMI, height, education, MHD",
+    
+    missing_gender = "Excluded: No gender",
+    missing_age = "Excluded: No age",
+    missing_ethnicity = "Excluded: No ethnicity",
+    missing_sexuality = "Excluded: No sexuality",
+    missing_bmiheight = "Excluded: No BMI or height",
+    missing_edu = "Excluded: No education",
+    missing_mhd = "Excluded No mental health diagnosis"
+  )
+```
+
+# Consort diagram (flow chart)
+
+```{r CONSORT diagram}
+study_consort <- study_cohorts %>%
+  consort_box_add(
+    name = "consented",
+    x = 0,
+    y = -10,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      .full)
+  ) %>%
+  consort_box_add(
+    "missing_gender",
+    x = 5,
+    y = -15,
+    label =  cohort_count_adorn(study_cohorts, missing_gender)
+  ) %>%
+  consort_box_add(
+    name = "nogender",
+    x = 0,
+    y = -20,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender)
+  ) %>%
+  consort_box_add(
+    "missing_age",
+    x = 5,
+    y = -25,
+    label =  cohort_count_adorn(study_cohorts, missing_age)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage",
+    x = 0,
+    y = -30,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage)
+  ) %>%
+  consort_box_add(
+    "missing_ethnicity",
+    x = 5,
+    y = -35,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      missing_ethnicity)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage.noethnicity",
+    x = 0,
+    y = -40,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage.noethnicity)
+  ) %>%
+  consort_box_add(
+    "missing_sexuality",
+    x = 5,
+    y = -45,
+    label =  cohort_count_adorn(study_cohorts, missing_sexuality)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage.noethnicity.nosexuality",
+    x = 0,
+    y = -50,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage.noethnicity.nosexuality)
+  )  %>%
+  consort_box_add(
+    "missing_bmiheight",
+    x = 5,
+    y = -75,
+    label =  cohort_count_adorn(study_cohorts, missing_bmiheight)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage.noethnicity.nosexuality.nobmiheight",
+    x = 0,
+    y = -80,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage.noethnicity.nosexuality.nobmiheight)
+  ) %>%
+  consort_box_add(
+    "missing_edu",
+    x = 5,
+    y = -85,
+    label =  cohort_count_adorn(study_cohorts, missing_edu)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage.noethnicity.nosexuality.nobmiheight.noedu",
+    x = 0,
+    y = -90,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu)
+  ) %>%
+  consort_box_add(
+    "missing_mhd",
+    x = 5,
+    y = -95,
+    label =  cohort_count_adorn(study_cohorts, missing_mhd)
+  ) %>%
+  consort_box_add(
+    name = "nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd",
+    x = 0,
+    y = -100,
+    label =  cohort_count_adorn(
+      study_cohorts,
+      nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd)
+  ) %>%
+  consort_arrow_add(
+    end = "nogender", end_side = "top", start_x = 0, start_y = -10
+  ) %>%
+  consort_arrow_add(
+    end = "missing_gender", end_side = "left", start_x = 0, start_y = -15
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage", end_side = "top", start_x = 0, start_y = -20
+  ) %>%
+  consort_arrow_add(
+    end = "missing_age", end_side = "left", start_x = 0, start_y = -25
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage.noethnicity", end_side = "top", start_x = 0, start_y = -30
+  ) %>%
+  consort_arrow_add(
+    end = "missing_ethnicity", end_side = "left", start_x = 0, start_y = -35
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage.noethnicity.nosexuality", end_side = "top", start_x = 0, start_y = -40
+  ) %>%
+  consort_arrow_add(
+    end = "missing_sexuality", end_side = "left", start_x = 0, start_y = -45
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage.noethnicity.nosexuality.nobmiheight", end_side = "top", start_x = 0, start_y = -70
+  ) %>%
+  consort_arrow_add(
+    end = "missing_bmiheight", end_side = "left", start_x = 0, start_y = -75
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage.noethnicity.nosexuality.nobmiheight.noedu", end_side = "top", start_x = 0, start_y = -80
+  ) %>%
+  consort_arrow_add(
+    end = "missing_edu", end_side = "left", start_x = 0, start_y = -85
+  ) %>%
+  consort_arrow_add(
+    end = "nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd", end_side = "top", start_x = 0, start_y = -90
+  ) %>%
+  consort_arrow_add(
+    end = "missing_mhd", end_side = "left", start_x = 0, start_y = -95
+  )
+  
+```
+
+## Figure
+
+```{r fig.height=8, fig.width=12}
+study_consort %>%
+  ggplot() + 
+  geom_consort() +
+  theme_consort(margin_h = 20, margin_v = 1)
+```
+
+## Save figure
+
++++ That's currently not working. I have opened an issue on the GitHub
+https://github.com/tgerke/ggconsort/issues/26
+
+```{r eval=FALSE, include=FALSE}
+ggsave(
+  filename = paste0("flow_chart_n_", date, ".pdf"),
+  plot = study_consort,
+  device = "pdf",
+  path = filepath_plots,
+  scale = 1,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
+```
+
+# Attrition variable
+
+```{r}
+names(study_cohorts$data)
+```
+
+## IDs after exclusion
+```{r IDs present after exclusion}
+IDs_present <-
+  as.vector(
+  study_cohorts$data$nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd$ID
+  )
+```
+
+
+```{r}
+dat_consented <- study_cohorts$data$consented
+```
+
+
+```{r attrition variable}
+dat_consented <- dat_consented %>%
+  mutate(
+    present =
+      if_else(
+        condition = ID %in% IDs_present,
+        true = "Present",
+        false = "Excluded",
+        missing = NA_character_
+      ) 
+  )
+```
+
+
+# Exclusion manually
+
+## gender
+
+```{r Exclusion gender}
+dim(dat)
+
+nogender <- dat %>%
+  drop_na(gender)
+
+missing_gender <- abs(nrow(nogender)-nrow(dat))
+missing_gender
+```
+
+`r abs(missing_gender)` participants excluded due to missing gender.
+
+## age
+
+```{r Exclusion age}
+dim(nogender)
+
+nogender.noage <- nogender %>%
+  drop_na(age)
+
+missing_age <- nrow(nogender.noage)-nrow(nogender)
+missing_age
+```
+
+`r abs(missing_age)` participants excluded due to missing age.
+
+## ethnicity
+
+```{r ethnicity}
+dim(nogender.noage)
+
+nogender.noage.noethnicity <-
+  nogender.noage %>%
+  drop_na(ethnicity)
+
+missing_ethnicity <-
+  nrow(nogender.noage.noethnicity) -
+  nrow(nogender.noage)
+
+missing_ethnicity
+```
+
+`r abs(missing_ethnicity)` participants excluded due to missing ethnicity.
+
+
+## sexual orientation
+
+```{r Exclusion sexual orientation}
+dim(nogender.noage.noethnicity)
+
+nogender.noage.noethnicity.nosexuality <-
+  nogender.noage.noethnicity %>%
+  drop_na(sexual_orientation)
+
+missing_sexuality <-
+  nrow(nogender.noage.noethnicity.nosexuality) -
+  nrow(nogender.noage.noethnicity)
+
+missing_sexuality
+```
+
+`r abs(missing_sexuality)` participants excluded due to missing sexual orientation.
+
+
+## Exclusion BMI or height
+
+```{r Remove those without BMI or height}
+dim(nogender.noage.noethnicity.nosexuality)
+
+nogender.noage.noethnicity.nosexuality.nobmiheight <- 
+  nogender.noage.noethnicity.nosexuality %>%
+  drop_na(
+    bmi,
+    height_m
+    )
+
+missing_bmi <-
+  nrow(nogender.noage.noethnicity.nosexuality.nobmiheight) - 
+  nrow(nogender.noage.noethnicity.nosexuality)
+
+missing_bmi
+```
+
+`r abs(missing_bmi)` participants excluded due to missing bmi.
+
+
+## education
+
+```{r Exclusion education}
+dim(nogender.noage.noethnicity.nosexuality.nobmiheight)
+
+nogender.noage.noethnicity.nosexuality.nobmiheight.noedu <-
+  nogender.noage.noethnicity.nosexuality.nobmiheight %>%
+  drop_na(dem.highest_education_collapsed)
+
+missing_edu <-
+  nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu) - 
+  nrow(nogender.noage.noethnicity.nosexuality.nobmiheight)
+
+missing_edu
+```
+
+`r abs(missing_edu)` participants excluded due to missing education.
+
+
+## mhd
+
+
+```{r Exclusion mhd}
+dim(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu)
+
+nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd<- nogender.noage.noethnicity.nosexuality.nobmiheight.noedu %>%
+  drop_na(
+    all_of(psy_dx_factors)
+  )
+
+missing_mhd <-
+  nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd) -
+  nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu)
+
+missing_mhd
+```
+
+`r abs(missing_mhd)` participants excluded due to missing mhd.
+
+```{r Final}
+nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd)
+```
+
+## Final
+
+Final *n* = `r abs(nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd))`
+
+Copy tibble after exclusion
+
+```{r Move data frame}
+dat_after_exclusion <- 
+  nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd
+nrow(dat_after_exclusion)
+```
+
+# Write rds file
+
+```{r write rds file exclusion}
+dat_after_exclusion %>%
+  write_rds(
+  file =  paste0(filepath_cleaned_data,"dat_after_exclusion", date, ".rds")
+  )
+```
+
+dat_consented
+
+```{r write rds file attrition}
+dat_consented %>%
+  write_rds(
+  file =  paste0(filepath_cleaned_data,"dat_consented_attrition", date, ".rds")
+  )
+```

@@ -68,6 +68,8 @@ date
 
 -   age_glad_clean.rds
 
+-   signup_bmi_height_weight_glad_clean.rds
+
 -   employment_glad_clean.rds
 
 -   ethnicity_glad_clean.rds
@@ -101,11 +103,15 @@ files
 
 ## Join rds files together
 
++++CH: Need to manage to remove startDate and endDate so not a million .x.x.x get added to variable names
+
 ```{r join all data}
 dat <- files %>%
   map(~ read_rds(file.path(data_path, .))) %>%
-  map(~ select(., -startDate, -endDate)) %>%
-  reduce(full_join, by = c("ID", "sample"))
+  reduce(
+    full_join,
+    by = c("ID", "sample")
+    )
 ```
 
 ## Check for duplicates
@@ -249,6 +255,82 @@ dat <- dat %>%
 ```{r Age after recoding}
 dat %>%
   freq(age)
+```
+
+
+# BMI
+
+```{r BMI inspection}
+dat %>%
+  descr(dem.bmi_signup)
+```
+
+```{r BMI recoding}
+dat <- dat %>%
+  mutate(
+    bmi =
+      case_when(
+        dem.bmi_signup < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+        !is.na(dem.bmi_signup ) ~ dem.bmi_signup,
+        TRUE ~ NA_real_
+        )
+    )
+```
+
+
+```{r BMI checking}
+dat %>%
+  descr(bmi)
+```
+
+
+# Height
+
+```{r Height inspection}
+dat %>%
+  descr(dem.height_signup_m)
+```
+
+```{r Height recoding}
+dat <- dat %>%
+  mutate(
+    height_m =
+      case_when(
+        dem.height_signup_m < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+        !is.na(dem.height_signup_m ) ~ dem.height_signup_m,
+        TRUE ~ NA_real_
+      )
+  )
+```
+
+
+```{r Height checking}
+dat %>%
+  descr(height_m)
+```
+
+
+## Correlation BMI and height
+
+```{r Correlation BMI and height}
+dat %>%
+  summarise(
+  cor = cor(
+  x = bmi,
+  y = height_m,
+  method = "spearman",
+  use = "pairwise.complete.obs"
+  )
+  )
+```
+Plot 
+
+```{r Correlation BMI and height plot}
+dat %>%
+ggplot(
+  aes(x=bmi, y=height_m)) + 
+  geom_point()+
+  geom_smooth(method=lm)
 ```
 
 
@@ -458,7 +540,12 @@ psy_dx_factors <- c(
   "mhd.agoraphobia",
   "mhd.panic_disorder",
   "mhd.panic_attacks",
-  "mhd.bipolar_disorder"
+  "mhd.bipolar_disorder",
+  "mhd.bdd",
+  "mhd.an",
+  "mhd.atypical_an",
+  "mhd.bn",
+  "mhd.bed"
 )
 
 psy_dx_numeric <- c(
@@ -471,7 +558,12 @@ psy_dx_numeric <- c(
   "mhd.panic_attacks_numeric",
   "mhd.ptsd_numeric",
   "mhd.ocd_numeric",
-  "mhd.bipolar_disorder_numeric"
+  "mhd.bipolar_disorder_numeric",
+  "mhd.bdd_numeric",
+  "mhd.an_numeric",
+  "mhd.atypical_an_numeric",
+  "mhd.bn_numeric",
+  "mhd.bed_numeric"
 )
 ```
 
@@ -515,6 +607,8 @@ dat_rds <- dat %>%
     
     "gender",
     "age",
+    "bmi",
+    "height_m",
     "ethnicity",
     "sexual_orientation",
     "dem.highest_education_finegrained",
