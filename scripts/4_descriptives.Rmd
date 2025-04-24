@@ -75,6 +75,7 @@ dat <- read_rds(
 dat_demographics <- dat %>%
   select(
     age,
+    sex,
     gender,
     ethnicity,
     sexual_orientation,
@@ -87,11 +88,12 @@ dat_demographics <- dat %>%
     mhd.mdd,
     mhd.gad,
     mhd.social_anxiety,
-    mhd.specific_phobia_,
+    mhd.specific_phobia,
     mhd.agoraphobia,
     mhd.panic_disorder,
     mhd.panic_attacks,
     mhd.bipolar_disorder,
+    mhd.ocd,
     mhd.bdd,
     mhd.an,
     mhd.atypical_an,
@@ -115,6 +117,7 @@ summary_table_whole_sample <-
   gtsummary::tbl_summary(
     label = list(
       gender = "Patient's gender",
+      dem.sex = "Patient's sex",
       age = "Age [years]",
       ethnicity = "Ethnicity",
       sexual_orientation = "Sexual orientation",
@@ -126,12 +129,13 @@ summary_table_whole_sample <-
       phq.Q9_suicidality_binary = "Suicidality",
       mhd.mdd = "Major depressive disorder",
       mhd.gad = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia_ = "Specific phobia",
+      mhd.social_anxiety = "Social anxiety",
+      mhd.specific_phobia = "Specific phobia",
       mhd.agoraphobia = "Agoraphobia",
       mhd.panic_disorder = "Panic disorder",
       mhd.panic_attacks = "Panic attacks",
       mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "Obsessive-compulsive disorder",
       mhd.bdd = "Body dysmorphic disorder",
       mhd.an = "Anorexia nervosa", 
       mhd.atypical_an = "Atypical anorexia nervosa",
@@ -140,6 +144,7 @@ summary_table_whole_sample <-
       ),
     type = list(
       gender = "categorical",
+      dem.sex = "categorical",
       age = "continuous2",
       ethnicity = "categorical",
       sexual_orientation = "categorical",
@@ -149,17 +154,17 @@ summary_table_whole_sample <-
       phq9.sum_score = "continuous2",
       gad7.sum_score = "continuous2",
       phq.Q9_suicidality_binary = "dichotomous",
-      mhd.personality_disorder = "dichotomous",
       mhd.mdd = "dichotomous",
       mhd.gad = "dichotomous",
       mhd.social_anxiety = "dichotomous",
-      mhd.specific_phobia_ = "dichotomous",
+      mhd.specific_phobia = "dichotomous",
       mhd.agoraphobia = "dichotomous",
       mhd.panic_disorder = "dichotomous",
       mhd.panic_attacks = "dichotomous",
       mhd.bipolar_disorder = "dichotomous",
+      mhd.ocd = "dichotomous",
       mhd.bdd = "dichotomous",
-      mhd.an = "dichotomous", 
+      mhd.an = "dichotomous",
       mhd.atypical_an = "dichotomous",
       mhd.bn = "dichotomous",
       mhd.bed = "dichotomous"
@@ -169,11 +174,12 @@ summary_table_whole_sample <-
       mhd.mdd = "MDD",
       mhd.gad = "GAD",
       mhd.social_anxiety = "Social anxiety",
-      mhd.specific_phobia_ = "Specific phobia",
+      mhd.specific_phobia = "Specific phobia",
       mhd.agoraphobia = "Agoraphobia",
       mhd.panic_disorder = "Panic disorder",
       mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.bipolar_disorder = "Bipolar disorder",
+      mhd.ocd = "OCD",
       mhd.bdd = "BDD",
       mhd.an = "AN", 
       mhd.atypical_an = "Atypical AN",
@@ -215,7 +221,7 @@ sect_properties1 <- officer::prop_section(
 summary_table_whole_sample %>%
   as_flex_table() %>%
   flextable::save_as_docx(
-    path = paste0(bddtrauma_folder, "tables/", date, "/BDDTRAUMA_descriptives", date, ".docx"),
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives", date, ".docx"),
     pr_section = sect_properties1
   )
 ```
@@ -226,26 +232,21 @@ summary_table_whole_sample %>%
 ```{r dat_demographics_clinical}
 dat_demographics_clinical <- dat %>%
   select(
-    dcq.clinical_score,
-    age,
+    sex,
     gender,
     ethnicity,
     sexual_orientation,
-    height_m,
-    bmi,
     dem.highest_education_collapsed,
-    phq9.sum_score,
-    gad7.sum_score,
     phq.Q9_suicidality_binary,
-    mhd.personality_disorder,
     mhd.mdd,
     mhd.gad,
     mhd.social_anxiety,
-    mhd.specific_phobia_,
+    mhd.specific_phobia,
     mhd.agoraphobia,
     mhd.panic_disorder,
     mhd.panic_attacks,
     mhd.bipolar_disorder,
+    mhd.ocd,
     mhd.bdd,
     mhd.an,
     mhd.atypical_an,
@@ -254,31 +255,27 @@ dat_demographics_clinical <- dat %>%
   )
 ```
 
-
 ```{r}
-summary_table_clinical <-
+summary_table_clinical_gender <-
   dat_demographics_clinical %>%
   gtsummary::tbl_summary(
-    by = dcq.clinical_score, 
+    by = gender, 
     label = list(
+      sex = "Patient's sex",
       gender = "Patient's gender",
-      age = "Age [years]",
       ethnicity = "Ethnicity",
       sexual_orientation = "Sexual orientation",
-      height_m = "Height [m]",
-      bmi = "BMI [kg/m2]",
       dem.highest_education_collapsed = "Highest education",
-      phq9.sum_score = "PHQ9 score",
-      gad7.sum_score = "GAD7 score",
       phq.Q9_suicidality_binary = "Suicidality",
       mhd.mdd = "Major depressive disorder",
       mhd.gad = "Generalised anxiety disorder",
       mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia_ = "Specific phobia",
+      mhd.specific_phobia = "Specific phobia",
       mhd.agoraphobia = "Agoraphobia",
       mhd.panic_disorder = "Panic disorder",
       mhd.panic_attacks = "Panic attacks",
       mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "Obsessive-compulsive disorder",
       mhd.bdd = "Body dysmorphic disorder",
       mhd.an = "Anorexia nervosa", 
       mhd.atypical_an = "Atypical anorexia nervosa",
@@ -286,12 +283,11 @@ summary_table_clinical <-
       mhd.bed = "Binge-eating disorder"
       ),
     type = list(
+      sex = "categorical",
       gender = "categorical",
-      age = "continuous2",
       ethnicity = "categorical",
       sexual_orientation = "categorical",
       height_m = "continuous2",
-      bmi = "continuous2",
       dem.highest_education_collapsed = "categorical",
       phq9.sum_score = "continuous2",
       gad7.sum_score = "continuous2",
@@ -299,11 +295,12 @@ summary_table_clinical <-
       mhd.mdd = "dichotomous",
       mhd.gad = "dichotomous",
       mhd.social_anxiety = "dichotomous",
-      mhd.specific_phobia_ = "dichotomous",
+      mhd.specific_phobia = "dichotomous",
       mhd.agoraphobia = "dichotomous",
       mhd.panic_disorder = "dichotomous",
       mhd.panic_attacks = "dichotomous",
       mhd.bipolar_disorder = "dichotomous",
+      mhd.ocd = "dichotomous",
       mhd.bdd = "dichotomous",
       mhd.an = "dichotomous", 
       mhd.atypical_an = "dichotomous",
@@ -314,12 +311,13 @@ summary_table_clinical <-
       phq.Q9_suicidality_binary = "Any suicidality",
       mhd.mdd = "MDD",
       mhd.gad = "GAD",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia_ = "Specific phobia",
+      mhd.social_anxiety = "Social anxiety",
+      mhd.specific_phobia = "Specific phobia",
       mhd.agoraphobia = "Agoraphobia",
       mhd.panic_disorder = "Panic disorder",
       mhd.panic_attacks = "Panic attacks",
       mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "OCD",
       mhd.bdd = "BDD",
       mhd.an = "AN", 
       mhd.atypical_an = "Atypical AN",
@@ -339,6 +337,167 @@ summary_table_clinical <-
   add_p() %>%
   add_overall()
 
+summary_table_clinical_gender
+```
+
+```{r}
+summary_table_clinical_sexual_orientation <-
+  dat_demographics_clinical %>%
+  gtsummary::tbl_summary(
+    by = sexual_orientation, 
+    label = list(
+      sex = "Patient's sex",
+      gender = "Patient's gender",
+      ethnicity = "Ethnicity",
+      sexual_orientation = "Sexual orientation",
+      dem.highest_education_collapsed = "Highest education",
+      phq.Q9_suicidality_binary = "Suicidality",
+      mhd.mdd = "Major depressive disorder",
+      mhd.gad = "Generalised anxiety disorder",
+      mhd.social_anxiety = "Social Anxiety",
+      mhd.specific_phobia = "Specific phobia",
+      mhd.agoraphobia = "Agoraphobia",
+      mhd.panic_disorder = "Panic disorder",
+      mhd.panic_attacks = "Panic attacks",
+      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "Obsessive-compulsive disorder",
+      mhd.bdd = "Body dysmorphic disorder",
+      mhd.an = "Anorexia nervosa", 
+      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.bn = "Bulimia nervosa",
+      mhd.bed = "Binge-eating disorder"
+      ),
+    type = list(
+      sex = "categorical",
+      gender = "categorical",
+      ethnicity = "categorical",
+      sexual_orientation = "categorical",
+      dem.highest_education_collapsed = "categorical",
+      phq.Q9_suicidality_binary = "dichotomous",
+      mhd.mdd = "dichotomous",
+      mhd.gad = "dichotomous",
+      mhd.social_anxiety = "dichotomous",
+      mhd.specific_phobia = "dichotomous",
+      mhd.agoraphobia = "dichotomous",
+      mhd.panic_disorder = "dichotomous",
+      mhd.panic_attacks = "dichotomous",
+      mhd.bipolar_disorder = "dichotomous",
+      mhd.ocd = "dichotomous",
+      mhd.bdd = "dichotomous",
+      mhd.an = "dichotomous", 
+      mhd.atypical_an = "dichotomous",
+      mhd.bn = "dichotomous",
+      mhd.bed = "dichotomous"
+      ),
+    value = list(
+      phq.Q9_suicidality_binary = "Any suicidality",
+      mhd.mdd = "MDD",
+      mhd.gad = "GAD",
+      mhd.social_anxiety = "Social anxiety",
+      mhd.specific_phobia = "Specific phobia",
+      mhd.agoraphobia = "Agoraphobia",
+      mhd.panic_disorder = "Panic disorder",
+      mhd.panic_attacks = "Panic attacks",
+      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "OCD",
+      mhd.bdd = "BDD",
+      mhd.an = "AN", 
+      mhd.atypical_an = "Atypical AN",
+      mhd.bn = "BN",
+      mhd.bed = "BED"
+      ),
+    missing_text = "Not answered",
+    digits = list(
+      all_categorical() ~ c(0, 1),
+      all_dichotomous() ~ c(0, 1)),
+    
+    statistic = list(
+      all_categorical() ~ "{n} ({p}%)",
+      all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})",  "{min} - {max}")
+      )
+    ) %>%
+  add_p() %>%
+  add_overall()
+
+summary_table_clinical_sexual_orientation
+```
+
+```{r}
+summary_table_clinical <-
+  dat_demographics_clinical %>%
+  gtsummary::tbl_summary(
+    label = list(
+      sex = "Patient's sex",
+      gender = "Patient's gender",
+      sexual_orientation = "Sexual orientation",
+      mhd.mdd = "Major depressive disorder",
+      mhd.gad = "Generalised anxiety disorder",
+      mhd.social_anxiety = "Social Anxiety",
+      mhd.specific_phobia = "Specific phobia",
+      mhd.agoraphobia = "Agoraphobia",
+      mhd.panic_disorder = "Panic disorder",
+      mhd.panic_attacks = "Panic attacks",
+      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "Obsessive-compulsive disorder",
+      mhd.bdd = "Body dysmorphic disorder",
+      mhd.an = "Anorexia nervosa", 
+      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.bn = "Bulimia nervosa",
+      mhd.bed = "Binge-eating disorder",
+      dem.highest_education_collapsed = "Highest education",
+      ethnicity = "Ethnicity",
+      phq.Q9_suicidality_binary = "Suicidality"
+      ),
+    type = list(
+      sex = "categorical",
+      gender = "categorical",
+      ethnicity = "categorical",
+      sexual_orientation = "categorical",
+      phq.Q9_suicidality_binary = "dichotomous",
+      mhd.mdd = "dichotomous",
+      mhd.gad = "dichotomous",
+      mhd.social_anxiety = "dichotomous",
+      mhd.specific_phobia = "dichotomous",
+      mhd.agoraphobia = "dichotomous",
+      mhd.panic_disorder = "dichotomous",
+      mhd.panic_attacks = "dichotomous",
+      mhd.bipolar_disorder = "dichotomous",
+      mhd.ocd = "dichotomous",
+      mhd.bdd = "dichotomous",
+      mhd.an = "dichotomous", 
+      mhd.atypical_an = "dichotomous",
+      mhd.bn = "dichotomous",
+      mhd.bed = "dichotomous",
+      dem.highest_education_collapsed = "categorical"
+      ),
+    value = list(
+      phq.Q9_suicidality_binary = "Any suicidality",
+      mhd.mdd = "MDD",
+      mhd.gad = "GAD",
+      mhd.social_anxiety = "Social anxiety",
+      mhd.specific_phobia = "Specific phobia",
+      mhd.agoraphobia = "Agoraphobia",
+      mhd.panic_disorder = "Panic disorder",
+      mhd.panic_attacks = "Panic attacks",
+      mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "OCD",
+      mhd.bdd = "BDD",
+      mhd.an = "AN", 
+      mhd.atypical_an = "Atypical AN",
+      mhd.bn = "BN",
+      mhd.bed = "BED"
+      ),
+    missing_text = "Not answered",
+    digits = list(
+      all_categorical() ~ c(0, 1),
+      all_dichotomous() ~ c(0, 1)),
+    
+    statistic = list(
+      all_categorical() ~ "{n} ({p}%)",
+      all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})",  "{min} - {max}")
+      )
+    )
+
 summary_table_clinical
 ```
 
@@ -356,11 +515,29 @@ sect_properties_landscape <- officer::prop_section(
 )
 ```
 
+```{r summary_table_clinical_gender as word document}
+summary_table_clinical_gender %>%
+  as_flex_table() %>%
+  flextable::save_as_docx(
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin_gender", date, ".docx"),
+    pr_section = sect_properties_landscape
+  )
+```
+
+```{r summary_table_clinical_sexual_orientation as word document}
+summary_table_clinical_sexual_orientation %>%
+  as_flex_table() %>%
+  flextable::save_as_docx(
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin_sexual_orientation", date, ".docx"),
+    pr_section = sect_properties_landscape
+  )
+```
+
 ```{r summary_table_clinical as word document}
 summary_table_clinical %>%
   as_flex_table() %>%
   flextable::save_as_docx(
-    path = paste0(LBGTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin", date, ".docx"),
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin", date, ".docx"),
     pr_section = sect_properties_landscape
   )
 ```

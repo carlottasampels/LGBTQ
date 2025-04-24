@@ -230,6 +230,38 @@ dat %>%
   freq(gender)
 ```
 
+# Sex
+```{r Age inspection}
+dat %>%
+  freq(dem.sex)
+```
+# Sex
+
+```{r Sexual orientation recoding}
+dat <- dat %>%
+  mutate(
+    sex =
+      if_else(
+        condition = dem.sex %in%
+          c("Prefer not to answer",
+          "Don't know",
+          "Seen but not answered",
+          "Other"
+          ), 
+        true = NA_character_, 
+        false = as.character(dem.sex),
+        missing = NA_character_
+      ) %>% forcats::fct_infreq()
+  )
+```
+
+
+```{r Sexual orientation checking}
+dat %>%
+  freq(sex)
+```
+
+
 # Age 
 ```{r Age inspection}
 dat %>%
@@ -351,8 +383,8 @@ dat <- dat %>%
           "Prefer not to say",
           "Don't know",
           "Seen but not answered") ~ NA_character_, 
-        dem.what_is_your_ethnic_origin %in% c("Asian or Asian British", "Arab") ~
-          "Asian, Asian British, Arab",
+        dem.what_is_your_ethnic_origin %in% c("Asian or Asian British", "Arab", "Black or Black British", "Other", "Mixed") ~
+          "Not white",
         TRUE ~ as.character(dem.what_is_your_ethnic_origin)
       ) %>% forcats::fct_infreq()
   )
@@ -478,7 +510,7 @@ We are recoding -777 to NA as only 71 (90) GLAD participants have seen but not a
 dat <- dat %>%
   mutate(
     phq.Q9_suicidality_binary_numeric =
-      recode_factor(
+      recode(
         phq9.dead_hurting_thoughts_numeric,
         `-777` = NA_real_,
         `0` = 0,
@@ -536,11 +568,12 @@ psy_dx_factors <- c(
   "mhd.mdd",
   "mhd.gad",
   "mhd.social_anxiety",
-  "mhd.specific_phobia_",
+  "mhd.specific_phobia",
   "mhd.agoraphobia",
   "mhd.panic_disorder",
   "mhd.panic_attacks",
   "mhd.bipolar_disorder",
+  "mhd.ocd",
   "mhd.bdd",
   "mhd.an",
   "mhd.atypical_an",
@@ -556,9 +589,8 @@ psy_dx_numeric <- c(
   "mhd.agoraphobia_numeric",
   "mhd.panic_disorder_numeric",
   "mhd.panic_attacks_numeric",
-  "mhd.ptsd_numeric",
-  "mhd.ocd_numeric",
   "mhd.bipolar_disorder_numeric",
+  "mhd.ocd_numeric",
   "mhd.bdd_numeric",
   "mhd.an_numeric",
   "mhd.atypical_an_numeric",
@@ -606,6 +638,7 @@ dat_rds <- dat %>%
     all_of(phq9_items),
     
     "gender",
+    "sex",
     "age",
     "bmi",
     "height_m",

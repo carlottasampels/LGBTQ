@@ -74,7 +74,7 @@ library(tidyverse)
 # Create output folder
 
 ```{r Create plot output folder}
-#dir.create(paste0(bddtrauma_folder, "tables/"))
+#dir.create(paste0(LGBTQ_folder, "tables/"))
 dir.create(paste0(LGBTQ_folder, "tables/", date))
 ```
 
@@ -125,11 +125,12 @@ attrition_table <- dat %>%
     mhd.mdd,
     mhd.gad,
     mhd.social_anxiety,
-    mhd.specific_phobia_,
+    mhd.specific_phobia,
     mhd.agoraphobia,
     mhd.panic_disorder,
     mhd.panic_attacks,
     mhd.bipolar_disorder,
+    mhd.ocd,
     mhd.bdd,
     mhd.an,
     mhd.atypical_an,
@@ -157,6 +158,7 @@ attrition_table <- dat %>%
       mhd.panic_disorder = "Panic disorder",
       mhd.panic_attacks = "Panic attacks",
       mhd.bipolar_disorder ="Bipolar disorder",
+      mhd.ocd = "Obsessive-compulsive disorder",
       mhd.bdd = "Body dysmorphic disorder",
       mhd.an = "Anorexia nervosa", 
       mhd.atypical_an = "Atypical anorexia nervosa",
