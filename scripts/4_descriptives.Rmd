@@ -68,6 +68,10 @@ dat <- read_rds(
 )
 ```
 
+```{r Gender check}
+dat %>%
+  freq(gender)
+```
 
 # dat_demographics
 
@@ -101,7 +105,6 @@ dat_demographics <- dat %>%
     mhd.bed
   )
 ```
-
 
 # Variable names
 
@@ -261,7 +264,7 @@ summary_table_clinical_gender <-
   gtsummary::tbl_summary(
     by = gender, 
     label = list(
-      sex = "Patient's sex",
+      sex = "Biological sex",
       gender = "Patient's gender",
       ethnicity = "Ethnicity",
       sexual_orientation = "Sexual orientation",
@@ -346,7 +349,7 @@ summary_table_clinical_sexual_orientation <-
   gtsummary::tbl_summary(
     by = sexual_orientation, 
     label = list(
-      sex = "Patient's sex",
+      sex = "Biological sex",
       gender = "Patient's gender",
       ethnicity = "Ethnicity",
       sexual_orientation = "Sexual orientation",
@@ -427,7 +430,7 @@ summary_table_clinical <-
   dat_demographics_clinical %>%
   gtsummary::tbl_summary(
     label = list(
-      sex = "Patient's sex",
+      sex = "Biological sex",
       gender = "Patient's gender",
       sexual_orientation = "Sexual orientation",
       mhd.mdd = "Major depressive disorder",
@@ -535,9 +538,9 @@ summary_table_clinical_sexual_orientation %>%
 
 ```{r summary_table_clinical as word document}
 summary_table_clinical %>%
-  as_flex_table() %>%
   flextable::save_as_docx(
     path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin", date, ".docx"),
     pr_section = sect_properties_landscape
   )
+
 ```

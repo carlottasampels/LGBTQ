@@ -1022,7 +1022,7 @@ dat %>%
 }
 ```
 
-```{r mhd anorexia_nervosa_broad}
+```{r mhd anorexia_nervosa}
 if(GLAD == TRUE | EDGI == TRUE | NBR == TRUE | RAMP == TRUE) {
 dat <- dat %>%
   mutate(
@@ -1036,24 +1036,24 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.anorexia_nervosa_broad =
-      recode_factor(mhd.anorexia_nervosa_broad_numeric,
-                    "0" = "No broad anorexia nervosa",
-                    "1" = "Broad anorexia nervosa",
+    mhd.anorexia_nervosa =
+      recode_factor(mhd.anorexia_nervosa_numeric,
+                    "0" = "No anorexia nervosa",
+                    "1" = "Anorexia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.anorexia_nervosa_broad,
+  freq(mhd.anorexia_nervosa,
        cumul = F)
 }
 ```
 
-```{r mhd anorexia_nervosa_narrow}
+```{r mhd narrow_anorexia_nervosa}
 if(GLAD == TRUE | EDGI == TRUE | NBR == TRUE | RAMP == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.anorexia_nervosa_narrow_numeric = 
+    mhd.narrow_anorexia_nervosa_numeric = 
       case_when(
         mhd.an_numeric == 1 & mhd.atypical_an_numeric == 0 ~ 1,
         mhd.an_numeric == 0 | mhd.atypical_an_numeric == 1 ~ 0
@@ -1061,24 +1061,51 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.anorexia_nervosa_narrow =
-      recode_factor(mhd.anorexia_nervosa_narrow_numeric,
+    mhd.narrow_anorexia_nervosa =
+      recode_factor(mhd.narrow_anorexia_nervosa_numeric,
                     "0" = "No narrow anorexia nervosa",
                     "1" = "Narrow anorexia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.anorexia_nervosa_narrow,
+  freq(mhd.narrow_anorexia_nervosa,
        cumul = F)
 }
 ```
 
-```{r mhd anorexia_nervosa_atypical}
+```{r mhd broad_anorexia_nervosa}
 if(GLAD == TRUE | EDGI == TRUE | NBR == TRUE | RAMP == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.anorexia_nervosa_atypical_numeric = 
+    mhd.broad_anorexia_nervosa_numeric = 
+      case_when(
+        mhd.an_numeric == "1" &
+        mhd.atypical_an_numeric == "1" ~ 1,
+        (mhd.an_numeric == "0" |
+        mhd.atypical_an_numeric == "0") ~ 0
+    )
+  )
+dat <- dat %>%
+  mutate(
+    mhd.broad_anorexia_nervosa =
+      recode_factor(mhd.broad_anorexia_nervosa_numeric,
+                    "0" = "No broad anorexia nervosa",
+                    "1" = "Broad anorexia nervosa",
+                    missing = NA_character_
+                    )
+  )
+dat %>%
+  freq(mhd.broad_anorexia_nervosa,
+       cumul = F)
+}
+```
+
+```{r mhd atypical_anorexia_nervosa}
+if(GLAD == TRUE | EDGI == TRUE | NBR == TRUE | RAMP == TRUE) {
+dat <- dat %>%
+  mutate(
+    mhd.atypical_anorexia_nervosa_numeric = 
       case_when(
         mhd.atypical_an_numeric == 1 & mhd.an_numeric == 0 ~ 1,
         mhd.atypical_an_numeric == 0 | mhd.an_numeric == 1 ~ 0
@@ -1086,15 +1113,15 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.anorexia_nervosa_atypical =
-      recode_factor(mhd.anorexia_nervosa_atypical_numeric,
+    mhd.atypical_anorexia_nervosa =
+      recode_factor(mhd.atypical_anorexia_nervosa_numeric,
                     "0" = "No atypical anorexia nervosa",
                     "1" = "Atypical anorexia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.anorexia_nervosa_atypical,
+  freq(mhd.atypical_anorexia_nervosa,
        cumul = F)
 }
 ```
@@ -1103,9 +1130,10 @@ dat %>%
 if(GLAD == TRUE | EDGI == TRUE | NBR == TRUE | RAMP == TRUE) {
 dat %>%
   select(
-    mhd.anorexia_nervosa_narrow,
-    mhd.anorexia_nervosa_broad,
-    mhd.anorexia_nervosa_atypical,
+    mhd.anorexia_nervosa,
+    mhd.narrow_anorexia_nervosa,
+    mhd.broad_anorexia_nervosa,
+    mhd.atypical_anorexia_nervosa,
     mhd.atypical_an,
     mhd.an,
   )
@@ -1140,11 +1168,11 @@ We assume that participants how did not endorse bulimia nervosa in GLAD may
 also not have an atypical bulimia nervosa. Therefore, we treated NA for atypical
 bulimia nervosa in GLAD (as the answer option atypical BN was not presented) in
 GLAD as 0 (= not having bulimia nervosa)
-```{r edgi mhd bulimia_nervosa_broad}
+```{r edgi mhd bulimia_nervosa}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_broad_numeric =
+    mhd.bulimia_nervosa_numeric =
       case_when(
         mhd.bn_numeric == "1" ~ 1,
         mhd.atypical_bn_numeric == "1" ~ 1, # additional diagnosis in EDGI but not in GLAD
@@ -1154,24 +1182,24 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_broad =
-      recode_factor(mhd.bulimia_nervosa_broad_numeric,
-                    "0" = "No broad bulimia nervosa",
-                    "1" = "Broad bulimia nervosa",
+    mhd.bulimia_nervosa =
+      recode_factor(mhd.bulimia_nervosa_numeric,
+                    "0" = "No bulimia nervosa",
+                    "1" = "Bulimia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.bulimia_nervosa_broad,
+  freq(mhd.bulimia_nervosa,
        cumul = F)
 }
 ```
 
-```{r edgi mhd bulimia_nervosa_narrow}
+```{r edgi mhd narrow_bulimia_nervosa}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_narrow_numeric =
+    mhd.narrow_bulimia_nervosa_numeric =
       case_when(
         mhd.bn_numeric == 1 & (mhd.atypical_bn_numeric == 0 | is.na(mhd.atypical_bn_numeric)) ~ 1,
         mhd.bn_numeric == 0 | mhd.atypical_bn_numeric == 1 ~ 0
@@ -1179,24 +1207,52 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_narrow =
-      recode_factor(mhd.bulimia_nervosa_narrow_numeric,
+    mhd.narrow_bulimia_nervosa =
+      recode_factor(mhd.narrow_bulimia_nervosa_numeric,
                     "0" = "No narrow bulimia nervosa",
                     "1" = "Narrow bulimia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.bulimia_nervosa_narrow,
+  freq(mhd.narrow_bulimia_nervosa,
        cumul = F)
 }
 ```
 
-```{r edgi mhd bulimia_nervosa_atypical}
+```{r edgi mhd broad_bulimia_nervosa}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_atypical_numeric =
+    mhd.broad_bulimia_nervosa_numeric = 
+      case_when(
+        mhd.bn_numeric == "1" &
+        mhd.atypical_bn_numeric == "1" ~ 1,
+        (mhd.bn_numeric == "0" |
+        mhd.atypical_bn_numeric == "0" | 
+        is.na(mhd.atypical_bn_numeric)) ~ 0
+    )
+  )
+dat <- dat %>%
+  mutate(
+    mhd.broad_bulimia_nervosa =
+      recode_factor(mhd.broad_bulimia_nervosa_numeric,
+                    "0" = "No broad bulimia nervosa",
+                    "1" = "Broad bulimia nervosa",
+                    missing = NA_character_
+                    )
+  )
+dat %>%
+  freq(mhd.broad_bulimia_nervosa,
+       cumul = F)
+}
+```
+
+```{r edgi mhd atypical_bulimia_nervosa}
+if(EDGI == TRUE) {
+dat <- dat %>%
+  mutate(
+    mhd.atypical_bulimia_nervosa_numeric =
       case_when(
         mhd.atypical_bn_numeric == "1" & 
         mhd.bn_numeric == "0" ~ 1,
@@ -1207,15 +1263,15 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.bulimia_nervosa_atypical =
-      recode_factor(mhd.bulimia_nervosa_atypical_numeric,
+    mhd.atypical_bulimia_nervosa =
+      recode_factor(mhd.atypical_bulimia_nervosa_numeric,
                     "0" = "No atypical bulimia nervosa",
                     "1" = "Atypical bulimia nervosa",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.bulimia_nervosa_atypical,
+  freq(mhd.atypical_bulimia_nervosa,
        cumul = F)
 }
 ```
@@ -1224,9 +1280,10 @@ dat %>%
 if(GLAD == TRUE | NBR == TRUE | RAMP == TRUE) {
 dat %>%
   select(
-    mhd.bulimia_nervosa_narrow,
-    mhd.bulimia_nervosa_broad,
-    mhd.bulimia_nervosa_atypical,
+    mhd.bulimia_nervosa,
+    mhd.narrow_bulimia_nervosa,
+    mhd.broad_bulimia_nervosa,
+    mhd.atypical_bulimia_nervosa,
     mhd.atypical_bn,
     mhd.bn,
   )
@@ -1261,11 +1318,11 @@ We assume that participants how did not endorse binge eating disorder in GLAD ma
 also not have an atypical binge eating disorder. Therefore, we treated NA for atypical
 binge eating disorder in GLAD (as the answer option atypical BED was not presented) in
 GLAD as 0 (= not having binge eating disorder)
-```{r edgi mhd binge_eating_disorder_broad}
+```{r edgi mhd binge_eating_disorder}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_broad_numeric =
+    mhd.binge_eating_disorder_numeric =
       case_when(
         mhd.bed_numeric == "1" ~ 1,
         mhd.atypical_bed_numeric == "1" ~ 1, # additional diagnosis in EDGI
@@ -1275,24 +1332,24 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_broad =
-      recode_factor(mhd.binge_eating_disorder_broad_numeric,
-                    "0" = "No broad binge eating disorder",
-                    "1" = "Broad binge eating disorder",
+    mhd.binge_eating_disorder =
+      recode_factor(mhd.binge_eating_disorder_numeric,
+                    "0" = "No binge eating disorder",
+                    "1" = "Binge eating disorder",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.binge_eating_disorder_broad,
+  freq(mhd.binge_eating_disorder,
        cumul = F)
 }
 ```
 
-```{r edgi mhd binge_eating_disorder_narrow}
+```{r edgi mhd narrow_binge_eating_disorder}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_narrow_numeric =
+    mhd.narrow_binge_eating_disorder_numeric =
       case_when(
         mhd.bed_numeric == 1 & (mhd.atypical_bed_numeric == 0 | is.na(mhd.atypical_bed_numeric)) ~ 1,
         mhd.bed_numeric == 0 | mhd.atypical_bed_numeric == 1 ~ 0
@@ -1300,24 +1357,52 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_narrow =
-      recode_factor(mhd.binge_eating_disorder_narrow_numeric,
+    mhd.narrow_binge_eating_disorder =
+      recode_factor(mhd.narrow_binge_eating_disorder_numeric,
                     "0" = "No narrow binge eating disorder",
                     "1" = "Narrow binge eating disorder",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.binge_eating_disorder_narrow,
+  freq(mhd.narrow_binge_eating_disorder,
        cumul = F)
 }
 ```
 
-```{r edgi mhd binge_eating_disorder_atypical}
+```{r edgi mhd broad_binge_eating_disorder}
 if(EDGI == TRUE) {
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_atypical_numeric =
+    mhd.broad_binge_eating_disorder_numeric = 
+      case_when(
+        mhd.bed_numeric == "1" &
+        mhd.atypical_bed_numeric == "1" ~ 1,
+        (mhd.bed_numeric == "0" |
+        mhd.atypical_bed_numeric == "0" |
+        is.na(mhd.atypical_bed_numeric)) ~ 0
+    )
+  )
+dat <- dat %>%
+  mutate(
+    mhd.broad_binge_eating_disorder =
+      recode_factor(mhd.broad_binge_eating_disorder_numeric,
+                    "0" = "No broad binge eating disorder",
+                    "1" = "Broad binge eating disorder",
+                    missing = NA_character_
+                    )
+  )
+dat %>%
+  freq(mhd.broad_binge_eating_disorder,
+       cumul = F)
+}
+```
+
+```{r edgi mhd atypical_binge_eating_disorder}
+if(EDGI == TRUE) {
+dat <- dat %>%
+  mutate(
+    mhd.atypical_binge_eating_disorder_numeric =
       case_when(
         mhd.atypical_bed_numeric == "1" & 
         mhd.bed_numeric == "0" ~ 1,
@@ -1328,15 +1413,15 @@ dat <- dat %>%
   )
 dat <- dat %>%
   mutate(
-    mhd.binge_eating_disorder_atypical =
-      recode_factor(mhd.binge_eating_disorder_atypical_numeric,
+    mhd.atypical_binge_eating_disorder =
+      recode_factor(mhd.atypical_binge_eating_disorder_numeric,
                     "0" = "No atypical binge eating disorder",
                     "1" = "Atypical binge eating disorder",
                     missing = NA_character_
                     )
   )
 dat %>%
-  freq(mhd.binge_eating_disorder_atypical,
+  freq(mhd.atypical_binge_eating_disorder,
        cumul = F)
 }
 ```
@@ -1345,10 +1430,11 @@ dat %>%
 if(EDGI == TRUE) {
 dat %>%
   select(
-    mhd.binge_eating_disorder_narrow,
-    mhd.binge_eating_disorder_narrow_numeric,
-    mhd.binge_eating_disorder_broad,
-    mhd.binge_eating_disorder_atypical,
+    mhd.binge_eating_disorder,
+    mhd.narrow_binge_eating_disorder,
+    mhd.narrow_binge_eating_disorder_numeric,
+    mhd.broad_binge_eating_disorder,
+    mhd.atypical_binge_eating_disorder,
     mhd.atypical_bed,
     mhd.bed,
   )

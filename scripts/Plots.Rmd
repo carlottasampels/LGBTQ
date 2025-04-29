@@ -198,72 +198,6 @@ p6 <- ggplot(dat, aes(x = sexual_orientation, y = age, fill = sexual_orientation
 (p2 + p4 + p6)
 ```
 
-```{r gender}
-# Liste der Störungsvariablen
-stoerungen <- c("mhd.mdd", "mhd.gad", "mhd.social_anxiety", "mhd.specific_phobia",
-                "mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks",
-                "mhd.bipolar_disorder", "mhd.ocd", "mhd.bdd", "mhd.an", 
-                "mhd.atypical_an", "mhd.bn", "mhd.bed")
-
-# Alle möglichen Gendertypen extrahieren
-alle_gender <- levels(dat$gender)
-
-# Leeres Dataframe vorbereiten
-ergebnistabelle_gender <- data.frame(matrix(0, nrow = length(stoerungen), ncol = length(alle_gender)))
-rownames(ergebnistabelle_gender) <- stoerungen
-colnames(ergebnistabelle_gender) <- alle_gender
-
-# Füllen der Tabelle
-for (stoerung in stoerungen) {
-  # Nur Personen mit der Störung (angenommen: "Not XYZ" ist der 1. Level)
-  betroffene <- dat[[stoerung]] != levels(dat[[stoerung]])[1]
-  
-  # Häufigkeiten nach Gender
-  counts <- table(dat$gender[betroffene])
-  
-  # In Tabelle eintragen
-  for (g in names(counts)) {
-    ergebnistabelle_gender[stoerung, g] <- counts[[g]]
-  }
-}
-
-# Ausgabe der Tabelle
-print(ergebnistabelle_gender)
-```
-
-```{r Sexuell orientation}
-# Liste der Störungsvariablen
-stoerungen <- c("mhd.mdd", "mhd.gad", "mhd.social_anxiety", "mhd.specific_phobia",
-                "mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks",
-                "mhd.bipolar_disorder", "mhd.ocd", "mhd.bdd", "mhd.an", 
-                "mhd.atypical_an", "mhd.bn", "mhd.bed")
-
-# Alle möglichen sexuellen Orientierungen extrahieren
-alle_orientierungen <- levels(dat$sexual_orientation)
-
-# Leeres Dataframe zum Füllen (Zeilen = Störungen, Spalten = Orientierungen)
-ergebnistabelle <- data.frame(matrix(0, nrow = length(stoerungen), ncol = length(alle_orientierungen)))
-rownames(ergebnistabelle) <- stoerungen
-colnames(ergebnistabelle) <- alle_orientierungen
-
-# Füllen der Tabelle
-for (stoerung in stoerungen) {
-  # Annahme: Erster Level ist "Not XYZ"
-  betroffene <- dat[[stoerung]] != levels(dat[[stoerung]])[1]
-  
-  # Tabelle der Häufigkeiten
-  counts <- table(dat$sexual_orientation[betroffene])
-  
-  # Eintragen in Ergebnis-Tabelle
-  for (orientation in names(counts)) {
-    ergebnistabelle[stoerung, orientation] <- counts[[orientation]]
-  }
-}
-
-# Ausgabe der Tabelle
-print(ergebnistabelle)
-
-```
 
 ```{r age}
 ggplot(dat, aes(x = age)) +
@@ -359,4 +293,71 @@ ggplot(dat, aes(x = "", y = gad7.sum_score)) +
   geom_boxplot(fill = "blue", color = "black") +
   labs(title = "Boxplot of GAD-7", x = "", y = "GAD-7") +
   theme_minimal()
+```
+
+```{r gender}
+# Liste der Störungsvariablen
+stoerungen <- c("mhd.mdd", "mhd.gad", "mhd.social_anxiety", "mhd.specific_phobia",
+                "mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks",
+                "mhd.bipolar_disorder", "mhd.ocd", "mhd.bdd", "mhd.an", 
+                "mhd.atypical_an", "mhd.bn", "mhd.bed")
+
+# Alle möglichen Gendertypen extrahieren
+alle_gender <- levels(dat$gender)
+
+# Leeres Dataframe vorbereiten
+ergebnistabelle_gender <- data.frame(matrix(0, nrow = length(stoerungen), ncol = length(alle_gender)))
+rownames(ergebnistabelle_gender) <- stoerungen
+colnames(ergebnistabelle_gender) <- alle_gender
+
+# Füllen der Tabelle
+for (stoerung in stoerungen) {
+  # Nur Personen mit der Störung (angenommen: "Not XYZ" ist der 1. Level)
+  betroffene <- dat[[stoerung]] != levels(dat[[stoerung]])[1]
+  
+  # Häufigkeiten nach Gender
+  counts <- table(dat$gender[betroffene])
+  
+  # In Tabelle eintragen
+  for (g in names(counts)) {
+    ergebnistabelle_gender[stoerung, g] <- counts[[g]]
+  }
+}
+
+# Ausgabe der Tabelle
+print(ergebnistabelle_gender)
+```
+
+```{r Sexuell orientation}
+# Liste der Störungsvariablen
+stoerungen <- c("mhd.mdd", "mhd.gad", "mhd.social_anxiety", "mhd.specific_phobia",
+                "mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks",
+                "mhd.bipolar_disorder", "mhd.ocd", "mhd.bdd", "mhd.an", 
+                "mhd.atypical_an", "mhd.bn", "mhd.bed")
+
+# Alle möglichen sexuellen Orientierungen extrahieren
+alle_orientierungen <- levels(dat$sexual_orientation)
+
+# Leeres Dataframe zum Füllen (Zeilen = Störungen, Spalten = Orientierungen)
+ergebnistabelle <- data.frame(matrix(0, nrow = length(stoerungen), ncol = length(alle_orientierungen)))
+rownames(ergebnistabelle) <- stoerungen
+colnames(ergebnistabelle) <- alle_orientierungen
+
+# Füllen der Tabelle
+for (stoerung in stoerungen) {
+  # Annahme: Erster Level ist "Not XYZ"
+  betroffene <- dat[[stoerung]] != levels(dat[[stoerung]])[1]
+  
+  # Tabelle der Häufigkeiten
+  counts <- table(dat$sexual_orientation[betroffene])
+  
+  # Eintragen in Ergebnis-Tabelle
+  for (orientation in names(counts)) {
+    ergebnistabelle[stoerung, orientation] <- counts[[orientation]]
+  }
+}
+
+# Ausgabe der Tabelle
+print(ergebnistabelle)
+
 ```
