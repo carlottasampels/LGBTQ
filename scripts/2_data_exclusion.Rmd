@@ -62,9 +62,9 @@ source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
 ## Load packages
 
 ```{r Load packages}
-library(openxlsx)
+#library(openxlsx)
 library(gtsummary)
-library(ggconsort)
+#library(ggconsort)
 library(tidyverse)
 ```
 
@@ -184,24 +184,24 @@ study_cohorts <-
       y =  nogender,
       by = "ID"),
     
-    nogender.nosex = nogender %>%
-      drop_na(sex),
-    
-     missing_sex = anti_join(
-      x = nogender,
-      y =  nogender.nosex,
-      by = "ID"),
-    
-    
-    nogender.nosex.nomhd = 
-      nogender.nosex %>%
+    nogender.nomhd = 
+      nogender %>%
       filter(
       !if_all(all_of(psy_dx_factors), is.na)
         ),
     
     missing_mhd = anti_join(
-      nogender.nosex,
-      nogender.nosex.nomhd,
+      x = nogender,
+      y = nogender.nomhd,
+      by = "ID"),
+    
+    nogender.nomhd.nosexualorientation = 
+      nogender.nomhd %>%
+       drop_na(sexual_orientation),
+    
+    missing_sexualorientation = anti_join(
+      nogender.nomhd,
+      nogender.nomhd.nosexualorientation,
       by = "ID")
     
   ) %>%
@@ -211,14 +211,14 @@ study_cohorts <-
       "Consented",
     nogender =
       "With gender",
-    nogender.nosex =
-      "With gender, sex",
-    nogender.nosex.nomhd =
-      "With gender, sex, MHD",
+    nogender.nomhd =
+      "With gender, MHD",
+    nogender.nomhd.nosexualorientation =
+      "With gender, MHD, sexual orientation",
     
     missing_gender = "Excluded: No gender",
-    missing_sex = "Ecluded: No sex",
-    missing_mhd = "Excluded No mental health diagnosis"
+    missing_mhd = "Excluded No mental health diagnosis",
+    missing_sexualorientation = "Excluded: No sexual orientation"
   )
 ```
 
@@ -249,32 +249,18 @@ study_consort <- study_cohorts %>%
       nogender)
   ) %>%
   consort_box_add(
-    "missing_sex",
+    "missing_mhd",
     x = 5,
     y = -25,
-    label =  cohort_count_adorn(study_cohorts, missing_sex)
+    label =  cohort_count_adorn(study_cohorts, missing_mhd)
   ) %>%
   consort_box_add(
-    name = "nogender.nosex",
+    name = "nogender.nomhd",
     x = 0,
     y = -30,
     label =  cohort_count_adorn(
       study_cohorts,
-      nogender.nosex)
-    ) %>%
-  consort_box_add(
-    "missing_mhd",
-    x = 5,
-    y = -35,
-    label =  cohort_count_adorn(study_cohorts, missing_mhd)
-  ) %>%
-  consort_box_add(
-    name = "nogender.nosex.nomhd",
-    x = 0,
-    y = -40,
-    label =  cohort_count_adorn(
-      study_cohorts,
-      nogender.nosex.nomhd)
+      nogender.nomhd)
   ) %>%
   consort_arrow_add(
     end = "nogender", end_side = "top", start_x = 0, start_y = -10
@@ -283,16 +269,10 @@ study_consort <- study_cohorts %>%
     end = "missing_gender", end_side = "left", start_x = 0, start_y = -15
   ) %>%
   consort_arrow_add(
-    end = "nogender.nosex", end_side = "top", start_x = 0, start_y = -20
+    end = "nogender.nomhd", end_side = "top", start_x = 0, start_y = -20
   ) %>%
   consort_arrow_add(
-    end = "missing_sex", end_side = "left", start_x = 0, start_y = -25
-  ) %>%
-  consort_arrow_add(
-    end = "nogender.nosex.nomhd", end_side = "top", start_x = 0, start_y = -30
-  ) %>%
-  consort_arrow_add(
-    end = "missing_mhd", end_side = "left", start_x = 0, start_y = -35
+    end = "missing_mhd", end_side = "left", start_x = 0, start_y = -25
   )
 ```
 
@@ -374,62 +354,89 @@ missing_gender
 
 `r abs(missing_gender)` participants excluded due to missing gender.
 
-## sex
+```{r missing disorder}
+Personen <- nogender %>%
+  filter(
+    #gender == "Trans woman",
+    if_all(all_of(psy_dx_factors), is.na) | !(mhd.mdd == "MDD" |
+    mhd.gad == "GAD" | mhd.agoraphobia == "Agoraphobia" | mhd.social_anxiety == "Social anxiety" |
+      mhd.specific_phobia == "Specific phobia" |
+      mhd.bipolar_disorder == "Bipolar disorder"),
+    is.na(cidia.diagnosis) | cidia.diagnosis == "No GAD diagnosis",
+    is.na(cidid.mdd_diagnosis) | cidid.mdd_diagnosis == "No MDD diagnosis",
+    is.na(phq9.sum_score) | phq9.sum_score < 10,
+    is.na(gad7.sum_score) | gad7.sum_score < 10,
+  )
 
-```{r Exclusion age}
-dim(nogender)
+nrow(Personen)
 
-nogender.nosex <- nogender %>%
-  drop_na(sex)
+Personen
+t(Personen)
 
-missing_sex <- nrow(nogender.nosex)-nrow(nogender)
-missing_sex
 ```
 
 ## mhd
 
 
-```{r Exclusion mhd}
-dim(nogender.nosex)
+```{r Exclusion no disorder}
+dim(nogender)
 
-nogender.nosex.nomhd <- nogender.nosex %>%
-  filter(
-    if_all(all_of(psy_dx_factors), is.na)
-  )
+nogender.nodisorder <- anti_join(nogender, Personen, by = "ID")
 
-missing_mhd <- 
-  nrow(nogender.nosex) - 
-  nrow(nogender.nosex.nomhd)
-missing_mhd
+missing_disorder <- 
+  nrow(nogender) - 
+  nrow(nogender.nodisorder)
+missing_disorder
+```
+`r abs(missing_disorder)` participants excluded due to missing mhd, cidia and cidid.
+
+
+## sexual orientation
+
+
+```{r Exclusion sexual orientation}
+dim(nogender.nodisorder)
+
+nogender.nodisorder.nosexualorientation <- nogender.nodisorder %>%
+  drop_na(sexual_orientation)
+
+missing_sexualorientation <- 
+  nrow(nogender.nodisorder) - 
+  nrow(nogender.nodisorder.nosexualorientation)
+missing_sexualorientation
 ```
 
-`r abs(missing_mhd)` participants excluded due to missing mhd.
-
-```{r Final}
-nrow(nogender.nosex.nomhd)
-nrow(nogender.nosex)
-
-nrow(nogender.nosex[nogender.nosex$gender == "Trans woman", ])-nrow(nogender.nosex.nomhd[nogender.nosex.nomhd$gender == "Trans woman", ])
-```
 
 ## Final
 
-Final *n* = `r abs(nrow(nogender.noage.noethnicity.nosexuality.nobmiheight.noedu.nomhd))`
+Final *n* = `r abs(nrow(nogender.nodisorder))`
 
 Copy tibble after exclusion
 
 ```{r Move data frame}
-dat_after_exclusion <- 
-  nogender.nosex.nomhd
-nrow(dat_after_exclusion)
+dat_after_exclusion_gender <- 
+  nogender.nodisorder
+nrow(dat_after_exclusion_gender)
+```
+```{r Move data frame}
+dat_after_exclusion_sexual_orientation <- 
+  nogender.nodisorder.nosexualorientation
+nrow(dat_after_exclusion_sexual_orientation)
 ```
 
 # Write rds file
 
 ```{r write rds file exclusion}
-dat_after_exclusion %>%
+dat_after_exclusion_gender %>%
   write_rds(
-  file =  paste0(filepath_cleaned_data,"dat_after_exclusion", date, ".rds")
+  file =  paste0(filepath_cleaned_data,"dat_after_exclusion_gender", date, ".rds")
+  )
+```
+
+```{r write rds file exclusion}
+dat_after_exclusion_sexual_orientation %>%
+  write_rds(
+  file =  paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
   )
 ```
 

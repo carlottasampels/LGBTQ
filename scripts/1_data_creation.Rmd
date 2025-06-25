@@ -202,150 +202,15 @@ dat_phq9 <- dat %>%
 
 dat_phq9 %>% names
 ```
-## Cidia items vector
 
-```{r cidia_items}
-cidia_items_numeric <-
-  c(
-#"cidia.antianxiety_medication_numeric",
-#"cidia.cbt_numeric",
-"cidia.control_difficult_find_worry_numeric",
-"cidia.counselling_numeric",
-"cidia.did_you_find_the_medication_helpful_numeric",
-"cidia.did_you_take_your_medication_as_advised_numeric",
-"cidia.drugs_or_alcohol_numeric",
-"cidia.easily_tired_numeric",
-"cidia.enrolled_psychotherapy_nhs_funded_numeric",
-"cidia.family_therapy_numeric",
-"cidia.felt_worried_tense_anxious_numeric",
-"cidia.felt_worried_tense_problems_numeric",
-"cidia.group_therapy_numeric",
-"cidia.guided_selfhelp_numeric",
-"cidia.having_tense_sore_or_aching_muscles_numeric",
-"cidia.job_security_failing_health_numeric",
-"cidia.keyed_up_or_on_edge_numeric",
-"cidia.life_lasting_estimate_number_numeric",
-"cidia.life_lasting_month_longer_numeric",
-"cidia.life_lasting_month_longer.1_numeric",
-"cidia.life_lasting_months_kind_numeric",
-"cidia.longest_period_continued_kind.2_numeric",
-"cidia.longest_period_continued_kind.3_numeric",
-"cidia.longest_period_continued_kind.4_numeric",
-"cidia.longest_period_worry_categorical_combined_numeric",
-"cidia.lot_people_things_situation_numeric",
-"cidia.matter_hard_strong_mind_numeric",
-"cidia.mind_difficulty_keeping_numeric",
-"cidia.mind_worries_time_numeric",
-"cidia.mindfulness_numeric",
-"cidia.more_irritable_than_usual_numeric",
-"cidia.number_of_episodes_numeric",
-"cidia.often_having_trouble_falling_or_staying_asleep_numeric",
-"cidia.people_period_worry_stronger_numeric",
-"cidia.prescribed_medication_numeric",
-"cidia.professional_problems_numeric",
-"cidia.psychotherapy_numeric",
-"cidia.regular_physical_exercise_numeric",
-"cidia.relationship_therapy_numeric",
-"cidia.restless_numeric",
-"cidia.stop_worrying_difficult_find_numeric",
-"cidia.structured_wellbeing_activity_numeric",
-"cidia.talking_therapy_complete_psychotherapy_numeric",
-"cidia.talking_therapy_helpful_find_numeric",
-"cidia.therapy_dont_know_numeric",
-"cidia.therapy_none_numeric",
-"cidia.therapy_other_numeric",
-"cidia.therapy_pnta_numeric",
-"cidia.treatment_none_numeric",
-"cidia.treatment_pnta_numeric",
-"cidia.unprescribed_medication_numeric",
-"cidia.workshops_numeric",
-"cidia.did_you_worry_most_days_numeric"
-  )
-
-cidia_items <-
-  c(
-"cidia.felt_worried_tense_anxious",
-"cidia.longest_period_continued_kind",
-"cidia.longest_period_continued_kind",
-"cidia.lot_people_things_situation",
-"cidia.people_period_worry_stronger",
-"cidia.did_you_worry_most_days",
-"cidia.job_security_failing_health",
-"cidia.stop_worrying_difficult_find",
-"cidia.mind_worries_time",
-"cidia.matter_hard_strong_mind",
-"cidia.control_difficult_find_worry",
-"cidia.restless",
-"cidia.keyed_up_or_on_edge",
-"cidia.easily_tired",
-"cidia.mind_difficulty_keeping",
-"cidia.more_irritable_than_usual",
-"cidia.having_tense_sore_or_aching_muscles",
-"cidia.often_having_trouble_falling_or_staying_asleep",
-"cidia.felt_worried_tense_problems",
-"cidia.longest_period_continued_kind",
-"cidia.longest_period_continued_kind",
-"cidia.life_lasting_month_longer",
-"cidia.life_lasting_month_longer",
-"cidia.age_fine_put_years.txt_unc",
-"cidia.age_fine_put_years.txt_unc",
-"cidia.age_fine_put_years.txt_unc",
-"cidia.age_fine_put_years.txt_unc",
-"cidia.longest_period_continued_kind",
-"cidia.life_lasting_months_kind",
-"cidia.life_lasting_estimate_number",
-"cidia.did_you_take_your_medication_as_advised",
-"cidia.did_you_find_the_medication_helpful",
-"cidia.professional_problems",
-"cidia.prescribed_medication",
-"cidia.antianxiety_medication",
-"cidia.unprescribed_medication",
-"cidia.drugs_or_alcohol",
-"cidia.psychotherapy",
-"cidia.structured_wellbeing_activity",
-"cidia.regular_physical_exercise",
-"cidia.treatment_none",
-"cidia.treatment_pnta",
-"cidia.counselling",
-"cidia.group_therapy",
-"cidia.cbt",
-"cidia.mindfulness",
-"cidia.guided_selfhelp",
-"cidia.workshops",
-"cidia.online_therapy",
-"cidia.family_therapy",
-"cidia.relationship_therapy",
-"cidia.therapy_other",
-"cidia.therapy_none",
-"cidia.therapy_dont_know",
-"cidia.therapy_pnta",
-"cidia.enrolled_psychotherapy_nhs_funded",
-"cidia.talking_therapy_complete_psychotherapy",
-"cidia.talking_therapy_helpful_find",
-"cidia.age_fine_put_years.txt",
-"cidia.age_fine_put_years.txt",
-"cidia.age_fine_put_years.txt",
-"cidia.age_fine_put_years.txt",
-"cidia.number_of_episodes_numeric",
-"cidia.longest_period_continued_kind.years",
-"cidia.longest_period_continued_kind.years",
-"cidia.longest_period_continued_kind.calc",
-"cidia.longest_period_worry_cont_combined",
-"cidia.longest_period_worry_categorical_clean",
-"cidia.longest_period_worry_categorical_combined"
-  )
+```{r cidia.diagnosis check}
+dat %>%
+  freq(cidia.diagnosis)
 ```
 
-# dat_cidia
-
-```{r dat_phq9}
-dat_cidia <- dat %>%
-  select(
-    all_of(cidia_items_numeric)
-  ) %>%
-  as.data.frame()
-
-dat_cidia %>% names
+```{r cidid.diagnosis check}
+dat %>%
+  freq(cidid.mdd_diagnosis)
 ```
 
 # Gender
@@ -391,12 +256,13 @@ dat %>%
   freq(gender)
 ```
 
+
 # Biological sex
 ```{r Age inspection}
 dat %>%
   freq(dem.sex)
 ```
-# Sex
+
 
 ```{r Sexual orientation recoding}
 dat <- dat %>%
@@ -518,7 +384,7 @@ dat %>%
 ```
 Plot 
 
-```{r Correlation BMI and height plot}
+```{r Correlation BMI and height plot, eval=FALSE, include=FALSE}
 dat %>%
 ggplot(
   aes(x=bmi, y=height_m)) + 
@@ -626,7 +492,7 @@ dat %>%
 
 ## Calculate Cronbach's alpha
 
-```{r alpha}
+```{r alpha, eval=FALSE, include=FALSE}
 alpha_results <- psych::alpha(
   x = dat_phq9,
   n.iter = 1000, 
@@ -638,7 +504,7 @@ alpha_results
 ```
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 ltm::cronbach.alpha(
   data = dat_phq9,
   CI = TRUE,
@@ -797,7 +663,8 @@ dat_rds <- dat %>%
     "phq.Q9_suicidality_binary",
     all_of(phq9_items_numeric),
     all_of(phq9_items),
-    all_of(cidia_items_numeric),
+    "cidia.diagnosis",
+    "cidid.mdd_diagnosis",
     
     "gender",
     "sex",

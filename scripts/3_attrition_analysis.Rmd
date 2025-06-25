@@ -58,6 +58,7 @@ Install necessary packages
 #install.packages("summarytools")
 #install.packages("tidyverse")
 #install.packages("gt")
+#install.packages("officer")
 ```
 
 Load necessary packages
