@@ -1,0 +1,239 @@
+Variable;group1;group2;test;xsquare;df;pvalue;padjust;adjust;sig
+Age;Cis woman;Cis man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis woman;Non-binary;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis woman;Trans man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis woman;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis woman;Trans woman;Fisher;NA;NA;9,57904209579042e-02;1,00000000000000e+00;bonferroni;
+Age;Cis man;Non-binary;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis man;Trans man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis man;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Cis man;Trans woman;Fisher;NA;NA;3,59964003599640e-03;5,39946005399460e-02;bonferroni;.
+Age;Non-binary;Trans man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Non-binary;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Non-binary;Trans woman;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Trans man;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Trans man;Trans woman;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+Age;Self-define;Trans woman;Fisher;NA;NA;7,09929007099290e-02;1,00000000000000e+00;bonferroni;
+Biological sex;Cis woman;Cis man;Chi-squared;5,20798515964066e+04;1;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+Biological sex;Cis woman;Non-binary;Fisher;NA;NA;1,04153917576903e-249;1,56230876365354e-248;bonferroni;***
+Biological sex;Cis woman;Self-define;Fisher;NA;NA;6,46073394447766e-144;9,69110091671649e-143;bonferroni;***
+Biological sex;Cis woman;Trans woman;Fisher;NA;NA;3,65728039402986e-278;5,48592059104479e-277;bonferroni;***
+Biological sex;Cis man;Non-binary;Chi-squared;9,65466910099187e+03;1;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+Biological sex;Cis man;Trans man;Chi-squared;1,09513976478879e+04;1;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+Biological sex;Cis man;Self-define;Chi-squared;8,71993090643951e+03;1;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+Biological sex;Non-binary;Trans man;Chi-squared;5,75318731400176e+01;1;3,32546549053371e-14;4,98819823580057e-13;bonferroni;***
+Biological sex;Non-binary;Self-define;Chi-squared;3,03699386318178e+00;1;8,13865043570977e-02;1,00000000000000e+00;bonferroni;
+Biological sex;Non-binary;Trans woman;Chi-squared;3,28760572934638e+02;1;1,78952488967175e-73;2,68428733450763e-72;bonferroni;***
+Biological sex;Trans man;Self-define;Chi-squared;7,19626149921868e+01;1;2,19313239078893e-17;3,28969858618340e-16;bonferroni;***
+Biological sex;Trans man;Trans woman;Chi-squared;4,21009651445649e+02;1;1,47124266378877e-93;2,20686399568316e-92;bonferroni;***
+Biological sex;Self-define;Trans woman;Chi-squared;1,93278928810243e+02;1;6,11847298109846e-44;9,17770947164768e-43;bonferroni;***
+NA;Cis woman;Cis man;Chi-squared;2,84370909009019e+03;4;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+NA;Cis woman;Non-binary;Chi-squared;3,50603029401480e+03;4;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+NA;Cis woman;Trans man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Cis woman;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Cis woman;Trans woman;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Cis man;Non-binary;Chi-squared;3,94832397518497e+03;4;0,00000000000000e+00;0,00000000000000e+00;bonferroni;***
+NA;Cis man;Trans man;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Cis man;Self-define;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Cis man;Trans woman;Fisher;NA;NA;9,99900009999000e-05;1,49985001499850e-03;bonferroni;**
+NA;Non-binary;Trans man;Chi-squared;2,04549769259757e+01;4;4,06013817952502e-04;6,09020726928753e-03;bonferroni;**
+NA;Non-binary;Self-define;Chi-squared;3,65926289279136e+01;4;2,18517366133331e-07;3,27776049199996e-06;bonferroni;***
+NA;Non-binary;Trans woman;Chi-squared;8,24705081718860e+00;4;8,29362822182811e-02;1,00000000000000e+00;bonferroni;
+NA;Trans man;Self-define;Chi-squared;5,11138760105138e+01;4;2,11320120535102e-10;3,16980180802653e-09;bonferroni;***
+NA;Trans man;Trans woman;Chi-squared;1,16640825832822e+01;4;2,00321300631872e-02;3,00481950947808e-01;bonferroni;
+NA;Self-define;Trans woman;Chi-squared;2,91886290579071e+00;4;5,71494027499249e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Cis woman;Cis man;Chi-squared;4,99233407154599e-03;1;9,43671181213656e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Cis woman;Non-binary;Chi-squared;1,35796278637898e+01;1;2,28653561732354e-04;3,42980342598532e-03;bonferroni;**
+Ethnicity;Cis woman;Trans man;Chi-squared;1,48310332972963e+00;1;2,23289608112474e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Cis woman;Self-define;Chi-squared;9,48570390414796e+00;1;2,07079148608166e-03;3,10618722912249e-02;bonferroni;*
+Ethnicity;Cis woman;Trans woman;Chi-squared;7,45413698916155e-01;1;3,87932176978095e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Cis man;Non-binary;Chi-squared;1,26252838440668e+01;1;3,80564090573728e-04;5,70846135860592e-03;bonferroni;**
+Ethnicity;Cis man;Trans man;Chi-squared;1,48363372704654e+00;1;2,23206856307483e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Cis man;Self-define;Chi-squared;9,26513196166950e+00;1;2,33557650495344e-03;3,50336475743016e-02;bonferroni;*
+Ethnicity;Cis man;Trans woman;Chi-squared;7,26451221073013e-01;1;3,94035909984427e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Non-binary;Trans man;Chi-squared;3,05568096710120e-01;1;5,80412598135641e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Non-binary;Self-define;Chi-squared;3,32255359444179e-01;1;5,64334058965343e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Non-binary;Trans woman;Chi-squared;2,71283579239712e+00;1;9,95438952063973e-02;1,00000000000000e+00;bonferroni;
+Ethnicity;Trans man;Self-define;Chi-squared;9,46483943586887e-01;1;3,30615896922643e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Trans man;Trans woman;Chi-squared;1,58170826893585e+00;1;2,08514802660242e-01;1,00000000000000e+00;bonferroni;
+Ethnicity;Self-define;Trans woman;Chi-squared;3,43979808119484e+00;1;6,36434703780075e-02;9,54652055670112e-01;bonferroni;
+Highest Education;Cis woman;Cis man;Chi-squared;8,89824224286260e+01;4;2,16590785636732e-18;3,24886178455098e-17;bonferroni;***
+Highest Education;Cis woman;Non-binary;Chi-squared;9,83262973900030e+01;4;2,23408965582308e-20;3,35113448373462e-19;bonferroni;***
+Highest Education;Cis woman;Trans man;Chi-squared;1,47031910651320e+02;4;8,80390897936313e-31;1,32058634690447e-29;bonferroni;***
+Highest Education;Cis woman;Self-define;Chi-squared;2,31000955964155e+01;4;1,20927021307311e-04;1,81390531960966e-03;bonferroni;**
+Highest Education;Cis woman;Trans woman;Fisher;NA;NA;4,65953404659534e-02;6,98930106989301e-01;bonferroni;
+Highest Education;Cis man;Non-binary;Chi-squared;1,27291515871140e+02;4;1,47753767554319e-26;2,21630651331479e-25;bonferroni;***
+Highest Education;Cis man;Trans man;Chi-squared;1,46977083769797e+02;4;9,04526404932874e-31;1,35678960739931e-29;bonferroni;***
+Highest Education;Cis man;Self-define;Chi-squared;2,80286751260693e+01;4;1,23071276347799e-05;1,84606914521698e-04;bonferroni;***
+Highest Education;Cis man;Trans woman;Fisher;NA;NA;5,08949105089491e-02;7,63423657634237e-01;bonferroni;
+Highest Education;Non-binary;Trans man;Chi-squared;4,34393496681781e+01;4;8,38816920182814e-09;1,25822538027422e-07;bonferroni;***
+Highest Education;Non-binary;Self-define;Chi-squared;7,45414440953207e+00;4;1,13748412407545e-01;1,00000000000000e+00;bonferroni;
+Highest Education;Non-binary;Trans woman;Fisher;NA;NA;5,99940005999400e-03;8,99910008999100e-02;bonferroni;
+Highest Education;Trans man;Self-define;Chi-squared;3,69910301167728e+01;4;1,80898340841519e-07;2,71347511262279e-06;bonferroni;***
+Highest Education;Trans man;Trans woman;Fisher;NA;NA;1,29987001299870e-03;1,94980501949805e-02;bonferroni;*
+Highest Education;Self-define;Trans woman;Fisher;NA;NA;1,32486751324868e-01;1,00000000000000e+00;bonferroni;
+Social Anxiety;Cis woman;Cis man;Chi-squared;3,17851966195890e+00;1;7,46122977244538e-02;1,00000000000000e+00;bonferroni;
+Social Anxiety;Cis woman;Non-binary;Chi-squared;6,70848715851742e+01;1;2,60066471435904e-16;3,90099707153856e-15;bonferroni;***
+Social Anxiety;Cis woman;Trans man;Chi-squared;5,39267398983747e+01;1;2,08106124027676e-13;3,12159186041514e-12;bonferroni;***
+Social Anxiety;Cis woman;Self-define;Chi-squared;2,22998078476757e+01;1;2,33229944797580e-06;3,49844917196370e-05;bonferroni;***
+Social Anxiety;Cis woman;Trans woman;Chi-squared;7,61215014117148e+00;1;5,79763119455187e-03;8,69644679182781e-02;bonferroni;
+Social Anxiety;Cis man;Non-binary;Chi-squared;5,20199344225872e+01;1;5,49400369680398e-13;8,24100554520596e-12;bonferroni;***
+Social Anxiety;Cis man;Trans man;Chi-squared;4,60348994085258e+01;1;1,16165085172143e-11;1,74247627758214e-10;bonferroni;***
+Social Anxiety;Cis man;Self-define;Chi-squared;1,80512223977188e+01;1;2,15040530250081e-05;3,22560795375122e-04;bonferroni;***
+Social Anxiety;Cis man;Trans woman;Chi-squared;6,40242743636301e+00;1;1,13964437013822e-02;1,70946655520733e-01;bonferroni;
+Social Anxiety;Non-binary;Trans man;Chi-squared;3,15583447751696e+00;1;7,56560007451463e-02;1,00000000000000e+00;bonferroni;
+Social Anxiety;Non-binary;Self-define;Chi-squared;3,40561450134194e-03;1;9,53463753196551e-01;1,00000000000000e+00;bonferroni;
+Social Anxiety;Non-binary;Trans woman;Chi-squared;1,82222904013670e-02;1;8,92619809208083e-01;1,00000000000000e+00;bonferroni;
+Social Anxiety;Trans man;Self-define;Chi-squared;2,33753812559999e+00;1;1,26288999848769e-01;1,00000000000000e+00;bonferroni;
+Social Anxiety;Trans man;Trans woman;Chi-squared;3,78713965824558e-01;1;5,38292304877377e-01;1,00000000000000e+00;bonferroni;
+Social Anxiety;Self-define;Trans woman;Chi-squared;3,11292562183049e-02;1;8,59952327916524e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Cis woman;Cis man;Chi-squared;1,40380621137968e+02;1;2,19776613495476e-32;3,29664920243214e-31;bonferroni;***
+Specific Phobia;Cis woman;Non-binary;Chi-squared;1,04861041336667e+00;1;3,05827338306586e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Cis woman;Trans man;Chi-squared;7,22193804006720e-25;1;9,99999999999322e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Cis woman;Self-define;Chi-squared;4,14346058978467e+00;1;4,17956422365001e-02;6,26934633547502e-01;bonferroni;
+Specific Phobia;Cis woman;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Specific Phobia;Cis man;Non-binary;Chi-squared;3,86603741685516e+01;1;5,04344803069448e-10;7,56517204604173e-09;bonferroni;***
+Specific Phobia;Cis man;Trans man;Chi-squared;7,78296615524969e+00;1;5,27411319984591e-03;7,91116979976887e-02;bonferroni;
+Specific Phobia;Cis man;Self-define;Chi-squared;3,41379135592611e+01;1;5,13411382419474e-09;7,70117073629212e-08;bonferroni;***
+Specific Phobia;Cis man;Trans woman;Fisher;NA;NA;2,87270434438040e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Non-binary;Trans man;Chi-squared;2,53221215638048e-01;1;6,14815998098490e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Non-binary;Self-define;Chi-squared;1,07901712553213e+00;1;2,98917535789125e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Non-binary;Trans woman;Chi-squared;1,31059666168019e-01;1;7,17335861046838e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Trans man;Self-define;Chi-squared;1,71618463335037e+00;1;1,90184908126583e-01;1,00000000000000e+00;bonferroni;
+Specific Phobia;Trans man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Specific Phobia;Self-define;Trans woman;Chi-squared;7,70053033730030e-01;1;3,80200646416962e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis woman;Cis man;Chi-squared;3,02649524689646e+01;1;3,76874626801677e-08;5,65311940202516e-07;bonferroni;***
+Agoraphobia;Cis woman;Non-binary;Chi-squared;2,73890270207688e-01;1;6,00734004070572e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis woman;Trans man;Chi-squared;8,44956422008461e-02;1;7,71295043158246e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis woman;Self-define;Chi-squared;3,85429320427919e-01;1;5,34711783469176e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis woman;Trans woman;Fisher;NA;NA;7,83604189727481e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis man;Non-binary;Chi-squared;6,56073340945822e+00;1;1,04253390182885e-02;1,56380085274328e-01;bonferroni;
+Agoraphobia;Cis man;Trans man;Chi-squared;2,46285755907763e+00;1;1,16566545999294e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Cis man;Self-define;Chi-squared;3,76153975268370e+00;1;5,24442635556409e-02;7,86663953334613e-01;bonferroni;
+Agoraphobia;Cis man;Trans woman;Fisher;NA;NA;3,28507134977390e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Non-binary;Trans man;Chi-squared;9,21593156484246e-29;1;9,99999999999992e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Non-binary;Self-define;Chi-squared;2,85081657356394e-02;1;8,65919652359191e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Non-binary;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Agoraphobia;Trans man;Self-define;Chi-squared;1,40440365955216e-03;1;9,70105975018691e-01;1,00000000000000e+00;bonferroni;
+Agoraphobia;Trans man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Agoraphobia;Self-define;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Panic Attacks;Cis woman;Cis man;Chi-squared;5,48155748171502e+02;1;3,17096206322523e-121;4,75644309483784e-120;bonferroni;***
+Panic Attacks;Cis woman;Non-binary;Chi-squared;1,31142199121096e+01;1;2,93062813494869e-04;4,39594220242303e-03;bonferroni;**
+Panic Attacks;Cis woman;Trans man;Chi-squared;6,65996401006727e+00;1;9,86029068669958e-03;1,47904360300494e-01;bonferroni;
+Panic Attacks;Cis woman;Self-define;Chi-squared;7,96363752287901e-06;1;9,97748379328346e-01;1,00000000000000e+00;bonferroni;
+Panic Attacks;Cis woman;Trans woman;Chi-squared;7,78221052188228e+00;1;5,27631963710115e-03;7,91447945565173e-02;bonferroni;
+Panic Attacks;Cis man;Non-binary;Chi-squared;1,38104323606296e+02;1;6,91470881601486e-32;1,03720632240223e-30;bonferroni;***
+Panic Attacks;Cis man;Trans man;Chi-squared;5,98021732295684e+01;1;1,04887473722972e-14;1,57331210584458e-13;bonferroni;***
+Panic Attacks;Cis man;Self-define;Chi-squared;2,44708552387704e+01;1;7,54424405941626e-07;1,13163660891244e-05;bonferroni;***
+Panic Attacks;Cis man;Trans woman;Chi-squared;1,80739357027989e-01;1;6,70738617281054e-01;1,00000000000000e+00;bonferroni;
+Panic Attacks;Non-binary;Trans man;Chi-squared;8,78714177413311e-02;1;7,66900850980962e-01;1,00000000000000e+00;bonferroni;
+Panic Attacks;Non-binary;Self-define;Chi-squared;3,07320984950431e+00;1;7,95921743403141e-02;1,00000000000000e+00;bonferroni;
+Panic Attacks;Non-binary;Trans woman;Chi-squared;1,37705639025396e+01;1;2,06547309560754e-04;3,09820964341132e-03;bonferroni;**
+Panic Attacks;Trans man;Self-define;Chi-squared;2,97140324976732e+00;1;8,47483123300423e-02;1,00000000000000e+00;bonferroni;
+Panic Attacks;Trans man;Trans woman;Chi-squared;1,32723372909186e+01;1;2,69351181408173e-04;4,04026772112259e-03;bonferroni;**
+Panic Attacks;Self-define;Trans woman;Chi-squared;6,31668085208808e+00;1;1,19607307894823e-02;1,79410961842235e-01;bonferroni;
+Obsessive-Compulsive Disorder;Cis woman;Cis man;Chi-squared;1,46663132412618e+01;1;1,28319236050609e-04;1,92478854075913e-03;bonferroni;**
+Obsessive-Compulsive Disorder;Cis woman;Non-binary;Chi-squared;9,26597994776042e+00;1;2,33449538683513e-03;3,50174308025269e-02;bonferroni;*
+Obsessive-Compulsive Disorder;Cis woman;Trans man;Chi-squared;5,64761605379482e+00;1;1,74791189616908e-02;2,62186784425362e-01;bonferroni;
+Obsessive-Compulsive Disorder;Cis woman;Self-define;Chi-squared;1,96127124920273e+00;1;1,61377425895467e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Cis woman;Trans woman;Chi-squared;1,56034155134749e-01;1;6,92834335534316e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Cis man;Non-binary;Chi-squared;1,93027695718313e+01;1;1,11544435102701e-05;1,67316652654051e-04;bonferroni;***
+Obsessive-Compulsive Disorder;Cis man;Trans man;Chi-squared;1,09110904735500e+01;1;9,55902386801913e-04;1,43385358020287e-02;bonferroni;*
+Obsessive-Compulsive Disorder;Cis man;Self-define;Chi-squared;5,17551321607474e+00;1;2,29074036704466e-02;3,43611055056699e-01;bonferroni;
+Obsessive-Compulsive Disorder;Cis man;Trans woman;Chi-squared;2,78571390125677e-07;1;9,99578877644262e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Non-binary;Trans man;Chi-squared;1,14729668994231e-01;1;7,34822417971932e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Non-binary;Self-define;Chi-squared;2,76995320407249e-02;1;8,67817178536634e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Non-binary;Trans woman;Chi-squared;1,30668206681833e+00;1;2,52996265001596e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Trans man;Self-define;Chi-squared;2,12585602962066e-01;1;6,44748339231970e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Trans man;Trans woman;Chi-squared;1,61857194489849e+00;1;2,03291024490093e-01;1,00000000000000e+00;bonferroni;
+Obsessive-Compulsive Disorder;Self-define;Trans woman;Chi-squared;8,58873104198975e-01;1;3,54054237581743e-01;1,00000000000000e+00;bonferroni;
+Body Dysmorphic Disorder;Cis woman;Cis man;Chi-squared;1,19485683271742e+02;1;8,19849346529968e-28;1,22977401979495e-26;bonferroni;***
+Body Dysmorphic Disorder;Cis woman;Non-binary;Chi-squared;1,36031030317853e+01;1;2,25811963837684e-04;3,38717945756527e-03;bonferroni;**
+Body Dysmorphic Disorder;Cis woman;Trans man;Chi-squared;4,13691073143573e+01;1;1,26033489637622e-10;1,89050234456432e-09;bonferroni;***
+Body Dysmorphic Disorder;Cis woman;Self-define;Chi-squared;1,01939381656888e+01;1;1,40903072121885e-03;2,11354608182827e-02;bonferroni;*
+Body Dysmorphic Disorder;Cis woman;Trans woman;Fisher;NA;NA;8,55209368863251e-06;1,28281405329488e-04;bonferroni;***
+Body Dysmorphic Disorder;Cis man;Non-binary;Chi-squared;9,33982655350349e+01;1;4,27625322503643e-22;6,41437983755464e-21;bonferroni;***
+Body Dysmorphic Disorder;Cis man;Trans man;Chi-squared;1,47350482378765e+02;1;6,57831446399571e-34;9,86747169599356e-33;bonferroni;***
+Body Dysmorphic Disorder;Cis man;Self-define;Fisher;NA;NA;2,80202470561019e-09;4,20303705841529e-08;bonferroni;***
+Body Dysmorphic Disorder;Cis man;Trans woman;Fisher;NA;NA;3,21704945896107e-10;4,82557418844161e-09;bonferroni;***
+Body Dysmorphic Disorder;Non-binary;Trans man;Chi-squared;6,50034845011639e+00;1;1,07853353116202e-02;1,61780029674302e-01;bonferroni;
+Body Dysmorphic Disorder;Non-binary;Self-define;Chi-squared;3,24979988454336e-01;1;5,68630112447229e-01;1,00000000000000e+00;bonferroni;
+Body Dysmorphic Disorder;Non-binary;Trans woman;Chi-squared;9,52847829109956e+00;1;2,02307793679523e-03;3,03461690519285e-02;bonferroni;*
+Body Dysmorphic Disorder;Trans man;Self-define;Chi-squared;1,85689701992472e+00;1;1,72983356224821e-01;1,00000000000000e+00;bonferroni;
+Body Dysmorphic Disorder;Trans man;Trans woman;Chi-squared;1,16465356814379e+00;1;2,80502517895575e-01;1,00000000000000e+00;bonferroni;
+Body Dysmorphic Disorder;Self-define;Trans woman;Chi-squared;4,77298659744023e+00;1;2,89096327050863e-02;4,33644490576294e-01;bonferroni;
+Anorexia Nervosa;Cis woman;Cis man;Chi-squared;3,63751252273614e+02;1;4,29310146535197e-81;6,43965219802795e-80;bonferroni;***
+Anorexia Nervosa;Cis woman;Non-binary;Chi-squared;1,54659845032968e+00;1;2,13638305070291e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Cis woman;Trans man;Chi-squared;4,85045385765385e-02;1;8,25686224275253e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Cis woman;Self-define;Chi-squared;8,36988099164657e-03;1;9,27105592758973e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Cis woman;Trans woman;Fisher;NA;NA;7,99800171204890e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Cis man;Non-binary;Chi-squared;9,11775714732520e+01;1;1,31340551732238e-21;1,97010827598357e-20;bonferroni;***
+Anorexia Nervosa;Cis man;Trans man;Fisher;NA;NA;8,24155868520411e-08;1,23623380278062e-06;bonferroni;***
+Anorexia Nervosa;Cis man;Self-define;Fisher;NA;NA;1,53352701321210e-09;2,30029051981815e-08;bonferroni;***
+Anorexia Nervosa;Cis man;Trans woman;Fisher;NA;NA;1,85063644069367e-02;2,77595466104051e-01;bonferroni;
+Anorexia Nervosa;Non-binary;Trans man;Chi-squared;6,45825524546231e-02;1;7,99394374115976e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Non-binary;Self-define;Chi-squared;6,00123024471829e-01;1;4,38531090522717e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Non-binary;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Trans man;Self-define;Chi-squared;5,02723149292662e-02;1;8,22590101275399e-01;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Trans man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Anorexia Nervosa;Self-define;Trans woman;Fisher;NA;NA;7,74930103457472e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Cis woman;Cis man;Chi-squared;8,29015677316987e+01;1;8,62427545474340e-20;1,29364131821151e-18;bonferroni;***
+Atypical anorexia nervosa;Cis woman;Non-binary;Chi-squared;6,20721360131147e+00;1;1,27230742553623e-02;1,90846113830434e-01;bonferroni;
+Atypical anorexia nervosa;Cis woman;Trans man;Fisher;NA;NA;6,06765265122606e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Cis woman;Self-define;Fisher;NA;NA;6,61489766688616e-02;9,92234650032924e-01;bonferroni;
+Atypical anorexia nervosa;Cis woman;Trans woman;Fisher;NA;NA;6,30380008113155e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Cis man;Non-binary;Fisher;NA;NA;6,87144189657109e-12;1,03071628448566e-10;bonferroni;***
+Atypical anorexia nervosa;Cis man;Trans man;Fisher;NA;NA;1,07150519208533e-03;1,60725778812799e-02;bonferroni;*
+Atypical anorexia nervosa;Cis man;Self-define;Fisher;NA;NA;1,73425715656928e-06;2,60138573485392e-05;bonferroni;***
+Atypical anorexia nervosa;Cis man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Non-binary;Trans man;Chi-squared;2,70098900387969e-01;1;6,03265436804914e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Non-binary;Self-define;Chi-squared;3,73259684638411e-03;1;9,51283565335745e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Non-binary;Trans woman;Fisher;NA;NA;2,46188530809424e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Trans man;Self-define;Chi-squared;3,41895518008628e-01;1;5,58737131172566e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Trans man;Trans woman;Fisher;NA;NA;5,88661475868340e-01;1,00000000000000e+00;bonferroni;
+Atypical anorexia nervosa;Self-define;Trans woman;Fisher;NA;NA;2,10932708191376e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Cis woman;Cis man;Chi-squared;3,32721736337056e+02;1;2,45469089222778e-74;3,68203633834167e-73;bonferroni;***
+Bulimia nervosa;Cis woman;Non-binary;Chi-squared;3,07034704824047e-01;1;5,79505534955862e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Cis woman;Trans man;Chi-squared;1,32951425682094e+00;1;2,48891650373794e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Cis woman;Self-define;Chi-squared;6,94102979520480e-01;1;4,04772301614643e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Cis woman;Trans woman;Fisher;NA;NA;5,88949056701389e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Cis man;Non-binary;Chi-squared;1,12014242274568e+02;1;3,54752603680493e-26;5,32128905520739e-25;bonferroni;***
+Bulimia nervosa;Cis man;Trans man;Fisher;NA;NA;8,71673061525288e-05;1,30750959228793e-03;bonferroni;**
+Bulimia nervosa;Cis man;Self-define;Fisher;NA;NA;1,41831174366845e-05;2,12746761550267e-04;bonferroni;***
+Bulimia nervosa;Cis man;Trans woman;Fisher;NA;NA;7,46103295714619e-02;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Non-binary;Trans man;Chi-squared;4,52953106399506e-01;1;5,00935897172287e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Non-binary;Self-define;Chi-squared;1,38300155453242e-01;1;7,09976769672664e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Non-binary;Trans woman;Fisher;NA;NA;7,62996266841238e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Trans man;Self-define;Chi-squared;8,48933178626432e-04;1;9,76755758937418e-01;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Trans man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Bulimia nervosa;Self-define;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Cis woman;Cis man;Chi-squared;1,69793666135581e+02;1;8,20789927099169e-39;1,23118489064875e-37;bonferroni;***
+Binge eating Disorder;Cis woman;Non-binary;Chi-squared;2,07247269557359e+00;1;1,49978187321024e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Cis woman;Trans man;Chi-squared;6,77159644265205e-01;1;4,10566509549853e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Cis woman;Self-define;Chi-squared;4,79656424497226e-01;1;4,88577983424845e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Cis woman;Trans woman;Fisher;NA;NA;6,33295409662737e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Cis man;Non-binary;Chi-squared;5,55508999031697e+01;1;9,10701321192144e-14;1,36605198178822e-12;bonferroni;***
+Binge eating Disorder;Cis man;Trans man;Chi-squared;4,11554211013242e+00;1;4,24909051332375e-02;6,37363576998562e-01;bonferroni;
+Binge eating Disorder;Cis man;Self-define;Chi-squared;2,03580001200276e+01;1;6,42240170831438e-06;9,63360256247157e-05;bonferroni;***
+Binge eating Disorder;Cis man;Trans woman;Fisher;NA;NA;4,66562586508853e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Non-binary;Trans man;Chi-squared;1,95623628899111e+00;1;1,61916413193987e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Non-binary;Self-define;Chi-squared;2,72379603815648e-31;1;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Non-binary;Trans woman;Chi-squared;8,98608973576137e-01;1;3,43154970448751e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Trans man;Self-define;Chi-squared;1,17682664496208e+00;1;2,78002975662543e-01;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Trans man;Trans woman;Fisher;NA;NA;1,00000000000000e+00;1,00000000000000e+00;bonferroni;
+Binge eating Disorder;Self-define;Trans woman;Chi-squared;6,98820869003392e-01;1;4,03180183193561e-01;1,00000000000000e+00;bonferroni;
+Suicidality;Cis woman;Cis man;Chi-squared;6,29484351294585e+01;1;2,12189571532508e-15;3,18284357298761e-14;bonferroni;***
+Suicidality;Cis woman;Non-binary;Chi-squared;1,81617826202951e+02;1;2,14877903465774e-41;3,22316855198660e-40;bonferroni;***
+Suicidality;Cis woman;Trans man;Chi-squared;1,08472657061801e+02;1;2,11751420893396e-25;3,17627131340094e-24;bonferroni;***
+Suicidality;Cis woman;Self-define;Chi-squared;5,10285096358785e+01;1;9,10341168148735e-13;1,36551175222310e-11;bonferroni;***
+Suicidality;Cis woman;Trans woman;Chi-squared;1,94267644750350e+01;1;1,04531830993856e-05;1,56797746490784e-04;bonferroni;***
+Suicidality;Cis man;Non-binary;Chi-squared;1,08587621317406e+02;1;1,99818731419208e-25;2,99728097128812e-24;bonferroni;***
+Suicidality;Cis man;Trans man;Chi-squared;7,52553925137213e+01;1;4,13599178274142e-18;6,20398767411212e-17;bonferroni;***
+Suicidality;Cis man;Self-define;Chi-squared;2,96748202706072e+01;1;5,10942054983381e-08;7,66413082475071e-07;bonferroni;***
+Suicidality;Cis man;Trans woman;Chi-squared;1,25785309278959e+01;1;3,90203331911272e-04;5,85304997866908e-03;bonferroni;**
+Suicidality;Non-binary;Trans man;Chi-squared;4,65187827982905e+00;1;3,10195879440307e-02;4,65293819160461e-01;bonferroni;
+Suicidality;Non-binary;Self-define;Chi-squared;5,85820887697906e-01;1;4,44039720912470e-01;1,00000000000000e+00;bonferroni;
+Suicidality;Non-binary;Trans woman;Chi-squared;3,75994350661988e-02;1;8,46249691029782e-01;1,00000000000000e+00;bonferroni;
+Suicidality;Trans man;Self-define;Chi-squared;6,02403660149837e+00;1;1,41123327493411e-02;2,11684991240117e-01;bonferroni;
+Suicidality;Trans man;Trans woman;Chi-squared;6,40063369163876e-01;1;4,23687851208948e-01;1,00000000000000e+00;bonferroni;
+Suicidality;Self-define;Trans woman;Chi-squared;3,63391804830730e-01;1;5,46628521727031e-01;1,00000000000000e+00;bonferroni;

@@ -28,36 +28,48 @@ Load packages
 ```{r Load packages}
 library(ggplot2)
 library(dplyr)
-library(UpSetR)
+#library(UpSetR)
 library(patchwork)
 library(tidyverse)
+library(paletteer)
 ```
 
 Retrieve the recent date
 ```{r Recent date}
-date = Sys.Date()
+#date = Sys.Date()
+date <- "2025-08-06"
 date
 ```
 
-Read in data
-```{r Read in data}
-dat <- read_rds(
-  #file = paste0(filepath_cleaned_data,"dat_variable_creation", date, ".rds"))
-  file = paste0(filepath_cleaned_data,"dat_after_exclusion", "2025-03-29", ".rds"))
+## Read in data
+
+```{r Load data sexual orientation}
+dat_sexual_orientation <- read_rds(
+  file =
+    paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
+)
+```
+
+```{r Load data gender}
+dat_gender <- read_rds(
+  file =
+    paste0(filepath_cleaned_data,"dat_after_exclusion_gender", date, ".rds")
+)
 ```
 
 #Plots
 ```{r density plot}
-ggplot(dat, aes(x = age, fill = sexual_orientation)) +
+ggplot(dat_sexual_orientation, aes(x = age, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
   labs(title = "Density Plot",
        x = "Age",
        y = "Density",
        fill = "Sexual orientation") +
   theme_minimal() +
+  scale_fill_paletteer_d("fishualize::Balistoides_conspicillum") +
   facet_wrap(vars(sexual_orientation),nrow = 6)
 
-ggplot(dat, aes(x = age, fill = gender)) +
+ggplot(dat_gender, aes(x = age, fill = gender)) +
   geom_density(alpha = 0.5) +
   labs(title = "Density Plot",
        x = "Age",
@@ -205,19 +217,96 @@ ggplot(dat, aes(x = age)) +
   labs(title = "Density Plot of Age", x = "Age", y = "Density") +
   theme_minimal()
 
-ggplot(dat, aes(x = age)) +
+ggplot(dat_gender, aes(x = age)) +
   geom_density(fill = "lightblue", alpha = 0.5) +
-  geom_vline(aes(xintercept = mean(dat$age)), color = "red", linetype = "dashed", size = 1) +  
-  annotate("text", x = mean(dat$age), y = 0, 
-           label = paste0("Mean = ", round(mean(dat$age), 2)), 
+  geom_vline(xintercept = mean(dat_gender$age, na.rm = TRUE), color = "red", linetype = "dashed", size = 1) +  
+  annotate("text", x = mean(dat_gender$age, na.rm = TRUE), y = 0, 
+           label = paste0("mean = ", round(mean(dat_gender$age, na.rm = TRUE), 2)), 
            color = "black", angle = 90, vjust = -0.5, hjust = 0) +
-  labs(title = "Density Plot of Age with Mean", x = "Age", y = "Density") +
+  labs(title = "Density Plot of Age with Mean", x = "Age", y = "Dichte") +
   theme_minimal()
+
+plot_age_gender <- ggplot(dat_gender, aes(x = age)) +
+  geom_density(fill = "lightblue", alpha = 0.5) +
+  geom_vline(xintercept = mean(dat_gender$age, na.rm = TRUE), color = "red", linetype = "dashed", size = 1) +  
+  annotate("text", x = mean(dat_gender$age, na.rm = TRUE), y = 0, 
+           label = paste0("Mittelwert = ", round(mean(dat_gender$age, na.rm = TRUE), 2)), 
+           color = "black", angle = 90, vjust = -0.5, hjust = 0) +
+  labs(title = NULL, x = "Alter", y = "Dichte") +
+  theme_minimal()
+
+plot_age_gender
+
+
+plot_age_sexual_orientation <- ggplot(dat_sexual_orientation, aes(x = age)) +
+  geom_density(fill = "lightblue", alpha = 0.5) +
+  geom_vline(xintercept = mean(dat_sexual_orientation$age, na.rm = TRUE), 
+             color = "red", linetype = "dashed", size = 1) + 
+  geom_vline(xintercept = median(dat_sexual_orientation$age, na.rm = TRUE), 
+             color = "blue", linetype = "solid", size = 1) + 
+  
+  # Annotation für den Mittelwert (rechts von der Linie)
+  annotate("text", x = mean(dat_sexual_orientation$age, na.rm = TRUE), y = 0.005, 
+           label = paste0("Mittelwert = ", round(mean(dat_sexual_orientation$age, na.rm = TRUE), 2)), 
+           color = "black", angle = 90, vjust = 1, size = 5) +
+  
+  # Annotation für den Median (links von der Linie)
+  annotate("text", x = median(dat_sexual_orientation$age, na.rm = TRUE), y = 0.005, 
+           label = paste0("Median = ", round(median(dat_sexual_orientation$age, na.rm = TRUE), 2)),
+           color = "black", angle = 90, vjust = 1, size = 5) +
+  
+  labs(title = NULL, x = "Alter", y = "Dichte") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 20),           
+    axis.title = element_text(size = 20)
+  )
+
+plot_age_sexual_orientation
 
 ggplot(dat, aes(x = "", y = age)) +
   geom_boxplot(fill = "blue", color = "black") +
   labs(title = "Boxplot of Age", x = "", y = "Age") +
   theme_minimal()
+```
+
+```{r plot einzelnd richtig}
+plot_age_sexual_orientation <- ggplot(dat_sexual_orientation, aes(x = age)) +
+  geom_density(fill = "lightblue", alpha = 0.5) +
+  geom_vline(xintercept = mean(dat_sexual_orientation$age, na.rm = TRUE), 
+             color = "red", linetype = "dashed", size = 1) +  # Mittelwert-Linie
+  geom_vline(xintercept = median(dat_sexual_orientation$age, na.rm = TRUE), 
+             color = "blue", linetype = "solid", size = 1) + # Median-Linie
+  annotate("text", x = mean(dat_sexual_orientation$age, na.rm = TRUE), y = 0, 
+           label = paste0("Mittelwert = ", round(mean(dat_sexual_orientation$age, na.rm = TRUE), 2)), 
+           color = "black", angle = 90, vjust = 1.5, hjust = 0, size = 6) +
+  annotate("text", x = median(dat_sexual_orientation$age, na.rm = TRUE), y = 0, 
+           label = paste0("Median = ", round(median(dat_sexual_orientation$age, na.rm = TRUE), 2)),
+           color = "black", angle = 90, vjust = -0.5, hjust = 0, size = 6) +
+  labs(title = NULL, x = "Alter", y = "Dichte") +
+  theme_minimal() +
+  theme(
+    text = element_text(size = 20),           # Schriftgröße für alle Textelemente
+    axis.title = element_text(size = 20),     # Achsentitel
+    #axis.text = element_text(size = 15),     # Achsenbeschriftungen
+  )
+plot_age_sexual_orientation
+```
+
+```{r plot speichern}
+ggsave(
+  filename = "plot_age_gender.png",
+  plot = plot_age_gender,
+  path = "C:/Users/carlo/Documents/work/LGBTQ/plots",
+  width = 8, height = 6, units = "in", dpi = 300
+)
+
+ggsave(
+  filename = "plot_age_sexual_orientation.png",
+  plot = plot_age_sexual_orientation,
+  path = "C:/Users/carlo/Documents/work/LGBTQ/plots",
+  width = 15, height = 5, units = "in", dpi = 300
+)
 ```
 
 ```{r BMI}

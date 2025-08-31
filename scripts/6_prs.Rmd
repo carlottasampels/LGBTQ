@@ -14,6 +14,7 @@ output:
 editor_options: 
   markdown: 
     wrap: 72
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -38,20 +39,19 @@ source(file = "credentials/paths.R")
 ```{r Load packages}
 library(ggplot2)
 library(readr)
+library(patchwork)
 ```
 
 ## Set current date
 
 ```{r current date}
-#date <- Sys.Date()
-date <- "2025-06-19"
-
+date <- Sys.Date()
 ```
 
 ## Load data
 
-```{r Load data}
-dat <- read_rds(
+```{r Load data sexual orientation}
+dat_sex <- read_rds(
   file =
     paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
 )
@@ -76,7 +76,7 @@ dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFa
 dat_prs_pc_subset <- dat_prs_pc[, c("FID", "batch", "pc1", "pc2", "pc3", "pc4", "pc5", "pc6")]
 ```
 
-```{r merge}
+```{r merge gender}
 #merged <- merge(dat_prs_bmi, dat_gender, by.x = "FID", by.y = "ID")
 #merged_dep <- merge(dat_prs_depression, dat_gender, by.x = "FID", by.y = "ID")
 
@@ -105,11 +105,35 @@ merged_an <- merge(
 )
 ```
 
+```{r merge}
+merged_dep_sex <- merge(
+  merge(dat_prs_depression, dat_sex, by.x = "FID", by.y = "ID"),
+  dat_prs_pc_subset,
+  by = "FID"
+)
+
+merged_anxiety_sex <- merge(
+  merge(dat_prs_anxiety, dat_sex, by.x = "FID", by.y = "ID"),
+  dat_prs_pc_subset,
+  by = "FID"
+)
+
+merged_an_sex <- merge(
+  merge(dat_prs_an, dat_sex, by.x = "FID", by.y = "ID"),
+  dat_prs_pc_subset,
+  by = "FID"
+)
+```
+
 ```{r regression}
 model_bmi <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_bmi)
 model_dep <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_dep)
 model_anxiety <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_anxiety)
 model_an <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_an)
+
+model_dep_sex <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_dep_sex)
+model_anxiety_sex <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_anxiety_sex)
+model_an_sex <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_an_sex)
 
 summary(model_dep)
 summary(model_anxiety)
@@ -119,6 +143,10 @@ merged_dep$residuals_score <- residuals(model_dep)
 merged_bmi$residuals_score <- residuals(model_bmi)
 merged_anxiety$residuals_score <- residuals(model_anxiety)
 merged_an$residuals_score <- residuals(model_an)
+
+merged_dep_sex$residuals_score <- residuals(model_dep_sex)
+merged_anxiety_sex$residuals_score <- residuals(model_anxiety_sex)
+merged_an_sex$residuals_score <- residuals(model_an_sex)
 ```
 
 ```{r regression depression sexual orientation}
@@ -135,7 +163,7 @@ reg_gender_dep <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch
 summary(reg_gender_dep)
 ```
 
-```{r regression anxiety sexual orientation}
+```{r regression anxiety sexual orientation, echo=TRUE}
 reg_sex_orientation_anxiety <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
     data = merged_anxiety)
 
@@ -164,38 +192,104 @@ reg_gender_an <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch 
 summary(reg_gender_an)
 ```
 
+```{r save all tables}
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_gender_dep", sep=""))
+#summary(reg_gender_dep)
+#sink()
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_gender_anxiety", sep=""))
+#summary(reg_gender_anxiety)
+#sink()
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_gender_an", sep=""))
+#summary(reg_gender_an)
+#sink()
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_sex_orientation_dep", sep=""))
+#summary(reg_sex_orientation_dep)
+#sink()
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_sex_orientation_anxiety", sep=""))
+#summary(reg_sex_orientation_anxiety)
+#sink()
+#sink(paste(LGBTQ_folder, "tables/", date,"_reg_sex_orientation_an", sep=""))
+#summary(reg_sex_orientation_an)
+#sink()
+#date
+```
+
+```{r plot Deutsche Namen}
+#Sexual Orientation
+merged_dep_sex$sexual_orientation <- factor(
+  merged_dep_sex$sexual_orientation,
+  levels = c("Heterosexual", "Homosexual", "Bisexual", "Self-define", "Asexual"),
+  labels = c("Heterosexuell", "Homosexuell", "Bisexuell", "Selbstdefiniert", "Asexuell")
+)
+merged_anxiety_sex$sexual_orientation <- factor(
+  merged_anxiety_sex$sexual_orientation,
+  levels = c("Heterosexual", "Homosexual", "Bisexual", "Self-define", "Asexual"),
+  labels = c("Heterosexuell", "Homosexuell", "Bisexuell", "Selbstdefiniert", "Asexuell")
+)
+merged_an_sex$sexual_orientation <- factor(
+  merged_an_sex$sexual_orientation,
+  levels = c("Heterosexual", "Homosexual", "Bisexual", "Self-define", "Asexual"),
+  labels = c("Heterosexuell", "Homosexuell", "Bisexuell", "Selbstdefiniert", "Asexuell")
+)
+
+#Gender
+merged_dep$gender <- factor(
+  merged_dep$gender,
+  levels = c("Cis woman", "Cis man", "Non-binary", "Trans man", "Self-define", "Trans woman"),
+  labels = c("Cis Frau", "Cis Mann", "Nicht-binär", "Trans Mann", "Selbstdefiniert", "Trans Frau")
+)
+merged_anxiety$gender <- factor(
+  merged_anxiety$gender,
+  levels = c("Cis woman", "Cis man", "Non-binary", "Trans man", "Self-define", "Trans woman"),
+  labels = c("Cis Frau", "Cis Mann", "Nicht-binär", "Trans Mann", "Selbstdefiniert", "Trans Frau")
+)
+merged_an$gender <- factor(
+  merged_an$gender,
+  levels = c("Cis woman", "Cis man", "Non-binary", "Trans man", "Self-define", "Trans woman"),
+  labels = c("Cis Frau", "Cis Mann", "Nicht-binär", "Trans Mann", "Selbstdefiniert", "Trans Frau")
+)
+```
+
 ```{r plot residuen depression}
-ggplot(merged_dep, aes(x = residuals_score, fill = sex)) +
+dep_gender <- ggplot(merged_dep, aes(x = residuals_score, fill = gender)) +
   geom_density(alpha = 0.5) +
-  facet_wrap(~ sex, nrow = 6) + 
+facet_wrap(~ gender, nrow = 6) + 
   labs(
-    title = "PRS-Residuen nach Biologischem Geschlecht",
-    x = "Bereinigter PRS (Residuen)",
-    y = "Dichte",
-    fill = "Biologisches Geschlecht"
-  ) +
-  theme_minimal()
-ggplot(merged_dep, aes(x = residuals_score, fill = gender)) +
-  geom_density(alpha = 0.5) +
-  facet_wrap(~ gender, nrow = 6, ncol = 1) + 
-  labs(
-    title = "PRS-Residuen nach Gender",
-    x = "Bereinigter PRS (Residuen)",
+    title = "Depression",
+    x = NULL,
     y = "Dichte",
     fill = "Gender"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme(legend.position = "none")+
+     theme(
+    axis.title.y = element_text(size = 20),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13)    # Facet-Titel zentrieren
+     )
 
-ggplot(merged_dep, aes(x = residuals_score, fill = sexual_orientation)) +
+dep_gender
+
+dep_sexual_orientation <- ggplot(merged_dep_sex, aes(x = residuals_score, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
 facet_wrap(~ sexual_orientation, nrow = 6) + 
   labs(
-    title = "PPRS-Residuen nach Sexueller Orientierung",
-    x = "Bereinigter PRS (Residuen)",
+    title = "Depression",
+    x = NULL,
     y = "Dichte",
     fill = "Sexuelle Orientierung"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme(legend.position = "none")+
+     theme(
+    axis.title.y = element_text(size = 20),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13)    # Facet-Titel zentrieren
+     )
+
+dep_sexual_orientation
 ```
 
 ```{r plot residuen anxiety}
@@ -209,27 +303,47 @@ ggplot(merged_anxiety, aes(x = residuals_score, fill = sex)) +
     fill = "Biologisches Geschlecht"
   ) +
   theme_minimal()
-ggplot(merged_anxiety, aes(x = residuals_score, fill = gender)) +
+anxiety_gender <- ggplot(merged_anxiety, aes(x = residuals_score, fill = gender)) +
   geom_density(alpha = 0.5) +
   facet_wrap(~ gender, nrow = 6, ncol = 1) + 
   labs(
-    title = "PRS-Residuen nach Gender",
+    title = "Angststörungen",
     x = "Bereinigter PRS (Residuen)",
-    y = "Dichte",
+    y = NULL,
     fill = "Gender"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme(legend.position = "none")+
+     theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_text(size = 20),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13)    # Facet-Titel zentrieren
+  )
 
-ggplot(merged_anxiety, aes(x = residuals_score, fill = sexual_orientation)) +
+anxiety_gender
+
+anxiety_sexual_orientation <- ggplot(merged_anxiety_sex, aes(x = residuals_score, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
 facet_wrap(~ sexual_orientation, nrow = 6) + 
   labs(
-    title = "PPRS-Residuen nach Sexueller Orientierung",
+    title = "Angststörungen",
     x = "Bereinigter PRS (Residuen)",
-    y = "Dichte",
+    y = NULL,
     fill = "Sexuelle Orientierung"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme(legend.position = "none")+
+     theme(
+    axis.text.y = element_blank(),
+    axis.title.x = element_text(size = 20),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13)    # Facet-Titel zentrieren
+  )
+
+anxiety_sexual_orientation
 ```
 
 ```{r plot residuen an}
@@ -243,27 +357,75 @@ ggplot(merged_an, aes(x = residuals_score, fill = sex)) +
     fill = "Biologisches Geschlecht"
   ) +
   theme_minimal()
-ggplot(merged_an, aes(x = residuals_score, fill = gender)) +
+
+an_gender <- ggplot(merged_an, aes(x = residuals_score, fill = gender)) +
   geom_density(alpha = 0.5) +
   facet_wrap(~ gender, nrow = 6, ncol = 1) + 
   labs(
-    title = "PRS-Residuen nach Gender",
-    x = "Bereinigter PRS (Residuen)",
-    y = "Dichte",
+    title = "Anorexia Nervosa",
+    x = NULL,
+    y = NULL ,
     fill = "Gender"
   ) +
-  theme_minimal()
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme_minimal() +
+    theme(
+    axis.text.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13),    # Facet-Titel zentrieren
+    legend.text = element_text(size = 13),               # Text in der Legende
+    legend.title = element_text(size = 15)
+    )
 
-ggplot(merged_an, aes(x = residuals_score, fill = sexual_orientation)) +
+an_gender
+
+an_sexual_orientation <- ggplot(merged_an_sex, aes(x = residuals_score, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
 facet_wrap(~ sexual_orientation, nrow = 6) + 
   labs(
-    title = "PPRS-Residuen nach Sexueller Orientierung",
-    x = "Bereinigter PRS (Residuen)",
-    y = "Dichte",
+    title = "Anorexia Nervosa",
+    x = NULL,
+    y = NULL ,
     fill = "Sexuelle Orientierung"
   ) +
-  theme_minimal()
+  coord_cartesian(xlim = c(-2e-6, 2e-6), ylim = c(0, 2000000)) +  #  Achsen begrenzen
+  theme_minimal() +
+    theme(
+    axis.text.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 20),   # Titel zentrieren
+    strip.text = element_text(hjust = 0.5, size = 13),    # Facet-Titel zentrieren
+    legend.text = element_text(size = 13),               # Text in der Legende
+    legend.title = element_text(size = 15)  
+    )
+  
+
+an_sexual_orientation
+```
+
+
+```{r kombiniert}
+combined_plot_sexual_orientation <- (dep_sexual_orientation | anxiety_sexual_orientation | an_sexual_orientation) + 
+  plot_annotation(
+    #title = "PPRS-Residuen nach Sexueller Orientierung für verschiedene Diagnosen",
+    #theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  )
+
+print(combined_plot_sexual_orientation)
+```
+
+```{r kombiniert gender}
+combined_plot_gender <- (dep_gender | anxiety_gender | an_gender) + 
+  plot_annotation(
+    #title = "PPRS-Residuen nach Geschlechtsidentität für verschiedene Diagnosen",
+    #theme = theme(plot.title = element_text(hjust = 0.5, size = 16))
+  )
+
+print(combined_plot_gender)
+```
+
+```{r svae plot}
+ggsave("C:/Users/carlo/Documents/work/LGBTQ/plots/prs_residuen_sexual_orientation.png", combined_plot_sexual_orientation, width = 12, height = 6, dpi = 300)
+ggsave("C:/Users/carlo/Documents/work/LGBTQ/plots/prs_residuen_gender.png", combined_plot_gender, width = 12, height = 7.2, dpi = 300)
 ```
 
 ```{r plot bmi}

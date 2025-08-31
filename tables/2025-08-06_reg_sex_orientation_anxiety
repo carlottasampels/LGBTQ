@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + 
+    sexual_orientation, data = merged_anxiety)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-1.896e-06 -3.196e-07  5.240e-09  3.262e-07  2.084e-06 
+
+Coefficients:
+                                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    9.666e-07  1.001e-08  96.602  < 2e-16 ***
+pc1                            2.550e-09  2.951e-09   0.864  0.38742    
+pc2                            9.853e-09  4.881e-09   2.018  0.04356 *  
+pc3                            3.992e-09  4.795e-09   0.832  0.40518    
+pc4                            1.358e-08  4.720e-09   2.877  0.00402 ** 
+pc5                            1.069e-07  2.616e-08   4.085 4.42e-05 ***
+pc6                            7.527e-09  7.437e-09   1.012  0.31153    
+batchb09                      -4.670e-09  1.044e-08  -0.447  0.65465    
+batchb12                       6.480e-09  1.040e-08   0.623  0.53303    
+batchb16                      -2.420e-10  1.049e-08  -0.023  0.98159    
+batchb17                      -1.106e-07  1.049e-07  -1.054  0.29181    
+batchb21                       6.255e-09  1.165e-08   0.537  0.59121    
+batchb24                      -6.071e-10  1.280e-08  -0.047  0.96218    
+sexual_orientationBisexual    -8.886e-09  9.335e-09  -0.952  0.34118    
+sexual_orientationHomosexual  -1.289e-09  1.327e-08  -0.097  0.92264    
+sexual_orientationSelf-define -1.272e-09  1.819e-08  -0.070  0.94426    
+sexual_orientationAsexual      2.887e-08  2.804e-08   1.030  0.30318    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.793e-07 on 21881 degrees of freedom
+  (312 Beobachtungen als fehlend gelöscht)
+Multiple R-squared:  0.002822,	Adjusted R-squared:  0.002093 
+F-statistic:  3.87 on 16 and 21881 DF,  p-value: 2.537e-07
+

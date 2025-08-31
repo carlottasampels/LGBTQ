@@ -14,7 +14,7 @@ LGBTQ_folder <- "C:/Users/carlo/Documents/work/LGBTQ/"
 
 filepath_prs_bmi <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_chr1_8_reduced.profile"
 
-filepath_prs_depression <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_depression_reduced.profile"
+filepath_prs_depression <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_depression_reduced1.profile"
 
 filepath_prs_an <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_an_reduced.profile"
 

@@ -83,7 +83,7 @@ dir.create(paste0(LGBTQ_folder, "tables/", date))
 
 ```{r read in raw_data}
 dat <- readRDS(
-  file = paste0(filepath_cleaned_data,"dat_consented_attrition", date, ".rds")
+  file = paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
   )
 ```
 

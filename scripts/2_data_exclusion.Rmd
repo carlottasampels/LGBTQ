@@ -1,7 +1,7 @@
 ---
 title: "data_exclusion"
-author: "Paula Adamopoulos, Christopher Huebel, Helena Davies"
-date: "15/03/2025"
+author: ""
+date: "15/06/2025"
 output:
   html_document:
     toc: true
@@ -144,7 +144,9 @@ dat %>%
     height_m,
     bmi,
     dem.highest_education_collapsed,
-    phq9.sum_score,
+    #phq9.sum_score,
+    any_mdd_diagnosis,
+    any_gad_diagnosis,
   "mhd.mdd",
   "mhd.gad",
   "mhd.social_anxiety",
@@ -352,41 +354,26 @@ missing_gender <- abs(nrow(nogender)-nrow(dat))
 missing_gender
 ```
 
-`r abs(missing_gender)` participants excluded due to missing gender.
-
-```{r missing disorder}
-Personen <- nogender %>%
-  filter(
-    #gender == "Trans woman",
-    if_all(all_of(psy_dx_factors), is.na) | !(mhd.mdd == "MDD" |
-    mhd.gad == "GAD" | mhd.agoraphobia == "Agoraphobia" | mhd.social_anxiety == "Social anxiety" |
-      mhd.specific_phobia == "Specific phobia" |
-      mhd.bipolar_disorder == "Bipolar disorder"),
-    is.na(cidia.diagnosis) | cidia.diagnosis == "No GAD diagnosis",
-    is.na(cidid.mdd_diagnosis) | cidid.mdd_diagnosis == "No MDD diagnosis",
-    is.na(phq9.sum_score) | phq9.sum_score < 10,
-    is.na(gad7.sum_score) | gad7.sum_score < 10,
-  )
-
-nrow(Personen)
-
-Personen
-t(Personen)
-
-```
-
 ## mhd
 
 
 ```{r Exclusion no disorder}
 dim(nogender)
 
-nogender.nodisorder <- anti_join(nogender, Personen, by = "ID")
+missing_disorder <- nogender %>%
+  filter(
+    #gender == "Trans woman",
+    #if_all(all_of(psy_dx_factors), is.na) | 
+    !(mhd.agoraphobia == "Agoraphobia" | mhd.social_anxiety == "Social anxiety" |
+      mhd.specific_phobia == "Specific phobia" |
+      mhd.panic_disorder == "Panic disorder" |
+      mhd.bipolar_disorder == "Bipolar disorder"),
+    !any_gad_diagnosis == "GAD",
+    !any_mdd_diagnosis == "MDD",
+  )
 
-missing_disorder <- 
-  nrow(nogender) - 
-  nrow(nogender.nodisorder)
-missing_disorder
+nogender.nodisorder <- anti_join(nogender, missing_disorder, by = "ID")
+nrow(missing_disorder)
 ```
 `r abs(missing_disorder)` participants excluded due to missing mhd, cidia and cidid.
 

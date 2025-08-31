@@ -1,6 +1,6 @@
 ---
 title: "Descriptives table"
-author: "Christopher Huebel"
+author: ""
 date: "2025-03-16"
 output:
   html_document:
@@ -47,24 +47,24 @@ source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
 Load packages
 
 ```{r Load packages}
-library(tidyverse)
 library(flextable)
 library(officer)
 library(dplyr)
 library(gtsummary)
+library(gt)
+library(tidyverse)
 ```
 
 ## Set current date
 
 ```{r current date}
 date <- Sys.Date()
-date <- "2025-06-19"
 ```
 
 ## Load data
 
 ```{r Load data}
-dat <- read_rds(
+dat_sexual_orientation <- read_rds(
   file =
     paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
 )
@@ -96,14 +96,16 @@ dat_gender <- read_rds(
 ```
 
 ```{r Gender check}
-dat %>%
+dat_gender %>%
+  freq(gender)
+dat_sexual_orientation %>%
   freq(gender)
 ```
 
 # dat_demographics
 
 ```{r dat_demographics}
-dat_demographics <- dat %>%
+dat_gender_demographics <- dat_gender %>%
   select(
     age,
     sex,
@@ -113,8 +115,10 @@ dat_demographics <- dat %>%
     height_m,
     bmi,
     dem.highest_education_collapsed,
-    phq9.sum_score,
-    gad7.sum_score,
+    #phq9.sum_score,
+    #gad7.sum_score,
+    any_mdd_diagnosis,
+    any_gad_diagnosis,
     phq.Q9_suicidality_binary,
     mhd.mdd,
     mhd.gad,
@@ -136,17 +140,17 @@ dat_demographics <- dat %>%
 # Variable names
 
 ```{r variable names}
-names(dat_demographics)
+names(dat_gender_demographics)
 ```
 
 # Demographics whole sample
 
 ```{r demographics whole sample}
 summary_table_whole_sample <-
-  dat_demographics %>%
+  dat_gender_demographics %>%
   gtsummary::tbl_summary(
     label = list(
-      gender = "Patient's gender",
+      gender = "Gender",
       sex = "Biological sex",
       age = "Age [years]",
       ethnicity = "Ethnicity",
@@ -256,64 +260,72 @@ summary_table_whole_sample %>%
   )
 ```
 
+```{r Deutsche Namen}
+#Sexual Orientation
+dat_sexual_orientation <- within(dat_sexual_orientation, {
+  sexual_orientation <- factor(
+    sexual_orientation,
+    levels = c("Heterosexual", "Homosexual", "Bisexual", "Self-define", "Asexual"),
+    labels = c("Heterosexuell", "Homosexuell", "Bisexuell", "Selbstdefiniert", "Asexuell")
+  )
+  gender <- factor(
+    gender,
+    levels = c("Cis woman", "Cis man", "Non-binary", "Trans man", "Self-define", "Trans woman"),
+    labels = c("Cis Frau", "Cis Mann", "Nicht-Binär", "Trans Mann", "Selbstdefiniert", "Trans Frau")
+  )
+  dem.highest_education_collapsed <- factor(
+    dem.highest_education_collapsed,
+    levels = c("None of the above", "GCSEs/CSEs/O-levels or equivalent", "NVQ/HND/HNC or equivalent", "A-levels/AS-levels or equivalent", "University"),
+    labels = c("Keine der genannten Optionen", "GCSEs/CSEs/O-levels oder Äquivalent", "NVQ/HND/HNC oder Äquivalent", "A-levels/AS-levels oder Äquivalent", "Universität")
+  )
+  ethniscity <- factor(
+    ethnicity,
+    levels = c("White", "Not white"),
+    labels = c("Weiß", "Nicht-weiß")
+  )
+  sex <- factor (
+    sex,
+    levels = c("Male", "Female"),
+    labels = c("Männlich", "Weiblich")
+  )
+})
+
+
+#Gender
+dat_gender <- within(dat_gender, {
+  sexual_orientation <- factor(
+    sexual_orientation,
+    levels = c("Heterosexual", "Homosexual", "Bisexual", "Self-define", "Asexual"),
+    labels = c("Heterosexuell", "Homosexuell", "Bisexuell", "Selbstdefiniert", "Asexuell")
+  )
+gender <- factor(
+  gender,
+  levels = c("Cis woman", "Cis man", "Non-binary", "Trans man", "Self-define", "Trans woman"),
+  labels = c("Cis Frau", "Cis Mann", "Nicht-Binär", "Trans Mann", "Selbstdefiniert", "Trans Frau")
+)
+  dem.highest_education_collapsed <- factor(
+    dem.highest_education_collapsed,
+    levels = c("None of the above", "GCSEs/CSEs/O-levels or equivalent", "NVQ/HND/HNC or equivalent", "A-levels/AS-levels or equivalent", "University"),
+    labels = c("Keine der genannten Optionen", "GCSEs/CSEs/O-levels oder Äquivalent", "NVQ/HND/HNC oder Äquivalent", "A-levels/AS-levels oder Äquivalent", "Universität")
+  )
+  ethnicity <- factor(
+    ethnicity,
+    levels = c("White", "Not white"),
+    labels = c("Weiß", "Nicht-weiß")
+  )
+    sex <- factor (
+    sex,
+    levels = c("Male", "Female"),
+    labels = c("Männlich", "Weiblich")
+  )
+})
+```
 
 # Table clinically significant
 
-```{r dat_gender dat mdd}
-#Zusammenfügen zu einer mdd Variable
-dat_gender <- dat_gender %>%
-  mutate(
-    any_mdd_diagnosis = ifelse(
-      mhd.mdd == "MDD" | 
-      cidid.mdd_diagnosis == "MDD diagnosis" | 
-      phq9.sum_score > 10,
-      "MDD",
-      "No MDD"
-    )
-  )
-
-dat$mhd.mdd
-dat <- dat %>%
-  mutate(
-    any_mdd_diagnosis = ifelse(
-      mhd.mdd == "MDD" | 
-      cidid.mdd_diagnosis == "MDD diagnosis" | 
-      phq9.sum_score > 10,
-      "MDD",
-      "No MDD"
-    )
-  )
-```
-
-```{r dat_gender dat gad}
-#Zusammenfügen zu einer gad Variable
-dat_gender <- dat_gender %>%
-  mutate(
-    any_gad_diagnosis = ifelse(
-      mhd.gad == "GAD" | 
-      cidia.diagnosis == "No GAD diagnosis" | 
-      gad7.sum_score < 10,
-      "GAD",
-      "No GAD"
-    )
-  )
-
-dat <- dat %>%
-  mutate(
-    any_gad_diagnosis = ifelse(
-      mhd.gad == "GAD" | 
-      cidia.diagnosis == "No GAD diagnosis" | 
-      gad7.sum_score < 10,
-      "GAD",
-      "No GAD"
-    )
-  )
-dat_gender$cidia.diagnosis
-dat$cidia.diagnosis
-```
 
 ```{r dat_demographics_clinical}
-dat_demographics_clinical <- dat %>%
+dat_demographics_clinical_sexual_orientation <- dat_sexual_orientation %>%
   select(
     sex,
     gender,
@@ -379,35 +391,51 @@ summary_table_clinical_gender <-
     by = gender, 
     missing = "no",
     label = list(
-      sex = "Biological sex",
-      ethnicity = "Ethnicity",
-      sexual_orientation = "Sexual orientation",
-      dem.highest_education_collapsed = "Highest education",
-      #cidid.mdd_diagnosis = "Major depressive disorder diagnosis",
-      #cidia.diagnosis = "Generalised anxiety disorder diagnosis",
-      #mhd.mdd = "Major depressive disorder",
-      #mhd.gad = "Generalised anxiety disorder",
-      any_mdd_diagnosis = "Major depressive disorder",
-      any_gad_diagnosis = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "Obsessive-compulsive disorder",
-      mhd.bdd = "Body dysmorphic disorder",
+#      sex = "Biological sex",
+ #     sexual_orientation = "Sexual orientation",
+  #    ethnicity = "Ethnicity",
+   #   dem.highest_education_collapsed = "Highest education",
+    #  any_mdd_diagnosis = "Major depressive disorder",
+     # any_gad_diagnosis = "Generalised anxiety disorder",
+      #mhd.social_anxiety = "Social Anxiety",
+#      mhd.specific_phobia = "Specific phobia",
+ #     mhd.agoraphobia = "Agoraphobia",
+  #    mhd.panic_disorder = "Panic disorder",
+   #   mhd.panic_attacks = "Panic attacks",
+    #  mhd.bipolar_disorder ="Bipolar disorder",
+     # mhd.ocd = "Obsessive-compulsive disorder",
+      #mhd.bdd = "Body dysmorphic disorder",
+#      mhd.an = "Anorexia nervosa", 
+ #     mhd.atypical_an = "Atypical anorexia nervosa",
+  #    mhd.bn = "Bulimia nervosa",
+   #   mhd.bed = "Binge-eating disorder",
+    #  phq.Q9_suicidality_binary = "Suicidality"
+     
+      sex = "Biologisches Geschlecht",
+      gender = "Geschlechtsidentität",
+      ethnicity = "Ethnizität",
+      dem.highest_education_collapsed = "Höchster Bildungsabschluss",
+      any_mdd_diagnosis = "Schwere depressive Störung",
+      any_gad_diagnosis = "Generalisierte Angststörung",
+      mhd.social_anxiety = "Soziale Angststörung",
+      mhd.specific_phobia = "Spezifische Phobie",
+      mhd.agoraphobia = "Agoraphobie",
+      mhd.panic_disorder = "Panik Störung",
+      mhd.panic_attacks = "Panik Atacken",
+      mhd.bipolar_disorder ="Bipolare Störung",
+      mhd.ocd = "Zwangsstörung",
+      mhd.bdd = "Körpersysmorphe Störung",
       mhd.an = "Anorexia nervosa", 
-      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.atypical_an = "Atypische anorexia nervosa",
       mhd.bn = "Bulimia nervosa",
-      mhd.bed = "Binge-eating disorder",
-      phq.Q9_suicidality_binary = "Suicidality"
-      ),
+      mhd.bed = "Binge-eating Störung",
+      phq.Q9_suicidality_binary = "Suizidaliät"
+       ),
     type = list(
       sex = "categorical",
       gender = "categorical",
-      ethnicity = "categorical",
       sexual_orientation = "categorical",
+      
       dem.highest_education_collapsed = "categorical",
       #phq9.sum_score = "continuous2",
       #gad7.sum_score = "continuous2",
@@ -470,34 +498,54 @@ summary_table_clinical_gender
 
 ```{r}
 summary_table_clinical_sexual_orientation <-
-  dat_demographics_clinical %>%
+  dat_demographics_clinical_sexual_orientation %>%
   gtsummary::tbl_summary(
     by = sexual_orientation, 
     missing = "no",
     label = list(
-      sex = "Biological sex",
-      gender = "Gender",
-      ethnicity = "Ethnicity",
-      dem.highest_education_collapsed = "Highest education",
-      #cidid.mdd_diagnosis = "Major depressive disorder diagnosis",
-      #cidia.diagnosis = "Feneralised anxiety diagnosis",
-      #mhd.mdd = "Major depressive disorder",
-      #mhd.gad = "Generalised anxiety disorder",
-      any_mdd_diagnosis = "Major depressive disorder",
-      any_gad_diagnosis = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "Obsessive-compulsive disorder",
-      mhd.bdd = "Body dysmorphic disorder",
+      #sex = "Biological sex",
+      #gender = "Gender",
+      #ethnicity = "Ethnicity",
+      #dem.highest_education_collapsed = "Highest education",
+      #any_mdd_diagnosis = "Major depressive disorder",
+      #any_gad_diagnosis = "Generalised anxiety disorder",
+      #mhd.social_anxiety = "Social Anxiety",
+      #mhd.specific_phobia = "Specific phobia",
+      #mhd.agoraphobia = "Agoraphobia",
+      #mhd.panic_disorder = "Panic disorder",
+      #mhd.panic_attacks = "Panic attacks",
+      #mhd.bipolar_disorder ="Bipolar disorder",
+      #mhd.ocd = "Obsessive-compulsive disorder",
+      #mhd.bdd = "Body dysmorphic disorder",
+      #mhd.an = "Anorexia nervosa", 
+      #mhd.atypical_an = "Atypical anorexia nervosa",
+      #mhd.bn = "Bulimia nervosa",
+      #mhd.bed = "Binge-eating disorder",
+      #phq.Q9_suicidality_binary = "Suicidality"
+      #sex = "Biological sex",
+      #gender = "Gender",
+      #ethnicity = "Ethnicity",
+      #dem.highest_education_collapsed = "Highest education",
+      
+      sex = "Biologisches Geschlecht",
+      gender = "Geschlechtsidentität",
+      ethnicity = "Ethnizität",
+      dem.highest_education_collapsed = "Höchster Bildungsabschluss",
+      any_mdd_diagnosis = "Schwere depressive Störung",
+      any_gad_diagnosis = "Generalisierte Angststörung",
+      mhd.social_anxiety = "Soziale Angststörung",
+      mhd.specific_phobia = "Spezifische Phobie",
+      mhd.agoraphobia = "Agoraphobie",
+      mhd.panic_disorder = "Panik Störung",
+      mhd.panic_attacks = "Panik Atacken",
+      mhd.bipolar_disorder ="Bipolare Störung",
+      mhd.ocd = "Zwangsstörung",
+      mhd.bdd = "Körpersysmorphe Störung",
       mhd.an = "Anorexia nervosa", 
-      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.atypical_an = "Atypische anorexia nervosa",
       mhd.bn = "Bulimia nervosa",
-      mhd.bed = "Binge-eating disorder",
-      phq.Q9_suicidality_binary = "Suicidality"
+      mhd.bed = "Binge-eating Störung",
+      phq.Q9_suicidality_binary = "Suizidaliät"
       ),
     type = list(
       sex = "categorical",
@@ -564,33 +612,48 @@ summary_table_clinical_sexual_orientation
 
 ```{r geändert} 
 summary_table_clinical <-
-  dat_demographics_clinical %>%
+  dat_demographics_clinical_sexual_orientation %>%
   gtsummary::tbl_summary(
     label = list(
-      sex = "Biological sex",
-      gender = "Gender",
-      sexual_orientation = "Sexual orientation",
-      #cidid.mdd_diagnosis = "Major depressive disorder diagnosis",
-      #cidia.diagnosis = "Generalised anxiety disorder diagnosis",
-      #mhd.mdd = "Major depressive disorder",
-      #mhd.gad = "Generalised anxiety disorder",
-      any_mdd_diagnosis = "Major depressive disorder",
-      any_gad_diagnosis = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "Obsessive-compulsive disorder",
-      mhd.bdd = "Body dysmorphic disorder",
+      #sex = "Biological sex",
+      #gender = "Gender",
+      #sexual_orientation = "Sexual orientation",
+      #any_mdd_diagnosis = "Major depressive disorder",
+      #any_gad_diagnosis = "Generalised anxiety disorder",
+      #mhd.social_anxiety = "Social Anxiety",
+      #mhd.specific_phobia = "Specific phobia",
+      #mhd.agoraphobia = "Agoraphobia",
+      #mhd.panic_disorder = "Panic disorder",
+      #mhd.panic_attacks = "Panic attacks",
+      #mhd.bipolar_disorder ="Bipolar disorder",
+      #mhd.ocd = "Obsessive-compulsive disorder",
+      #mhd.bdd = "Body dysmorphic disorder",
+      #mhd.an = "Anorexia nervosa", 
+      #mhd.atypical_an = "Atypical anorexia nervosa",
+      #mhd.bn = "Bulimia nervosa",
+      #mhd.bed = "Binge-eating disorder",
+      #phq.Q9_suicidality_binary = "Suicidality",
+      #dem.highest_education_collapsed = "Highest education",
+      #ethnicity = "Ethnicity"
+      sex = "Biologisches Geschlecht",
+      gender = "Geschlechtsidentität",
+      ethnicity = "Ethnizität",
+      dem.highest_education_collapsed = "Höchster Bildungsabschluss",
+      any_mdd_diagnosis = "Schwere depressive Störung",
+      any_gad_diagnosis = "Generalisierte Angststörung",
+      mhd.social_anxiety = "Soziale Angststörung",
+      mhd.specific_phobia = "Spezifische Phobie",
+      mhd.agoraphobia = "Agoraphobie",
+      mhd.panic_disorder = "Panik Störung",
+      mhd.panic_attacks = "Panik Atacken",
+      mhd.bipolar_disorder ="Bipolare Störung",
+      mhd.ocd = "Zwangsstörung",
+      mhd.bdd = "Körpersysmorphe Störung",
       mhd.an = "Anorexia nervosa", 
-      mhd.atypical_an = "Atypical anorexia nervosa",
+      mhd.atypical_an = "Atypische anorexia nervosa",
       mhd.bn = "Bulimia nervosa",
-      mhd.bed = "Binge-eating disorder",
-      phq.Q9_suicidality_binary = "Suicidality",
-      dem.highest_education_collapsed = "Highest education",
-      ethnicity = "Ethnicity"
+      mhd.bed = "Binge-eating Störung",
+      phq.Q9_suicidality_binary = "Suizidaliät"
       ),
     type = list(
       sex = "categorical",

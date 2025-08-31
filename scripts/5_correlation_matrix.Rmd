@@ -37,7 +37,8 @@ rm(list = ls(all.names = TRUE))
 Set current date
 
 ```{r current date}
-date <- Sys.Date()
+#date <- Sys.Date()
+date <- "2025-08-06"
 ```
 
 Install necessary packages
@@ -46,7 +47,7 @@ Install necessary packages
 #install.packages("knitr")
 #install.packages("summarytools")
 #install.packages("polycor")
-#install.packages("corrplot")
+#install.packages("ggcorrplot")
 #install.packages("broom")
 #install.packages("poolr")
 #install.packages("officer")
@@ -98,7 +99,7 @@ Read in clean data
 ```{r read in clean data}
 dat <- read_rds(
   file =
-    paste0(filepath_cleaned_data,"dat_after_exclusion", date, ".rds")
+    paste0(filepath_cleaned_data,"dat_after_exclusion_gender", date, ".rds")
 )
 ```
 
@@ -150,6 +151,19 @@ variables_to_rename <- c(
     "Bulimia nervosa" = "V21",
     "Binge-eating disorder" = "V22"
 )
+```
+
+```{r Korrelationstest}
+#install.packages("vcd")   # falls noch nicht installiert
+library(vcd)
+# Kontingenztabelle erstellen
+tab <- table(dat$gender, dat$sex)
+tab2 <- table(dat$sexual_orientation, dat$sex)
+tab2
+
+assocstats(tab)
+assocstats(tab2)
+
 ```
 
 
@@ -220,26 +234,32 @@ dat_factor <- dat %>%
   select(
     
     # Select continuous data for polyserial correlations
-    "PHQ9 score" = "phq9.sum_score",                                  
+    #"PHQ9 score" = "phq9.sum_score",                                  
     "Age [years]" = "age",
     "BMI [kg/m2]"  = "bmi", 
     "Height [m]" = "height_m",
     
     # Demographics
+    "Biologisches Geschlecht" = "sex",
     "Gender" = "gender",
-    "Ethnicity" = "ethnicity",
-    "Sexual orientation" = "sexual_orientation",
+    "Sexuelle Orientierung" = "sexual_orientation",
+    "Ethnezität" = "ethnicity",
+#    "Gender" = "gender",
+ #   "Sexual orientation" = "sexual_orientation",
+  #  "Ethnicity" = "ethnicity",
     
     # Education
     "Highest education" = "dem.highest_education_collapsed",
     
     # Mental health diagnoses
-    "Major depressive disorder" = "mhd.mdd",
-    "Generalised anxiety disorder" = "mhd.gad",
+    "schwere depressive Störung" = "any_mdd_diagnosis",
+    "Generalisierte Angststörung" = "any_gad_diagnosis",
+#    "Major depressive disorder" = "mhd.mdd",
+ #   "Generalised anxiety disorder" = "mhd.gad",
     "Social anxiety" = "mhd.social_anxiety",
     "Specific phobia" = "mhd.specific_phobia",
     "Agoraphobia" = "mhd.agoraphobia",
-    "Panic disorder" = "mhd.panic_disorder",
+    #"Panic disorder" = "mhd.panic_disorder",
     "Panic attacks" = "mhd.panic_attacks",
     "Bipolar disorder" = "mhd.bipolar_disorder",  
     "Obsessive-compulsive disorder" = "mhd.ocd",

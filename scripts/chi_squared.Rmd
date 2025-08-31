@@ -1,0 +1,380 @@
+---
+title: "chi sqared"
+author: "Carlotta Sampels"
+date: "2025-06-25"
+output: html_document
+---
+
+# Setup
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment=NA,
+                      prompt=FALSE,
+                      cache=FALSE)
+```
+
+## Clear workspace
+
+```{r Clear worksapce}
+rm(list = ls())
+```
+
+
+Read in file with path to ilovedata channel on Teams
+Ensure that your credentials directory is correctly located
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+
+## Install packages
+
+```{r Install packages}
+#install.packages("ggformula")
+#install.packages("tidyverse")
+```
+
+## Load packages
+
+```{r Load packages}
+library(dplyr)
+library(rstatix)
+library(purrr)
+library(tibble)
+library(readr)
+library(writexl)
+library(officer)
+```
+
+## Retrieve the recent date
+
+```{r Recent date}
+date = Sys.Date()
+date
+```
+
+## Load data
+
+```{r Load data sexual orientation}
+dat_sexual_orientation <- read_rds(
+  file =
+    paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
+)
+```
+
+```{r Load data gender}
+dat_gender <- read_rds(
+  file =
+    paste0(filepath_cleaned_data,"dat_after_exclusion_gender", date, ".rds")
+)
+```
+
+## Testing
+
+```{r labels}
+var_labels <- c(
+  "age" = "Age",
+  "sex" = "Biological sex",
+  "sexual_orientation" = "Sexual orientation",
+  "gender" = "Gender",
+  "ethnicity" = "Ethnicity",
+  "dem.highest_education_collapsed" = "Highest Education",
+  "mhd.social_anxiety" = "Social Anxiety",
+  "mhd.specific_phobia" = "Specific Phobia",
+  "mhd.agoraphobia" = "Agoraphobia",
+  "mhd.panic_attacks" = "Panic Attacks",
+  "mhd.ocd" = "Obsessive-Compulsive Disorder",
+  "mhd.bdd" = "Body Dysmorphic Disorder",
+  "mhd.an" = "Anorexia Nervosa",
+  "mhd.atypical_an" = "Atypical anorexia nervosa",
+  "mhd.bn" = "Bulimia nervosa",
+  "mhd.bed" = "Binge eating Disorder",
+  "phq.Q9_suicidality_binary" = "Suicidality"
+)
+```
+
+```{r chi squared}
+pairwise.chisq.test <- function(A, B, p.adjust.method="bonferroni"){
+  
+  # wir überprüfen, ob die Objekte vom Typ factor sind.
+  if (!is.factor(A) | !is.factor(B)) {
+    stop("Both objects need to be factors.")
+  }
+
+  # erstelle ein Hilfsdatenframe
+  df <- data.frame(A=A, B=B)
+
+  # Erzeuge alle möglichen 2er-Kombinationen von B
+  kombi <- combn(levels(B), 2)
+
+  # Erzeuge ein Datenframe für die Werterückgabe
+  # die erste Zeile wird später wieder gelöscht.
+  result <- data.frame(group1 = "A",
+                       group2 = "B",
+                       xsquare = "9",
+                       df = "9999",
+                       pvalue = "9",
+                       padjust = "9",
+                       adjust = p.adjust.method,
+                       sig = "")
+
+  # Berechne für jedes Paar
+  for (i in 1:(length(kombi)/2)) {
+    # füge die aktuelle Paarung in einem Datenframe zusammen
+    help <- rbind(df[df$B==kombi[,i][1],],
+                  df[df$B==kombi[,i][2],])
+    #Prüfen ob A zwei verschiedene Ausprägungen hat wegen z.B. cis woman/trans man biologisches Geschlecht
+    if (length(unique(help$A)) < 2) {
+  cat("Variable:", var, "| Vergleich:", kombi[, i][1], "vs.", kombi[, i][2], 
+      "| Überspringe: A hat nur", unique(help$A), "\n")
+  next
+}
+if (length(unique(help$B)) < 2) {
+  cat("Variable:", var, "| Vergleich:", kombi[, i][1], "vs.", kombi[, i][2], 
+        "| Überspringe: B hat nur", unique(help$B), "\n")
+  next
+}
+    
+    # führe den Chi-Quadrat-Test durch
+    pups <- chisq.test(help$A, help$B)
+    
+    # setze das Signifikanz-Signal zurück
+    sig = ""
+    
+    # setze einen Punkt wenn p < 0.055
+    if(p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n=(length(kombi)/2)) < 0.055) {sig="."}
+    # setze einen Stern wenn p < 0.05
+    if(p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n=(length(kombi)/2)) < 0.05)  {sig="*"}
+    # setze zwei Sterne wenn p < 0.01
+    if(p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n=(length(kombi)/2)) < 0.01)  {sig="**"}
+    # setze drei Sterne wenn p < 0.001
+    if(p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n=(length(kombi)/2)) < 0.001) {sig="***"}
+    # speichere die Ergebnisse in ein Datenframe
+    loop <- data.frame(group1 = kombi[,i][1],
+                       group2 = kombi[,i][2],
+                       xsquare = as.numeric(pups$statistic),
+                       df = as.numeric(pups$parameter),
+                       pvalue = as.numeric(pups$p.value),
+                       padjust = p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n=(length(kombi)/2)),
+                       adjust = p.adjust.method,
+                       sig = sig
+    )
+    # füge die aktuellen Ergebnisse dem "result"-Objekt hinzu
+    result <- rbind(result, loop)
+  }
+  # Fertig mit allen Paarungen
+  
+  # Entferne den Dummy-Eintrag 
+  result <- result[-1,]
+  # Korrigiere die Zeilennummerierung
+  row.names(result) <- NULL
+  # Gebe die Ergebnisse zurück
+  return(result)
+}
+```
+
+```{r ch squared test mit fisher}
+pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
+  
+  # Überprüfen, ob beide Variablen Faktoren sind
+  if (!is.factor(A) | !is.factor(B)) {
+    stop("Both objects need to be factors.")
+  }
+  
+  # Hilfsdatenframe erstellen
+  df <- data.frame(A = A, B = B)
+  
+  # Alle möglichen 2er-Kombinationen der Levels von B
+  kombi <- combn(levels(B), 2)
+  
+  # Ergebnis-Datenframe mit Dummy-Zeile
+  result <- data.frame(
+    group1 = "A",
+    group2 = "B",
+    test = "",
+    xsquare = NA,
+    df = NA,
+    pvalue = NA,
+    padjust = NA,
+    adjust = p.adjust.method,
+    sig = ""
+  )
+  
+  # Schleife über alle Paarungen
+  for (i in 1:(ncol(kombi))) {
+    
+    # Subset der Daten nur für diese beiden Gruppen
+    help <- droplevels(
+      rbind(
+        df[df$B == kombi[, i][1], ],
+        df[df$B == kombi[, i][2], ]
+      )
+    )
+    
+    # Prüfen, ob in A mindestens 2 Levels vorhanden sind
+    if (length(unique(help$A)) < 2) {
+      cat("Vergleich:", kombi[, i][1], "vs.", kombi[, i][2],
+          "| Überspringe: A hat nur", unique(help$A), "\n")
+      next
+    }
+    
+    # Prüfen, ob in B mindestens 2 Levels vorhanden sind
+    if (length(unique(help$B)) < 2) {
+      cat("Vergleich:", kombi[, i][1], "vs.", kombi[, i][2],
+          "| Überspringe: B hat nur", unique(help$B), "\n")
+      next
+    }
+    
+    # Kontingenztafel
+    tab <- table(help$A, help$B)
+    
+    # Test auswählen: Fisher oder Chi-Quadrat
+    #if (any(tab < 5)) 
+    if (any(chisq.test(tab)$expected < 5)) {
+      pups <- fisher.test(tab, simulate.p.value = TRUE, B = 10000)
+      test_used <- "Fisher"
+    } else {
+      pups <- chisq.test(tab)
+      test_used <- "Chi-squared"
+    }
+    
+    # Signifikanz-Symbol setzen
+    p_adj <- p.adjust(as.numeric(pups$p.value), method = p.adjust.method, n = ncol(kombi))
+    sig <- ""
+    if (p_adj < 0.001) { sig <- "***" }
+    else if (p_adj < 0.01) { sig <- "**" }
+    else if (p_adj < 0.05) { sig <- "*" }
+    else if (p_adj < 0.055) { sig <- "." }
+    
+    # Ergebnis-Datensatz für diese Paarung
+    loop <- data.frame(
+      group1 = kombi[, i][1],
+      group2 = kombi[, i][2],
+      test = test_used,
+      xsquare = ifelse(test_used == "Chi-squared", as.numeric(pups$statistic), NA),
+      df = ifelse(test_used == "Chi-squared", as.numeric(pups$parameter), NA),
+      pvalue = as.numeric(pups$p.value),
+      padjust = p_adj,
+      adjust = p.adjust.method,
+      sig = sig
+    )
+    
+    # Anhängen
+    result <- rbind(result, loop)
+  }
+  
+  # Dummy-Zeile entfernen
+  result <- result[-1, ]
+  row.names(result) <- NULL
+  return(result)
+}
+```
+
+```{r ch squared test anwenden sexual_orientation}
+target_vars <- c("age", "sex", "gender", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
+
+# Leere Liste, um Zwischenergebnisse zu speichern
+results_list <- list()
+
+# Leerer Dataframe für alle Ergebnisse
+all_results_df <- data.frame()
+
+# Schleife über alle Zielvariablen
+for (var in target_vars) {
+  
+  # Hole die aktuelle Zielvariable als Faktor
+  A_current <- factor(dat_sexual_orientation[[var]])
+  
+  # Hole die Gruppierungsvariable als Faktor
+  B_current <- factor(dat_sexual_orientation$sexual_orientation)
+  
+  # Führe den Test aus
+  res <- pairwise.chisq.test(A = A_current, B = B_current)
+  
+  # Speichere das Ergebnis in der Liste
+  results_list[[var]] <- res
+  
+  # Füge eine Spalte mit dem Variablennamen hinzu
+  res$Variable <- var
+  
+  # Hänge die Ergebnisse an den Gesamtdatensatz
+  all_results_df <- rbind(all_results_df, res)
+  
+  # Spalte "Variable" nach vorne stellen
+all_results_df <- all_results_df[, c("Variable", setdiff(names(all_results_df), "Variable"))]
+}
+
+#Labels verwenden
+all_results_df$Variable <- var_labels[all_results_df$Variable]
+
+# Zeige die Gesamttabelle an
+print(all_results_df)
+```
+
+```{r save all_results_df for sexual_orientation}
+date <- "2025-08-12"
+write_xlsx(
+  all_results_df,
+  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_sexual_orientation", date, ".xlsx")
+)
+```
+
+```{r ch squared test anwenden gender}
+target_vars <- c("age", "sex", "sexual_orientation", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
+
+# Leere Liste, um Zwischenergebnisse zu speichern
+results_list <- list()
+
+# Leerer Dataframe für alle Ergebnisse
+all_results_df <- data.frame()
+
+# Schleife über alle Zielvariablen
+for (var in target_vars) {
+  
+  # Hole die aktuelle Zielvariable als Faktor
+  A_current <- factor(dat_gender[[var]])
+  
+  # Hole die Gruppierungsvariable als Faktor
+  B_current <- factor(dat_gender$gender)
+  
+  # Führe den Test aus
+  res <- pairwise.chisq.test(A = A_current, B = B_current)
+  
+  # Speichere das Ergebnis in der Liste
+  results_list[[var]] <- res
+  
+  # Füge eine Spalte mit dem Variablennamen hinzu
+  res$Variable <- var
+  
+  # Hänge die Ergebnisse an den Gesamtdatensatz
+  all_results_df <- rbind(all_results_df, res)
+  
+  # Spalte "Variable" nach vorne stellen
+all_results_df <- all_results_df[, c("Variable", setdiff(names(all_results_df), "Variable"))]
+}
+
+# Labels verwenden
+all_results_df$Variable <- var_labels[all_results_df$Variable]
+
+# Zeige die Gesamttabelle an
+print(all_results_df)
+```
+
+```{r save all_results_df for gender}
+write_xlsx(
+  all_results_df, 
+  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_gender", date, ".xlsx")
+)
+
+install.packages("vcd")   # nur beim ersten Mal nötig
+library(vcd)
+library(grid)
+
+library(vcd)
+tab <- table(dat_gender$sex, dat_gender$gender)
+
+# Direkt aufrufen, keine Zuweisung
+assocstats(tab)
+
+```

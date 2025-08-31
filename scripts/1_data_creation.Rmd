@@ -1,7 +1,7 @@
 ---
 title: "01 data_creation"
 author: ""
-date: "21/02/2025"
+date: "29/05/2025"
 output:
   html_document:
     toc: true
@@ -237,7 +237,7 @@ dat <- dat %>%
     ) %>% forcats::fct_infreq()
   )
 
-dat <- dat %>%
+dat_1 <- dat %>%
   filter(
     is.na(gender) | is.na(dem.sex) |
       !(
@@ -247,6 +247,8 @@ dat <- dat %>%
         (gender == "Trans man" & dem.sex == "Male")
       )
   )
+nrow(dat) - nrow(dat_1)
+dat <- dat_1
 
 ```
 
@@ -643,6 +645,29 @@ dat_psy_dx %>%
 ```
 
 
+```{r Columns in last data object}
+#Zusammenfügen zu einer mdd bzw. gad Variable
+dat <- dat %>%
+  mutate(
+    any_mdd_diagnosis = case_when(
+      mhd.mdd == "MDD" ~ "MDD",
+      cidid.mdd_diagnosis == "MDD diagnosis" ~ "MDD",
+      phq9.sum_score >= 10 ~ "MDD",
+      TRUE ~ "No MDD or NA"
+    ),
+    any_gad_diagnosis = case_when(
+      mhd.gad == "GAD" ~ "GAD",
+      cidia.diagnosis == "GAD diagnosis" ~ "GAD",
+      gad7.sum_score >= 10 ~ "GAD",
+      TRUE ~ "No GAD or NA"
+    )
+  )
+
+sum(dat$any_mdd_diagnosis == "MDD")
+sum(dat$any_gad_diagnosis == "GAD")
+```
+
+
 # Selection of variables
 
 ```{r Columns in last data object}
@@ -663,8 +688,12 @@ dat_rds <- dat %>%
     "phq.Q9_suicidality_binary",
     all_of(phq9_items_numeric),
     all_of(phq9_items),
+    
     "cidia.diagnosis",
     "cidid.mdd_diagnosis",
+    
+    "any_mdd_diagnosis",
+    "any_gad_diagnosis",
     
     "gender",
     "sex",

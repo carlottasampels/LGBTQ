@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + 
+    gender, data = merged_an)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-1.943e-06 -2.983e-07  4.720e-09  3.043e-07  1.815e-06 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        1.633e-06  9.844e-09 165.849  < 2e-16 ***
+pc1                3.530e-08  2.866e-09  12.317  < 2e-16 ***
+pc2                2.572e-08  4.768e-09   5.393 7.01e-08 ***
+pc3                5.954e-09  4.681e-09   1.272    0.203    
+pc4               -6.392e-09  4.610e-09  -1.386    0.166    
+pc5                1.880e-07  2.553e-08   7.363 1.86e-13 ***
+pc6               -4.634e-09  7.279e-09  -0.637    0.524    
+batchb09          -1.512e-08  1.023e-08  -1.477    0.140    
+batchb12          -1.021e-08  1.020e-08  -1.001    0.317    
+batchb16          -7.052e-09  1.029e-08  -0.685    0.493    
+batchb17          -1.058e-07  1.034e-07  -1.023    0.306    
+batchb21          -1.469e-08  1.139e-08  -1.290    0.197    
+batchb24          -3.793e-09  1.254e-08  -0.302    0.762    
+genderCis man      3.240e-11  7.803e-09   0.004    0.997    
+genderNon-binary  -1.654e-08  2.580e-08  -0.641    0.521    
+genderTrans man   -1.134e-08  4.545e-08  -0.249    0.803    
+genderSelf-define  3.524e-09  4.197e-08   0.084    0.933    
+genderTrans woman  8.566e-08  9.462e-08   0.905    0.365    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.724e-07 on 22192 degrees of freedom
+Multiple R-squared:  0.03122,	Adjusted R-squared:  0.03048 
+F-statistic: 42.07 on 17 and 22192 DF,  p-value: < 2.2e-16
+
