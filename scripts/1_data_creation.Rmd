@@ -96,7 +96,6 @@ data_path <- filepath_data_raw
 
 
 ## Read file names of rds files
-
 ```{r Read file names of rds files}
 files <- dir(
   path = data_path, # Folder with cleaned data for this project (copied from ilovedata)
@@ -106,9 +105,6 @@ files
 ```
 
 ## Join rds files together
-
-+++CH: Need to manage to remove startDate and endDate so not a million .x.x.x get added to variable names
-
 ```{r join all data}
 dat <- files %>%
   map(~ read_rds(file.path(data_path, .))) %>%
@@ -119,7 +115,6 @@ dat <- files %>%
 ```
 
 ## Check for duplicates
-
 ```{r Check for duplicates}
 dat %>% group_by(ID) %>% filter(n()>1) %>% summarize(n=n())
 ```
@@ -461,7 +456,6 @@ dat %>%
 
 # Highest education
 
-
 ```{r Highest education finegrained inspection}
 dat %>%
   summarytools::freq(dem.highest_education_finegrained)
@@ -533,7 +527,7 @@ More than half the days
 Nearly every day
 
 -777 Seen but not answered
-We are recoding -777 to NA as only 71 (90) GLAD participants have seen but not answered the question. 
+recoding -777 to NA as only 71 (90) GLAD participants have seen but not answered the question. 
 
 ```{r Create binary phq suicidality measure numeric}
 dat <- dat %>%

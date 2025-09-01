@@ -30,8 +30,7 @@ Set current date
 date <- Sys.Date()
 ```
 
-Read in file with path to ilovedata channel on Teams Ensure that your
-credentials directory is correctly located
+Read in file with path to ilovedata channel on Teams 
 
 ```{r Read in paths file}
 source(file = "credentials/paths.R")

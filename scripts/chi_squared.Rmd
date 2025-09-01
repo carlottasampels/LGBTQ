@@ -174,7 +174,7 @@ if (length(unique(help$B)) < 2) {
 }
 ```
 
-```{r ch squared test mit fisher}
+```{r chi squared test mit fisher}
 pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
   
   # Überprüfen, ob beide Variablen Faktoren sind
@@ -271,7 +271,7 @@ pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
 }
 ```
 
-```{r ch squared test anwenden sexual_orientation}
+```{r chi squared test anwenden sexual_orientation}
 target_vars <- c("age", "sex", "gender", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
 
 # Leere Liste, um Zwischenergebnisse zu speichern
