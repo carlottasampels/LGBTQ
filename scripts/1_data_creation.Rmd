@@ -492,7 +492,7 @@ dat %>%
 alpha_results <- psych::alpha(
   x = dat_phq9,
   n.iter = 1000, 
-  use = "pairwise.complete.obs"#,
+  use = "pairwise.complete.obs",
   #  check.keys = TRUE,  # This is to take into account those variables that are reverse coded/negatively related.
   )
 

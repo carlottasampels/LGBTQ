@@ -20,4 +20,17 @@ filepath_prs_an <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_an_reduced.profi
 
 filepath_prs_anxiety <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_anxiety_reduced.profile"
 
+filepath_prs_bipolar <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_bipolar_reduced.profile"
+
+filepath_prs_ptsd <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_ptsd_reduced.profile"
+
+filepath_MegaPRS_scz <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/MegaPRS_SCZ2022_tab.tsv"
+
+filepath_SBayesRC_scz <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/SCZ_SBayesRC_tab.tsv"
+
+filepath_PRSCS_scz <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_scz_reduced_PRSCS.profile"
+
 filepath_prs_pc <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/GLADv3_EDGIv1_NBRv2_EUR_covariates_1kg_projecting_pcs_batch_array.txt"
+
+filepath_prs_same_sex <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_same_sex_reduced.profile"
+
