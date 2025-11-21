@@ -1,7 +1,7 @@
 ---
 title: "data_exclusion"
 author: ""
-date: "15/06/2025"
+date: ""
 output:
   html_document:
     toc: true
@@ -74,7 +74,6 @@ library(tidyverse)
 
 ```{r Recent date}
 date = Sys.Date()
-date <- "2025-10-16"
 ```
 
 ## Read in data
@@ -85,7 +84,7 @@ dat <- read_rds(
 ```
 
 
-Psychiatric diagnoses
+# Psychiatric diagnoses vector
 ```{r Psychiatric diagnoses vector}
 psy_dx_factors <- c(
   "mhd.mdd",
@@ -105,9 +104,9 @@ psy_dx_factors <- c(
 )
 ```
 
-Analysis variables vector
+# Analysis variables vector
 
-```{r}
+```{r Analysis variables vector}
 analysis_variables_vector <- c(
   "phq9.sum_score", 
   "phq.Q9_suicidality_binary_numeric", # Suicidality
@@ -127,15 +126,13 @@ analysis_variables_vector <- c(
 
 # Exclusion criteria
 
-## Exclusion table
-
 -555 'Not applicable' response from participant
 -666 Implausible response/value
 -777 Seen but not answered
 -888 Don't know
 -999 Prefer not to answer/Prefer not to say
 
-```{r Exclusion table demographics exposure outcome}
+```{r table before exclusion}
 dat %>%
   select(
     age,
@@ -182,32 +179,28 @@ missing_gender <- abs(nrow(nogender)-nrow(dat))
 missing_gender
 ```
 
-## mhd
-
+## disorders
 
 ```{r Exclusion no disorder}
+
 dim(nogender)
 
 missing_disorder <- nogender %>%
   filter(
-    #gender == "Trans woman",
     #if_all(all_of(psy_dx_factors), is.na) | 
     !(mhd.agoraphobia == "Agoraphobia" | mhd.social_anxiety == "Social anxiety" |
       mhd.specific_phobia == "Specific phobia" |
       mhd.panic_disorder == "Panic disorder" |
       mhd.bipolar_disorder == "Bipolar disorder"),
-    !any_gad_diagnosis == "GAD",
-    !any_mdd_diagnosis == "MDD",
+    !any_gad_diagnosis == "GAD", #for mhd, cidia, gad7
+    !any_mdd_diagnosis == "MDD", #for mhd, cidid, phq9
   )
-
+      
 nogender.nodisorder <- anti_join(nogender, missing_disorder, by = "ID")
 nrow(missing_disorder)
 ```
-`r abs(missing_disorder)` participants excluded due to missing mhd, cidia and cidid.
-
 
 ## sexual orientation
-
 
 ```{r Exclusion sexual orientation}
 dim(nogender.nodisorder)
@@ -221,69 +214,31 @@ missing_sexualorientation <-
 missing_sexualorientation
 ```
 
-
 ## Final
 
 Final *n* = `r abs(nrow(nogender.nodisorder))`for gender
 
-Copy tibble after exclusion
-
-```{r Move data frame}
+```{r name}
 dat_after_exclusion_gender <- 
   nogender.nodisorder
 nrow(dat_after_exclusion_gender)
 ```
-```{r flow chart without inconsistent gender}
-n_total <- nrow(dat)
-n_missing_gender <- nrow(dat) - nrow(nogender)
-n_remaining_gender <- nrow(nogender)
 
-n_missing_mhd <- nrow(nogender) - nrow(nogender.nodisorder)
-n_remaining_mhd <- nrow(nogender.nodisorder)
+Final *n* = `r abs(nrow(nogender.nodisorder.nosexualorientation))`for sexual orientation
 
-n_missing_sexual <- nrow(nogender.nodisorder) - nrow(nogender.nodisorder.nosexualorientation)
-n_remaining_sexual <- nrow(nogender.nodisorder.nosexualorientation)
-
-n_total_f <- format(n_total, big.mark = ",")
-n_missing_gender_f <- format(n_missing_gender, big.mark = ",")
-n_remaining_gender_f <- format(n_remaining_gender, big.mark = ",")
-n_missing_mhd_f <- format(n_missing_mhd, big.mark = ",")
-n_remaining_mhd_f <- format(n_remaining_mhd, big.mark = ",")
-n_missing_sexual_f <- format(n_missing_sexual, big.mark = ",")
-n_remaining_sexual_f <- format(n_remaining_sexual, big.mark = ",")
-
-flowchart <- grViz(sprintf("
-digraph flowchart {
-    graph [layout = dot, rankdir = TB, fontsize=12]
-
-    node [shape = box, style=solid, color=black, fontname=Helvetica, width=2]
-    
-    gender [label='With Gender\\n(n = %s)']
-    mhd [label='With Disorder\\n(n = %s)']
-    sexual [label='With Sexual Orientation\\n(n = %s)']
-
-    start [label='Start\\n(n = %s)', shape=box, style=solid, color=black]
-
-    # Geändert: labeldistance auf 5.0 erhöht
-    start -> gender [label='Excluded: Missing Gender\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
-    gender -> mhd [label='Excluded: Missing Disorder\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
-    mhd -> sexual [label='Excluded: Missing Sexual Orientation\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
-}
-", n_remaining_gender_f, n_remaining_mhd_f, n_remaining_sexual_f,
-    n_total_f, n_missing_gender_f, n_missing_mhd_f, n_missing_sexual_f))
-
-flowchart
-
-
-
+```{r name}
+dat_after_exclusion_sexual_orientation <- 
+  nogender.nodisorder.nosexualorientation
+nrow(dat_after_exclusion_sexual_orientation)
 ```
 
-```{r flow chart with indconsistend gender}
+## Flowchart
+
+```{r flowchart exclusison}
 n_total <- 55811 # from data_creation
 
-
 n_inconsistent_gender <- n_total - nrow(dat)
-n_remaining_consistent_gender <- nrow(dat)  # inconsistend gender, sex and transgednder question
+n_remaining_consistent_gender <- nrow(dat)  # inconsistent gender, sex and transgender question
 
 missing_gender <- nrow(dat) - nrow(nogender)
 n_remaining_gender <- nrow(nogender)
@@ -317,7 +272,6 @@ digraph flowchart {
     with_disorder [label='With Disorder\\n(n = %s)']
     with_sexual [label='With Sexual Orientation\\n(n = %s)']
 
-    # Pfeile mit Ausschlüssen
     start -> consistent_gender [label='Excluded: Inconsistent Gender information\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
     consistent_gender -> with_gender [label='Excluded: Missing Gender\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
     with_gender -> with_disorder [label='Excluded: Missing Disorder\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
@@ -340,18 +294,11 @@ flowchart
 
 
 ```{r safe figure}
-#rsvg_png(charToRaw(export_svg(flowchart)), file.path(filepath_plots, "flowchart.png"))
 rsvg_png(charToRaw(export_svg(flowchart)), 
         file.path(filepath_plots, "flowchart.png"),
          width = 1500, 
          height = 1000 
 )
-```
-
-```{r control}
-dat_after_exclusion_sexual_orientation <- 
-  nogender.nodisorder.nosexualorientation
-nrow(dat_after_exclusion_sexual_orientation)
 ```
 
 # Write rds file

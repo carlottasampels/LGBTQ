@@ -4,7 +4,7 @@ author: "Carlotta Sampels"
 date: "2025-03-25"
 output: html_document
 ---
-
+#Setup
 
 ```{r Setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -14,17 +14,17 @@ knitr::opts_chunk$set(
 	prompt = FALSE)
 ```
 
-Clear global environment prior to initiation
+## Clear global environment prior to initiation
 ```{r Clear global environment}
 remove(list = ls())
 ```
 
-Read in file with path to ilovedata channel on Teams
+## Read in file with path to ilovedata channel on Teams
 ```{r Read in paths file}
 source(file = "credentials/paths.R")
 ```
 
-Load packages
+## Load packages
 ```{r Load packages}
 library(ggplot2)
 library(dplyr)
@@ -34,10 +34,9 @@ library(tidyverse)
 library(paletteer)
 ```
 
-Retrieve the recent date
+## Retrieve the recent date
 ```{r Recent date}
-#date = Sys.Date()
-date <- "2025-08-31"
+date = Sys.Date()
 date
 ```
 
@@ -57,7 +56,7 @@ dat_gender <- read_rds(
 )
 ```
 
-#Plots
+# Plots
 ```{r density plot}
 ggplot(dat_sexual_orientation, aes(x = age, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
@@ -78,7 +77,6 @@ ggplot(dat_gender, aes(x = age, fill = gender)) +
   theme_minimal() +
   facet_wrap(vars(gender),nrow = 4)
 ```
-
 
 ```{r age}
 ggplot(dat, aes(x = age)) +
@@ -155,9 +153,9 @@ plot_age_sexual_orientation <- ggplot(dat_sexual_orientation, aes(x = age)) +
   labs(title = NULL, x = "Alter", y = "Dichte") +
   theme_minimal() +
   theme(
-    text = element_text(size = 20),           # Schriftgröße für alle Textelemente
-    axis.title = element_text(size = 20),     # Achsentitel
-    #axis.text = element_text(size = 15),     # Achsenbeschriftungen
+    text = element_text(size = 20),           
+    axis.title = element_text(size = 20),   
+    #axis.text = element_text(size = 15),     
   )
 plot_age_sexual_orientation
 ```

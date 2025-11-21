@@ -1,7 +1,7 @@
 ---
 title: "Descriptives table"
 author: ""
-date: "2025-03-16"
+date: ""
 output:
   html_document:
     toc: true
@@ -16,17 +16,16 @@ editor_options:
     wrap: 72
 ---
 
+# Setup
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Clear Global Environment
 ```{r clear global environment}
 rm(list = ls(all.names = TRUE)) 
 ```
 
-Read in file with path to ilovedata channel on Teams
 ```{r Read in paths file}
 source(file = "credentials/paths.R")
 ```
@@ -43,8 +42,6 @@ source(file = paste0(ilovedata_scripts, "functions/imp_check.R"))
 source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
 ```
 
-Load packages
-
 ```{r Load packages}
 library(flextable)
 library(officer)
@@ -55,16 +52,11 @@ library(summarytools)
 library(tidyverse)
 ```
 
-## Set current date
-
-```{r current date}
+```{r set current date}
 date <- Sys.Date()
-date <- "2025-10-16"
 ```
 
-## Load data
-
-```{r Load data}
+```{r Load data sexual orientation}
 dat_sexual_orientation <- read_rds(
   file =
     paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
@@ -102,10 +94,10 @@ dat_gender %>%
 dat_sexual_orientation %>%
   freq(gender)
 ```
+# Tables
+## dat_gender_demographics
 
-# dat_demographics
-
-```{r dat_demographics}
+```{r dat_gender_demographics}
 dat_gender_demographics <- dat_gender %>%
   select(
     age,
@@ -138,16 +130,16 @@ dat_gender_demographics <- dat_gender %>%
   )
 ```
 
-# Variable names
+### Variable names
 
 ```{r variable names}
 names(dat_gender_demographics)
 ```
 
-# Demographics whole sample
+### Demographics gender sample
 
-```{r demographics whole sample}
-summary_table_whole_sample <-
+```{r gender sample}
+summary_table_gender_sample <-
   dat_gender_demographics %>%
   gtsummary::tbl_summary(
     label = list(
@@ -233,11 +225,11 @@ summary_table_whole_sample <-
     ) %>%
   bold_labels()
 
-summary_table_whole_sample
+summary_table_gender_sample
 ```
 
 
-## Save as a word document
+### Save as a word document
 
 ```{r word properties 1}
 sect_properties1 <- officer::prop_section(
@@ -253,7 +245,7 @@ sect_properties1 <- officer::prop_section(
 
 
 ```{r summary_table_whole_sample as word document}
-summary_table_whole_sample %>%
+summary_table_gender_sample %>%
   as_flex_table() %>%
   flextable::save_as_docx(
     path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives", date, ".docx"),
@@ -261,10 +253,9 @@ summary_table_whole_sample %>%
   )
 ```
 
-# Table clinically significant
+## descriptive tables
 
-
-```{r dat_demographics_clinical}
+```{r dat_demographics_clinical_sexual_orientation}
 dat_demographics_clinical_sexual_orientation <- dat_sexual_orientation %>%
   select(
     sex,
@@ -324,7 +315,7 @@ dat_demographics_clinical_gender <- dat_gender %>%
   )
 ```
 
-```{r}
+```{r summary_table_clinical_gender}
 summary_table_clinical_gender <-
   dat_demographics_clinical_gender %>%
   gtsummary::tbl_summary(
@@ -436,7 +427,7 @@ summary_table_clinical_gender <-
 summary_table_clinical_gender
 ```
 
-```{r}
+```{r summary_table_clinical_sexual_orientation}
 summary_table_clinical_sexual_orientation <-
   dat_demographics_clinical_sexual_orientation %>%
   gtsummary::tbl_summary(
@@ -550,113 +541,7 @@ summary_table_clinical_sexual_orientation <-
 summary_table_clinical_sexual_orientation
 ```
 
-```{r geändert} 
-summary_table_clinical <-
-  dat_demographics_clinical_sexual_orientation %>%
-  gtsummary::tbl_summary(
-    label = list(
-      sex = "Biological sex",
-      gender = "Gender",
-      sexual_orientation = "Sexual orientation",
-      any_mdd_diagnosis = "Major depressive disorder",
-      any_gad_diagnosis = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "Obsessive-compulsive disorder",
-      mhd.bdd = "Body dysmorphic disorder",
-      mhd.an = "Anorexia nervosa", 
-      mhd.atypical_an = "Atypical anorexia nervosa",
-      mhd.bn = "Bulimia nervosa",
-      mhd.bed = "Binge-eating disorder",
-      phq.Q9_suicidality_binary = "Suicidality",
-      dem.highest_education_collapsed = "Highest education",
-      ethnicity = "Ethnicity"
-#      sex = "Biologisches Geschlecht",
- #     gender = "Geschlechtsidentität",
-  #    ethnicity = "Ethnizität",
-   #   dem.highest_education_collapsed = "Höchster Bildungsabschluss",
-    #  any_mdd_diagnosis = "Schwere depressive Störung",
-     # any_gad_diagnosis = "Generalisierte Angststörung",
-      #mhd.social_anxiety = "Soziale Angststörung",
-#      mhd.specific_phobia = "Spezifische Phobie",
- #     mhd.agoraphobia = "Agoraphobie",
-  #    mhd.panic_disorder = "Panik Störung",
-   #   mhd.panic_attacks = "Panik Atacken",
-    #  mhd.bipolar_disorder ="Bipolare Störung",
-     # mhd.ocd = "Zwangsstörung",
-      #mhd.bdd = "Körpersysmorphe Störung",
-#      mhd.an = "Anorexia nervosa", 
- #     mhd.atypical_an = "Atypische anorexia nervosa",
-  #    mhd.bn = "Bulimia nervosa",
-   #   mhd.bed = "Binge-eating Störung",
-    #  phq.Q9_suicidality_binary = "Suizidaliät"
-      ),
-    type = list(
-      sex = "categorical",
-      gender = "categorical",
-      sexual_orientation = "categorical",
-      #cidid.mdd_diagnosis = "dichotomous",
-      #cidia.diagnosis = "dichotomous",
-      #mhd.mdd = "dichotomous",
-      #mhd.gad = "dichotomous",
-      any_mdd_diagnosis = "dichotomous",
-      any_gad_diagnosis = "dichotomous",
-      mhd.social_anxiety = "dichotomous",
-      mhd.specific_phobia = "dichotomous",
-      mhd.agoraphobia = "dichotomous",
-      mhd.panic_disorder = "dichotomous",
-      mhd.panic_attacks = "dichotomous",
-      mhd.bipolar_disorder = "dichotomous",
-      mhd.ocd = "dichotomous",
-      mhd.bdd = "dichotomous",
-      mhd.an = "dichotomous", 
-      mhd.atypical_an = "dichotomous",
-      mhd.bn = "dichotomous",
-      mhd.bed = "dichotomous",
-      phq.Q9_suicidality_binary = "dichotomous",
-      dem.highest_education_collapsed = "categorical",
-      ethnicity = "categorical"
-      ),
-    value = list(
-      #cidid.mdd_diagnosis = "MDD diagnosis",
-      #cidia.diagnosis = "GAD diagnosis",
-      #mhd.mdd = "MDD",
-      #mhd.gad = "GAD",
-      any_mdd_diagnosis = "MDD",
-      any_gad_diagnosis = "GAD",
-      mhd.social_anxiety = "Social anxiety",
-      mhd.specific_phobia = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "OCD",
-      mhd.bdd = "BDD",
-      mhd.an = "AN", 
-      mhd.atypical_an = "Atypical AN",
-      mhd.bn = "BN",
-      mhd.bed = "BED",
-      phq.Q9_suicidality_binary = "Any suicidality"
-      ),
-    missing_text = "Not answered",
-    digits = list(
-      all_categorical() ~ c(0, 1),
-      all_dichotomous() ~ c(0, 1)),
-    
-    statistic = list(
-      all_categorical() ~ "{n} ({p}%)",
-      all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})",  "{min} - {max}")
-      )
-    )
-
-summary_table_clinical
-```
-
-## Word document
+### Safe as word document
 
 ```{r word properties}
 sect_properties_landscape <- officer::prop_section(
@@ -686,13 +571,4 @@ summary_table_clinical_sexual_orientation %>%
     path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin_sexual_orientation", date, ".docx"),
     pr_section = sect_properties_landscape
   )
-```
-
-```{r summary_table_clinical as word document}
-summary_table_clinical %>%
-  flextable::save_as_docx(
-    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_clin", date, ".docx"),
-    pr_section = sect_properties_landscape
-  )
-
 ```

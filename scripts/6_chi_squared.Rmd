@@ -21,7 +21,7 @@ rm(list = ls())
 ```
 
 
-Read in file with path to ilovedata channel on Teams
+## Read in file with path to ilovedata channel on Teams
 Ensure that your credentials directory is correctly located
 ```{r Read in paths file}
 source(file = "credentials/paths.R")
@@ -42,6 +42,8 @@ library(dplyr)
 library(rstatix)
 library(purrr)
 library(tibble)
+library(vcd)
+library(grid)
 library(readr)
 library(writexl)
 library(officer)
@@ -70,7 +72,7 @@ dat_gender <- read_rds(
 )
 ```
 
-## Testing
+# Testing
 
 ```{r labels}
 var_labels <- c(
@@ -97,7 +99,6 @@ var_labels <- c(
 ```{r chi squared}
 pairwise.chisq.test <- function(A, B, p.adjust.method="bonferroni"){
   
-  # wir überprüfen, ob die Objekte vom Typ factor sind.
   if (!is.factor(A) | !is.factor(B)) {
     stop("Both objects need to be factors.")
   }
@@ -177,7 +178,6 @@ if (length(unique(help$B)) < 2) {
 ```{r chi squared test mit fisher}
 pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
   
-  # Überprüfen, ob beide Variablen Faktoren sind
   if (!is.factor(A) | !is.factor(B)) {
     stop("Both objects need to be factors.")
   }
@@ -274,10 +274,8 @@ pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
 ```{r chi squared test anwenden sexual_orientation}
 target_vars <- c("age", "sex", "gender", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
 
-# Leere Liste, um Zwischenergebnisse zu speichern
 results_list <- list()
 
-# Leerer Dataframe für alle Ergebnisse
 all_results_df <- data.frame()
 
 # Schleife über alle Zielvariablen
@@ -308,25 +306,14 @@ all_results_df <- all_results_df[, c("Variable", setdiff(names(all_results_df), 
 #Labels verwenden
 all_results_df$Variable <- var_labels[all_results_df$Variable]
 
-# Zeige die Gesamttabelle an
 print(all_results_df)
-```
-
-```{r save all_results_df for sexual_orientation}
-date <- "2025-08-12"
-write_xlsx(
-  all_results_df,
-  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_sexual_orientation", date, ".xlsx")
-)
 ```
 
 ```{r ch squared test anwenden gender}
 target_vars <- c("age", "sex", "sexual_orientation", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
 
-# Leere Liste, um Zwischenergebnisse zu speichern
 results_list <- list()
 
-# Leerer Dataframe für alle Ergebnisse
 all_results_df <- data.frame()
 
 # Schleife über alle Zielvariablen
@@ -338,7 +325,7 @@ for (var in target_vars) {
   # Hole die Gruppierungsvariable als Faktor
   B_current <- factor(dat_gender$gender)
   
-  # Führe den Test aus
+  # Test
   res <- pairwise.chisq.test(A = A_current, B = B_current)
   
   # Speichere das Ergebnis in der Liste
@@ -350,15 +337,21 @@ for (var in target_vars) {
   # Hänge die Ergebnisse an den Gesamtdatensatz
   all_results_df <- rbind(all_results_df, res)
   
-  # Spalte "Variable" nach vorne stellen
 all_results_df <- all_results_df[, c("Variable", setdiff(names(all_results_df), "Variable"))]
 }
 
-# Labels verwenden
 all_results_df$Variable <- var_labels[all_results_df$Variable]
 
-# Zeige die Gesamttabelle an
 print(all_results_df)
+```
+
+##safe
+
+```{r save all_results_df for sexual_orientation}
+write_xlsx(
+  all_results_df,
+  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_sexual_orientation", date, ".xlsx")
+)
 ```
 
 ```{r save all_results_df for gender}
@@ -366,15 +359,4 @@ write_xlsx(
   all_results_df, 
   path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_gender", date, ".xlsx")
 )
-
-install.packages("vcd")   # nur beim ersten Mal nötig
-library(vcd)
-library(grid)
-
-library(vcd)
-tab <- table(dat_gender$sex, dat_gender$gender)
-
-# Direkt aufrufen, keine Zuweisung
-assocstats(tab)
-
 ```

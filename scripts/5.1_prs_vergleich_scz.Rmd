@@ -16,19 +16,19 @@ editor_options:
     wrap: 72
   chunk_output_type: inline
 ---
-
+# Setup
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Clear Global Environment
+## Clear Global Environment
 
 ```{r clear global environment}
 rm(list = ls(all.names = TRUE)) 
 ```
 
-Read in file with path to ilovedata channel on Teams Ensure that your
-credentials directory is correctly located
+## Read in file with path to ilovedata channel on Teams 
+Ensure that your credentials directory is correctly located
 
 ```{r Read in paths file}
 source(file = "credentials/paths.R")
@@ -40,19 +40,19 @@ source(file = "credentials/paths.R")
 library(ggplot2)
 library(readr)
 library(patchwork)
+library(tidyr)
 ```
 
 ## Set current date
 
 ```{r current date}
 date <- Sys.Date()
-date <- "2025-10-16"
 ```
 
 ## Load data
 
 ```{r Load data sexual orientation}
-dat_sex <- read_rds(
+dat_so <- read_rds(
   file =
     paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
 )
@@ -76,13 +76,15 @@ dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFa
 dat_prs_pc_subset <- dat_prs_pc[, c("FID", "batch", "pc1", "pc2", "pc3", "pc4", "pc5", "pc6")]
 ```
 
-```{r prs standartisieren}
+# prepare for comparision
+
+```{r prs standardise}
 dat_megaprs_scz$SCORE_scaled <- scale(dat_megaprs_scz$SCORE)
 dat_SBayesRC_scz$SCORE_scaled <- scale(dat_SBayesRC_scz$SCORE)
 dat_PRSCS_scz$SCORE_scaled <- scale(dat_PRSCS_scz$SCORE)
 ```
 
-```{r scz kombinieren}
+```{r scz combine}
 
 dat_combined_scz <- merge(dat_megaprs_scz[, c("ID","SCORE_scaled")],
                       dat_SBayesRC_scz[, c("ID","SCORE_scaled")],
@@ -91,50 +93,54 @@ dat_combined_scz <- merge(dat_megaprs_scz[, c("ID","SCORE_scaled")],
 
 dat_combined_scz <- merge(
   dat_combined_scz,
-  dat_PRSCS_scz[, c("FID","SCORE_scaled")],  # ACHTUNG: Spalte heißt "FID", nicht "ID"
-  by.x = "ID",  # ID-Spalte in dat_combined_scz
-  by.y = "FID"  # FID-Spalte in dat_PRSCS_scz
+  dat_PRSCS_scz[, c("FID","SCORE_scaled")],  
+  by.x = "ID",  
+  by.y = "FID" 
 )
 
-# PRS-CS-Spalte umbenennen
+# rename PRS-CS-colnames
 colnames(dat_combined_scz)[colnames(dat_combined_scz) == "SCORE_scaled"] <- "SCORE_PRSCS"
 
 ```
 
-```{r prs standartisieren}
+```{r prs standardise}
 cor(dat_combined_scz$SCORE_scaled_MegaPRS, dat_combined_scz$SCORE_scaled_SBayesRC)
 ```
 
-```{r prs plot scz MegaPRS und SBayesRC}
+#Plots
+
+```{r prs plot scz MegaPRS and SBayesRC}
 plot(dat_combined_scz$SCORE_scaled_MegaPRS, dat_combined_scz$SCORE_scaled_SBayesRC,
-     xlab="MegaPRS Score (standardisiert)",
-     ylab="SBayesRC Score (standardisiert)",
-     main="Vergleich PRS: MegaPRS vs SBayesRC",
+     xlab="MegaPRS Score (standardised)",
+     ylab="SBayesRC Score (standardised)",
+     main="Compare PRS: MegaPRS vs SBayesRC",
      xlim = c(-4, 4.5),
      ylim = c(-5, 5)) 
 abline(lm(SCORE_scaled_SBayesRC ~ SCORE_scaled_MegaPRS, data=dat_combined_scz), col="red")
 ```
-```{r prs plot scz MegaPRS und PRSCS}
+```{r prs plot scz MegaPRS and PRSCS}
 plot(dat_combined_scz$SCORE_scaled_MegaPRS, dat_combined_scz$SCORE_PRSCS,
-     xlab="MegaPRS Score (standardisiert)",
-     ylab="PRS-CS Score (standardisiert)",
-     main="Vergleich PRS: MegaPRS vs PRS-CS",
+     xlab="MegaPRS Score (standardised)",
+     ylab="PRS-CS Score (standardised)",
+     main="Comparision PRS: MegaPRS vs PRS-CS",
      xlim = c(-4, 4.5),
      ylim = c(-5, 5)) 
 abline(lm(SCORE_PRSCS ~ SCORE_scaled_MegaPRS, data=dat_combined_scz), col="red")
 ```
 
-```{r prs plot scz SBayesRC und PRSCS}
+```{r prs plot scz SBayesRC and PRSCS}
 plot(dat_combined_scz$SCORE_scaled_SBayesRC, dat_combined_scz$SCORE_PRSCS,
-     xlab="SBayesRC Score (standardisiert)",
-     ylab="PRS-CS Score (standardisiert)",
-     main="Vergleich PRS: SBayesRC vs PRS-CS",
+     xlab="SBayesRC Score (standardised)",
+     ylab="PRS-CS Score (standardised)",
+     main="Comparision PRS: SBayesRC vs PRS-CS",
      xlim = c(-4, 4.5),
      ylim = c(-5, 5)) 
 abline(lm(SCORE_PRSCS ~ SCORE_scaled_SBayesRC, data=dat_combined_scz), col="red")
 ```
 
-```{r prs mit glad vergleich}
+# Method comparision with glad
+
+```{r prs with glad compairsion}
 merged_all_scz <- merge(dat_megaprs_scz[, c("ID","SCORE_scaled")],
                     dat_SBayesRC_scz[, c("ID","SCORE_scaled")],
                     by="ID", suffixes=c("_MegaPRS","_SBayesRC"))
@@ -157,37 +163,35 @@ merged_all_scz <- merge(
 colnames(merged_all_scz)[colnames(merged_all_scz) == "SCORE_scaled"] <- "SCORE_scaled_PRSCS"
 
 
-# Merge mit GLAD-Daten (sexuelle Orientierung)
-merged_all_scz <- merge(merged_all_scz, dat_sex, by.x="ID", by.y="ID")
+# Merge with GLAD-Data (sexual Orientation)
+merged_all_scz <- merge(merged_all_scz, dat_so, by.x="ID", by.y="ID")
 
-# Merge mit PCs
+# Merge with PCs
 merged_all_scz <- merge(merged_all_scz, dat_prs_pc_subset, by.x="ID", by.y="FID")
 ```
 
-```{r regression nach prs art sexuelle orientierung}
-
+```{r regression for prs method sexuelle orientierung}
 # MegaPRS
-reg_megaprs_sex <- lm(SCORE_scaled_MegaPRS ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
+reg_megaprs_so <- lm(SCORE_scaled_MegaPRS ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
                   data=merged_all_scz)
-summary(reg_megaprs_sex)
-merged_all_scz$PRS_resid_MegaPRS_sex <- resid(reg_megaprs_sex)
+summary(reg_megaprs_so)
+merged_all_scz$PRS_resid_MegaPRS_so <- resid(reg_megaprs_so)
 
 # SBayesRC
-reg_sbayes_sex <- lm(SCORE_scaled_SBayesRC ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
+reg_sbayes_so <- lm(SCORE_scaled_SBayesRC ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
                  data=merged_all_scz)
-summary(reg_sbayes_sex)
-merged_all_scz$PRS_resid_SBayesRC_sex <- resid(reg_sbayes_sex)
+summary(reg_sbayes_so)
+merged_all_scz$PRS_resid_SBayesRC_so <- resid(reg_sbayes_so)
 
 # PRS-CS
-reg_prscs_sex <- lm(SCORE_scaled_PRSCS ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
+reg_prscs_so <- lm(SCORE_scaled_PRSCS ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
                  data=merged_all_scz)
-summary(reg_prscs_sex)
-merged_all_scz$PRS_resid_prscs_sex <- resid(reg_prscs_sex)
+summary(reg_prscs_so)
+merged_all_scz$PRS_resid_prscs_so <- resid(reg_prscs_so)
 
 ```
 
-```{r regression nach prs art gender}
-
+```{r regression for prs method gender}
 # MegaPRS
 reg_megaprs_gender <- lm(SCORE_scaled_MegaPRS ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + gender, 
                   data=merged_all_scz)
@@ -209,24 +213,21 @@ merged_all_scz$PRS_resid_prscs_gender <- resid(reg_prscs_gender)
 
 ```
 
-```{r plots prs vergleich ohne prscs für sexuelle orientierung}
-library(ggplot2)
-library(tidyr)
+## Plots
 
-dat_long_resid <- merged_all_scz %>%
-  pivot_longer(cols = c(PRS_resid_MegaPRS_sex, PRS_resid_SBayesRC_sex, PRS_resid_prscs_sex),
+```{r plots prs comparision sexual orientation}
+dat_long_resid_so <- merged_all_scz %>%
+  pivot_longer(cols = c(PRS_resid_MegaPRS_so, PRS_resid_SBayesRC_so, PRS_resid_prscs_so),
                names_to = "PRS_method",
                values_to = "Score_resid")
 
-# Schönerer Name für Methoden
-dat_long_resid$PRS_method <- factor(dat_long_resid$PRS_method,
-                                   levels = c("PRS_resid_MegaPRS_sex", "PRS_resid_SBayesRC_sex", "PRS_resid_prscs_sex"),
+# names for Methods
+dat_long_resid_so$PRS_method <- factor(dat_long_resid_so$PRS_method,
+                                   levels = c("PRS_resid_MegaPRS_so", "PRS_resid_SBayesRC_so", "PRS_resid_prscs_so"),
                                    labels = c("MegaPRS", "SBayesRC", "PRSCS"))
 
-# -------------------------------
-#  Boxplot der Residuen
-# -------------------------------
-prs_com_sex_orientation <- ggplot(dat_long_resid, aes(x = sexual_orientation, y = Score_resid, fill = PRS_method)) +
+#  Boxplot of Residuals
+prs_com_sex_orientation <- ggplot(dat_long_resid_so, aes(x = sexual_orientation, y = Score_resid, fill = PRS_method)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
   labs(x = "Sexual Orientation",
        y = "Adjusted PRS residuals",
@@ -235,10 +236,9 @@ prs_com_sex_orientation <- ggplot(dat_long_resid, aes(x = sexual_orientation, y 
   theme_bw() +
   theme(text = element_text(size = 30))
 prs_com_sex_orientation
-# -------------------------------
-#  Density-Plot der Residuen
-# -------------------------------
-ggplot(dat_long_resid, aes(x = Score_resid, fill = PRS_method)) +
+
+#  Density-Plot of Residuals
+ggplot(dat_long_resid_so, aes(x = Score_resid, fill = PRS_method)) +
   geom_density(alpha = 0.4) +
   facet_wrap(~sexual_orientation) +
   labs(x = "Adjusted PRS residuals",
@@ -250,10 +250,18 @@ ggplot(dat_long_resid, aes(x = Score_resid, fill = PRS_method)) +
 ```
 
 ```{r plots prs vergleich ohne prscs für gender}
-# -------------------------------
-#  Boxplot der Residuen
-# -------------------------------
-prs_com_gender <- ggplot(dat_long_resid, aes(x = gender, y = Score_resid, fill = PRS_method)) +
+dat_long_resid_gender <- merged_all_scz %>%
+  pivot_longer(cols = c(PRS_resid_MegaPRS_gender, PRS_resid_SBayesRC_gender, PRS_resid_prscs_gender),
+               names_to = "PRS_method",
+               values_to = "Score_resid")
+
+# names for Methods
+dat_long_resid_gender$PRS_method <- factor(dat_long_resid_gender$PRS_method,
+                                   levels = c("PRS_resid_MegaPRS_gender", "PRS_resid_SBayesRC_gender", "PRS_resid_prscs_gender"),
+                                   labels = c("MegaPRS", "SBayesRC", "PRSCS"))
+
+#  Boxplot of Residuals
+prs_com_gender <- ggplot(dat_long_resid_gender, aes(x = gender, y = Score_resid, fill = PRS_method)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
   labs(x = "Gender",
        y = "Adjusted PRS residuals",
@@ -263,21 +271,22 @@ prs_com_gender <- ggplot(dat_long_resid, aes(x = gender, y = Score_resid, fill =
   theme(text = element_text(size = 30))
 
 prs_com_gender
-# -------------------------------
-#  Density-Plot der Residuen
-# -------------------------------
-ggplot(dat_long_resid, aes(x = Score_resid, fill = PRS_method)) +
+
+#  Density-Plot of Residuals
+ggplot(dat_long_resid_gender, aes(x = Score_resid, fill = PRS_method)) +
   geom_density(alpha = 0.4) +
   facet_wrap(~gender) +
   labs(x = "Bereinigte PRS-Residuen",
        y = "Dichte",
-       fill = "PRS Methode",
+       fill = "PRS Method",
        title = "Density-Plot der PRS-Residuen nach gender") +
   theme_bw() +
   theme(text = element_text(size = 14))
 ```
 
+## Safe
+
 ```{r save plot all}
-ggsave("C:/Users/carlo/Documents/work/LGBTQ/plots/prs_comparision_sexual_orientation.png", prs_com_sex_orientation, width = 16, height = 9, dpi = 300)
-ggsave("C:/Users/carlo/Documents/work/LGBTQ/plots/prs_comparision_gender.png", prs_com_gender, width = 16, height = 9, dpi = 300)
+ggsave(file.path(filepath_plots, "prs_comparision_sexual_orientation.png"), prs_com_sex_orientation, width = 16, height = 9, dpi = 300)
+ggsave(file.path(filepath_plots, "prs_comparision_gender.png"), prs_com_gender, width = 16, height = 9, dpi = 300)
 ```

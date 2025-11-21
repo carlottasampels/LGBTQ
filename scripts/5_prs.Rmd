@@ -16,19 +16,20 @@ editor_options:
     wrap: 72
   chunk_output_type: inline
 ---
+# Setup
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Clear Global Environment
+## Clear Global Environment
 
 ```{r clear global environment}
 rm(list = ls(all.names = TRUE)) 
 ```
 
-Read in file with path to ilovedata channel on Teams Ensure that your
-credentials directory is correctly located
+## Read in file with path to ilovedata channel on Teams 
+Ensure that your credentials directory is correctly located
 
 ```{r Read in paths file}
 source(file = "credentials/paths.R")
@@ -39,6 +40,9 @@ source(file = "credentials/paths.R")
 ```{r Load packages}
 library(ggplot2)
 library(readr)
+library(nnet)
+library(lmtest)
+library(pscl)
 library(patchwork)
 ```
 
@@ -46,7 +50,6 @@ library(patchwork)
 
 ```{r current date}
 date <- Sys.Date()
-date <- "2025-10-16"
 ```
 
 ## Load data
@@ -85,6 +88,8 @@ dat_prs_same_sex <- read.table(filepath_prs_same_sex, header = TRUE, sep = "\t",
 dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 dat_prs_pc_subset <- dat_prs_pc[, c("FID", "batch", "pc1", "pc2", "pc3", "pc4", "pc5", "pc6")]
 ```
+
+## Merge data
 
 ```{r merge gender}
 #merged <- merge(dat_prs_bmi, dat_gender, by.x = "FID", by.y = "ID")
@@ -183,6 +188,8 @@ merged_same_sex_so <- merge(
 )
 ```
 
+# Regressions
+
 ```{r regression}
 model_bmi_g <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_bmi_g)
 model_dep_g <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data=merged_dep_g)
@@ -224,6 +231,7 @@ merged_scz_so$residuals_score <- residuals(model_scz_so)
 merged_same_sex_so$residuals_score <- residuals(model_same_sex_so)
 ```
 
+## disorders
 
 ```{r regression depression sexual orientation}
 reg_sex_orientation_dep <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
@@ -295,7 +303,7 @@ reg_gender_ptsd <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batc
 summary(reg_gender_ptsd)
 ```
 
-```{r regression scz sexual_orientation}
+```{r regression scz sexual orientation}
 reg_sex_orientation_scz <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
     data = merged_scz_so)
 
@@ -309,14 +317,16 @@ reg_gender_scz <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch
 summary(reg_gender_scz)
 ```
 
-```{r regression same_sex sexual_orientation}
+## same sex sexual behavior
+
+```{r regression same_sex sexual orientation}
 reg_sex_orientation_same_sex <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + sexual_orientation, 
     data = merged_same_sex_so)
 
 summary(reg_sex_orientation_same_sex)
 ```
 
-```{r regression scz gender}
+```{r regression same_sex gender}
 reg_gender_same_sex <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + gender, 
     data = merged_same_sex_g)
 
@@ -324,15 +334,8 @@ summary(reg_gender_same_sex)
 ```
 
 ```{r multinomiale logistische Regression}
-## Pakete
-library(nnet)
-library(lmtest)
-library(pscl)
-
-# Outcome als Faktor (falls nötig)
 merged_same_sex_so$sexual_orientation <- factor(merged_same_sex_so$sexual_orientation)
 
-# Hauptmodell: PRS + PCs + Batch
 model <- multinom(
   sexual_orientation ~ residuals_score +
                        pc1 + pc2 + pc3 + pc4 + pc5 + pc6 +
@@ -340,7 +343,6 @@ model <- multinom(
   data = merged_same_sex_so
 )
 
-# Zusammenfassung
 summary(model)
 
 # z- und p-Werte
@@ -361,9 +363,9 @@ model_null <- multinom(
 
 # Likelihood-Ratio-Test
 lrtest(model, model_null)
-
 ```
 
+# Plots
 
 ```{r plot residuen depression}
 dep_gender <- ggplot(merged_dep_g, aes(x = residuals_score, fill = gender)) +
@@ -517,9 +519,6 @@ facet_wrap(~ sexual_orientation, nrow = 6) +
 an_sexual_orientation
 ```
 
-
-
-
 ```{r plot residuen bipolar}
 bipolar_gender <- ggplot(merged_bipolar_g, aes(x = residuals_score, fill = gender)) +
   geom_density(alpha = 0.5) +
@@ -610,7 +609,7 @@ facet_wrap(~ sexual_orientation, nrow = 6) +
 ptsd_sexual_orientation
 ```
 
-```{r plot residuen ptsd}
+```{r plot residuen scz}
 scz_gender <- ggplot(merged_scz_g, aes(x = residuals_score, fill = gender)) +
   geom_density(alpha = 0.5) +
   facet_wrap(~ gender, nrow = 6, ncol = 1) + 
@@ -676,7 +675,7 @@ combined_plot_gender <- (dep_gender | anxiety_gender | an_gender) +
 print(combined_plot_gender)
 ```
 
-```{r all plots combined}
+```{r plot combined all disorders}
 all_sex_orientation <- dep_sexual_orientation  + anxiety_sexual_orientation + an_sexual_orientation + bipolar_sexual_orientation + ptsd_sexual_orientation + scz_sexual_orientation 
 all_sex_orientation
 
@@ -684,7 +683,7 @@ all_gender <- dep_gender + anxiety_gender + an_gender + bipolar_gender + ptsd_ge
 all_gender
 ```
 
-```{r plot residuen same_sex}
+```{r plot residuen same_sex sexual orientation}
 same_sex_sexual_orientation <- ggplot(merged_same_sex_so, aes(x = residuals_score, fill = sexual_orientation)) +
   geom_density(alpha = 0.5) +
 facet_wrap(~ sexual_orientation, nrow = 6) + 
@@ -730,6 +729,8 @@ same_sex_gender <- ggplot(merged_same_sex_g, aes(x = residuals_score, fill = gen
 same_sex_gender
 ```
 
+##save
+
 ```{r save plot all}
 ggsave(filename = file.path(filepath_plots, "all_prs_residuen_sexual_orientation.png"), all_sex_orientation, width = 12, height = 12, dpi = 300)
 ggsave(filename = file.path(filepath_plots, "all_prs_residuen_gender.png"), all_gender, width = 12, height = 14.4, dpi = 300)
@@ -741,6 +742,8 @@ ggsave(
 )
 ggsave(filename = file.path(filepath_plots, "prs_residuen_gender.png"), combined_plot_gender, width = 12, height = 7.2, dpi = 300)
 ```
+
+##old
 
 ```{r plot bmi}
 ggplot(merged_bmi_g, aes(x = SCORE, fill = sex)) +

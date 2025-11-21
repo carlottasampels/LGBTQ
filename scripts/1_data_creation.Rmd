@@ -1,7 +1,7 @@
 ---
 title: "01 data_creation"
 author: ""
-date: "29/05/2025"
+date: ""
 output:
   html_document:
     toc: true
@@ -175,7 +175,7 @@ phq9_items <-
   )
 ```
 
-# dat_gad7
+## dat_gad7
 
 ```{r dat_gad7}
 dat_gad7 <- dat %>%
@@ -186,7 +186,7 @@ dat_gad7 <- dat %>%
 
 dat_gad7 %>% names
 ```
-# dat_phq9
+## dat_phq9
 
 ```{r dat_phq9}
 dat_phq9 <- dat %>%
@@ -639,8 +639,7 @@ dat_psy_dx %>%
 ```
 
 
-```{r Columns in last data object}
-#Zusammenfügen zu einer mdd bzw. gad Variable
+```{r Combine for just one Variable for mdd bzw. gad }
 dat <- dat %>%
   mutate(
     any_mdd_diagnosis = case_when(
