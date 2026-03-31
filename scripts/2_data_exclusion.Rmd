@@ -61,9 +61,7 @@ source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
 ## Load packages
 
 ```{r Load packages}
-#library(openxlsx)
 library(gtsummary)
-#library(ggconsort)
 library(DiagrammeR)
 library(DiagrammeRsvg)
 library(rsvg)
@@ -100,7 +98,15 @@ psy_dx_factors <- c(
   "mhd.an",
   "mhd.atypical_an",
   "mhd.bn",
-  "mhd.bed"
+  "mhd.bed",
+  "mhd.schizophrenia",
+  "mhd.ptsd",  
+  "mhd.addadhd",
+  
+  
+  "mhd.perinatal_depression",
+  "mhd.depressive_disorders",
+  "mhd.anxiety_disorders" 
 )
 ```
 
@@ -159,7 +165,14 @@ dat %>%
   "mhd.an",
   "mhd.atypical_an",
   "mhd.bn",
-  "mhd.bed"
+  "mhd.bed",
+  "mhd.schizophrenia",
+  "mhd.ptsd",  
+  "mhd.addadhd",
+  
+  "mhd.perinatal_depression",
+  "mhd.depressive_disorders",
+  "mhd.anxiety_disorders" 
 ) %>%
   gtsummary::tbl_summary()
 ```
@@ -179,56 +192,36 @@ missing_gender <- abs(nrow(nogender)-nrow(dat))
 missing_gender
 ```
 
-## disorders
-
-```{r Exclusion no disorder}
-
-dim(nogender)
-
-missing_disorder <- nogender %>%
-  filter(
-    #if_all(all_of(psy_dx_factors), is.na) | 
-    !(mhd.agoraphobia == "Agoraphobia" | mhd.social_anxiety == "Social anxiety" |
-      mhd.specific_phobia == "Specific phobia" |
-      mhd.panic_disorder == "Panic disorder" |
-      mhd.bipolar_disorder == "Bipolar disorder"),
-    !any_gad_diagnosis == "GAD", #for mhd, cidia, gad7
-    !any_mdd_diagnosis == "MDD", #for mhd, cidid, phq9
-  )
-      
-nogender.nodisorder <- anti_join(nogender, missing_disorder, by = "ID")
-nrow(missing_disorder)
-```
-
 ## sexual orientation
 
 ```{r Exclusion sexual orientation}
-dim(nogender.nodisorder)
+dim(nogender)
 
-nogender.nodisorder.nosexualorientation <- nogender.nodisorder %>%
+
+nogender.nosexualorientation <- nogender %>%
   drop_na(sexual_orientation)
 
 missing_sexualorientation <- 
-  nrow(nogender.nodisorder) - 
-  nrow(nogender.nodisorder.nosexualorientation)
+  nrow(nogender) - 
+  nrow(nogender.nosexualorientation)
 missing_sexualorientation
 ```
 
 ## Final
 
-Final *n* = `r abs(nrow(nogender.nodisorder))`for gender
+Final *n* = `r abs(nrow(nogender))`for gender
 
 ```{r name}
 dat_after_exclusion_gender <- 
-  nogender.nodisorder
+  nogender
 nrow(dat_after_exclusion_gender)
 ```
 
-Final *n* = `r abs(nrow(nogender.nodisorder.nosexualorientation))`for sexual orientation
+Final *n* = `r abs(nrow(nogender.nosexualorientation))`for sexual orientation
 
 ```{r name}
 dat_after_exclusion_sexual_orientation <- 
-  nogender.nodisorder.nosexualorientation
+  nogender.nosexualorientation
 nrow(dat_after_exclusion_sexual_orientation)
 ```
 
@@ -240,22 +233,18 @@ n_total <- 55811 # from data_creation
 n_inconsistent_gender <- n_total - nrow(dat)
 n_remaining_consistent_gender <- nrow(dat)  # inconsistent gender, sex and transgender question
 
-missing_gender <- nrow(dat) - nrow(nogender)
+n_missing_gender <- nrow(dat) - nrow(nogender)
 n_remaining_gender <- nrow(nogender)
 
-n_missing_mhd <- nrow(nogender) - nrow(nogender.nodisorder)
-n_remaining_mhd <- nrow(nogender.nodisorder)
 
-n_missing_sexual <- nrow(nogender.nodisorder) - nrow(nogender.nodisorder.nosexualorientation)
-n_remaining_sexual <- nrow(nogender.nodisorder.nosexualorientation)
+n_missing_sexual <- nrow(nogender) - nrow(nogender.nosexualorientation)
+n_remaining_sexual <- nrow(nogender.nosexualorientation)
 
 n_total_f <- format(n_total, big.mark = ",")
 n_inconsistent_gender_f <- format(n_inconsistent_gender, big.mark = ",")
 n_remaining_consistent_gender_f <- format(n_remaining_consistent_gender, big.mark = ",")
 n_missing_gender_f <- format(n_missing_gender, big.mark = ",")
 n_remaining_gender_f <- format(n_remaining_gender, big.mark = ",")
-n_missing_mhd_f <- format(n_missing_mhd, big.mark = ",")
-n_remaining_mhd_f <- format(n_remaining_mhd, big.mark = ",")
 n_missing_sexual_f <- format(n_missing_sexual, big.mark = ",")
 n_remaining_sexual_f <- format(n_remaining_sexual, big.mark = ",")
 
@@ -269,23 +258,19 @@ digraph flowchart {
     start [label='Start\\n(n = %s)']
     consistent_gender [label='Consistent Gender inforamation\\n(n = %s)']
     with_gender [label='With Gender\\n(n = %s)']
-    with_disorder [label='With Disorder\\n(n = %s)']
     with_sexual [label='With Sexual Orientation\\n(n = %s)']
 
     start -> consistent_gender [label='Excluded: Inconsistent Gender information\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
     consistent_gender -> with_gender [label='Excluded: Missing Gender\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
-    with_gender -> with_disorder [label='Excluded: Missing Disorder\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
-    with_disorder -> with_sexual [label='Excluded: Missing Sexual Orientation\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
+    with_gender ->  with_sexual [label='Excluded: Missing Sexual Orientation\\n(n = %s)', labeljust=l, labelangle=-45, labeldistance=5.0]
 }
 ", 
 n_total_f, 
 n_remaining_consistent_gender_f, 
 n_remaining_gender_f, 
-n_remaining_mhd_f, 
 n_remaining_sexual_f,
 n_inconsistent_gender_f, 
 n_missing_gender_f, 
-n_missing_mhd_f, 
 n_missing_sexual_f))
 
 flowchart

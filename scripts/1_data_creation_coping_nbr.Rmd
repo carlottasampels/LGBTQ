@@ -16,8 +16,6 @@ editor_options:
     wrap: 72
 ---
 
-#Setup
-
 ```{r Setup, include=FALSE}
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -61,6 +59,7 @@ Retrieve the recent date
 
 ```{r Recent date}
 date = Sys.Date()
+date = "2026-03-22"
 date
 ```
 
@@ -93,7 +92,7 @@ date
 
 ## File path
 ```{r}
-data_path <- filepath_data_raw
+data_path <- filepath_data_raw_coping_nbr
 ```
 
 
@@ -121,6 +120,13 @@ dat <- files %>%
 dat %>% group_by(ID) %>% filter(n()>1) %>% summarize(n=n())
 ```
 
+## Variable names
+```{r}
+dat %>% names
+```
+
+
+
 The tibble has no duplicates.
 
 # Vectors
@@ -130,13 +136,13 @@ The tibble has no duplicates.
 ```{r gad7_items vector}
 gad7_items_numeric <-
   c(
-  "gad7.feeling_nervous_anxious_or_on_edge_numeric",
-  "gad7.control_worrying_stop_numeric",
-  "gad7.worrying_too_much_about_different_things_numeric",
-  "gad7.trouble_relaxing_numeric",
-  "gad7.sit_restless_hard_numeric",
-  "gad7.becoming_easily_annoyed_or_irritable_numeric",
-  "gad7.awful_feeling_afraid_happen_numeric"
+  "gad7.feeling_nervous_anxious_or_on_edge_cop_numeric",
+  "gad7.control_worrying_stop_cop_numeric",
+  "gad7.worrying_too_much_about_different_things_cop_numeric",
+  "gad7.trouble_relaxing_cop_numeric",
+  "gad7.sit_restless_hard_cop_numeric",
+  "gad7.becoming_easily_annoyed_or_irritable_cop_numeric",
+  "gad7.awful_feeling_afraid_happen_cop_numeric"
   )
 ```
 
@@ -145,28 +151,32 @@ gad7_items_numeric <-
 ```{r phq9_items}
 phq9_items_numeric <-
   c(
-  "phq9.dead_hurting_thoughts_numeric",
-  "phq9.feeling_bad_failure_family_numeric",
-  "phq9.feeling_down_depressed_or_hopeless_numeric",
-  "phq9.feeling_tired_or_having_little_energy_numeric",
-  "phq9.little_interest_or_pleasure_in_doing_things_numeric",
-  "phq9.moving_fidgety_noticed_opposite_numeric",
-  "phq9.poor_appetite_or_overeating_numeric",
-  "phq9.staying_asleep_sleeping_trouble_numeric",
-  "phq9.trouble_concentrating_reading_newspaper_numeric"
+  "phq9.dead_hurting_thoughts_cop_numeric",
+  "phq9.feeling_bad_failure_family_cop_numeric",
+  "phq9.feeling_down_depressed_or_hopeless_cop_numeric",
+  "phq9.feeling_tired_or_having_little_energy_cop_numeric",
+  "phq9.little_interest_or_pleasure_in_doing_things_cop_numeric",
+  #"phq9.moving_fidgety_noticed_opposite_cop_numeric",
+  "phq9.moving_fidgety_opposite_slowly.1_cop_numeric",
+  "phq9.poor_appetite_or_overeating_cop_numeric",
+  "phq9.staying_asleep_sleeping_trouble_cop_numeric",
+  #"phq9.trouble_concentrating_reading_newspaper_cop_numeric"
+  "phq9.trouble_concentrating_newspaper_reading_cop_numeric"
   )
 
 phq9_items <-
   c(
-  "phq9.dead_hurting_thoughts",
-  "phq9.feeling_bad_failure_family",
-  "phq9.feeling_down_depressed_or_hopeless",
-  "phq9.feeling_tired_or_having_little_energy",
-  "phq9.little_interest_or_pleasure_in_doing_things",
-  "phq9.moving_fidgety_noticed_opposite",
-  "phq9.poor_appetite_or_overeating",
-  "phq9.staying_asleep_sleeping_trouble",
-  "phq9.trouble_concentrating_reading_newspaper"
+  "phq9.dead_hurting_thoughts_cop",
+  "phq9.feeling_bad_failure_family_cop",
+  "phq9.feeling_down_depressed_or_hopeless_cop",
+  "phq9.feeling_tired_or_having_little_energy_cop",
+  "phq9.little_interest_or_pleasure_in_doing_things_cop",
+  #"phq9.moving_fidgety_noticed_opposite_cop",
+  "phq9.moving_fidgety_opposite_slowly.1_cop",
+  "phq9.poor_appetite_or_overeating_cop",
+  "phq9.staying_asleep_sleeping_trouble_cop",
+  #"phq9.trouble_concentrating_reading_newspaper_cop"
+  "phq9.trouble_concentrating_newspaper_reading.1_cop"
   )
 ```
 
@@ -194,13 +204,13 @@ dat_phq9 %>% names
 ```
 
 ```{r cidia.diagnosis check}
-dat %>%
-  freq(cidia.diagnosis)
+#dat %>%
+ # freq(cidia.diagnosis_cop)
 ```
 
 ```{r cidid.diagnosis check}
-dat %>%
-  freq(cidid.mdd_diagnosis)
+#dat %>%
+ # freq(cidid.mdd_diagnosis)
 ```
 
 # Gender
@@ -208,7 +218,7 @@ dat %>%
 ## Inspection
 ```{r Gender inspection}
 dat %>%
-  select(dem.which_gender_do_you_identify_with, dem.do_you_identify_as_transgender) %>%
+  select(dem.which_gender_do_you_identify_with_cop, dem.do_you_identify_as_transgender_cop) %>%
   freq()
 ```
 
@@ -218,28 +228,16 @@ dat %>%
 dat <- dat %>%
   mutate(
     gender = case_when(
-      dem.which_gender_do_you_identify_with == "Self-define" ~ "Self-define",
-      dem.which_gender_do_you_identify_with == "Non-binary" ~ "Non-binary",
-      dem.which_gender_do_you_identify_with == "Male" & dem.do_you_identify_as_transgender == "No" ~ "Cis man",
-      dem.which_gender_do_you_identify_with == "Male" & dem.do_you_identify_as_transgender == "Yes" ~ "Trans man",
-      dem.which_gender_do_you_identify_with == "Female" & dem.do_you_identify_as_transgender == "No" ~ "Cis woman",
-      dem.which_gender_do_you_identify_with == "Female" & dem.do_you_identify_as_transgender == "Yes" ~ "Trans woman"
+      dem.which_gender_do_you_identify_with_cop == "Self-define" ~ "Self-define",
+      dem.which_gender_do_you_identify_with_cop == "Non-binary" ~ "Non-binary",
+      dem.which_gender_do_you_identify_with_cop == "Male" & dem.sex_cop == "Male" ~ "Cis man",
+      dem.which_gender_do_you_identify_with_cop == "Male" & dem.sex_cop == "Female" ~ "Trans man",
+      dem.which_gender_do_you_identify_with_cop == "Female" & dem.sex_cop == "Female" ~ "Cis woman",
+      dem.which_gender_do_you_identify_with_cop == "Female" & dem.sex_cop == "Male" ~ "Trans woman"
     ) %>% forcats::fct_infreq()
   )
 
-dat_1 <- dat %>%
-  filter(
-    is.na(gender) | is.na(dem.sex) |
-      !(
-        (gender == "Cis woman" & dem.sex == "Male") |
-        (gender == "Cis man" & dem.sex == "Female") |
-        (gender == "Trans woman" & dem.sex == "Female") |
-        (gender == "Trans man" & dem.sex == "Male")
-      )
-  )
-nrow(dat) - nrow(dat_1)
-dat <- dat_1
-
+# no control because dem.do_you_identify_as_transgender_cop is NA
 ```
 
 
@@ -247,46 +245,53 @@ dat <- dat_1
 dat %>%
   freq(gender)
 ```
+# Transgender
+```{r Transgender inspection}
+dat %>%
+  freq(dem.do_you_identify_as_transgender_cop)
+```
 
 
 # Biological sex
 ```{r Biological sex inspection}
 dat %>%
-  freq(dem.sex)
+  freq(dem.sex_cop)
 ```
 
 
-```{r Sexual orientation recoding}
+```{r sex recoding}
 dat <- dat %>%
   mutate(
     sex =
       if_else(
-        condition = dem.sex %in%
+        condition = dem.sex_cop %in%
           c("Prefer not to answer",
           "Don't know",
           "Seen but not answered",
           "Other"
           ), 
         true = NA_character_, 
-        false = as.character(dem.sex),
+        false = as.character(dem.sex_cop),
         missing = NA_character_
       ) %>% forcats::fct_infreq()
   )
 ```
 
 
-```{r Sexual orientation checking}
+```{r sex checking}
 dat %>%
   freq(sex)
+dat %>%
+  freq(dem.sex_cop)
 ```
 
 
 # Age 
 ```{r Age inspection}
 dat %>%
-  freq(dem.dob_age)
+  freq(dem.dob_age_cop)
 dat %>%
-  freq(dem.age_likely)
+  freq(dem.age_likely_cop)
 ```
 
 
@@ -295,10 +300,10 @@ dat %>%
  # mutate(
   #  age =
    #   case_when(
-    #    dem.dob_age < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
-     #   dem.how_old_are_you_now.txt < 0 ~ NA_real_,
-      #  !is.na(dem.dob_age) ~ dem.dob_age,
-       # !is.na(dem.how_old_are_you_now.txt) ~ dem.how_old_are_you_now.txt,
+    #    dem.dob_age_cop < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+     #   #dem.how_old_are_you_now_cop.txt < 0 ~ NA_real_,
+      #  !is.na(dem.dob_age_cop) ~ dem.dob_age_cop,
+       # #!is.na(dem.how_old_are_you_now.txt) ~ dem.how_old_are_you_now.txt,
         #TRUE ~ NA_real_
         #)
     #)
@@ -306,7 +311,7 @@ dat %>%
 
 
 ```{r Age after recoding}
-names(dat)[names(dat) == "dem.age_likely"] <- "age"
+names(dat)[names(dat) == "dem.age_likely_cop"] <- "age"
 
 dat %>%
   freq(age)
@@ -317,7 +322,7 @@ dat %>%
 
 ```{r BMI inspection}
 dat %>%
-  descr(dem.bmi_signup)
+  descr(dem.bmi_signup_cop)
 ```
 
 ```{r BMI recoding}
@@ -325,8 +330,8 @@ dat <- dat %>%
   mutate(
     bmi =
       case_when(
-        dem.bmi_signup < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
-        !is.na(dem.bmi_signup ) ~ dem.bmi_signup,
+        dem.bmi_signup_cop < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+        !is.na(dem.bmi_signup_cop) ~ dem.bmi_signup_cop,
         TRUE ~ NA_real_
         )
     )
@@ -343,7 +348,7 @@ dat %>%
 
 ```{r Height inspection}
 dat %>%
-  descr(dem.height_signup_m)
+  descr(dem.height_signup_m_cop)
 ```
 
 ```{r Height recoding}
@@ -351,8 +356,8 @@ dat <- dat %>%
   mutate(
     height_m =
       case_when(
-        dem.height_signup_m < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
-        !is.na(dem.height_signup_m ) ~ dem.height_signup_m,
+        dem.height_signup_m_cop < 0 ~ NA_real_, # For the continuous version, we need to assign all implausible/PNTA/DK values as NA_real_
+        !is.na(dem.height_signup_m_cop) ~ dem.height_signup_m_cop,
         TRUE ~ NA_real_
       )
   )
@@ -393,7 +398,7 @@ ggplot(
 
 ```{r Ethnicity inspection}
 dat %>%
-  freq(dem.what_is_your_ethnic_origin)
+  freq(dem.what_is_your_ethnic_origin_cop)
 ```
 
 
@@ -402,13 +407,13 @@ dat <- dat %>%
   mutate(
     ethnicity =
       case_when(
-        dem.what_is_your_ethnic_origin %in% c(
+        dem.what_is_your_ethnic_origin_cop %in% c(
           "Prefer not to say",
           "Don't know",
           "Seen but not answered") ~ NA_character_, 
-        dem.what_is_your_ethnic_origin %in% c("Asian or Asian British", "Arab", "Black or Black British", "Other", "Mixed") ~
+        dem.what_is_your_ethnic_origin_cop %in% c("Asian or Asian British", "Arab", "Black or Black British", "Other", "Mixed") ~
           "Not white",
-        TRUE ~ as.character(dem.what_is_your_ethnic_origin)
+        TRUE ~ as.character(dem.what_is_your_ethnic_origin_cop)
       ) %>% forcats::fct_infreq()
   )
 ```
@@ -421,27 +426,25 @@ dat %>%
 
 ```{r Sexual orientation inspection}
 dat %>%
-  freq(dem.what_is_your_sexual_orientation)
+  freq(dem.what_is_your_sexual_orientation_cop)
+#all NA
 ```
 
 # Sexual orientation
-
-The "Other" category should be kept depending on research question
-and available data. In this case, no one answered "Other".
 
 ```{r Sexual orientation recoding}
 dat <- dat %>%
   mutate(
     sexual_orientation =
       if_else(
-        condition = dem.what_is_your_sexual_orientation %in%
+        condition = dem.what_is_your_sexual_orientation_cop %in%
           c("Prefer not to answer",
           "Don't know",
           "Seen but not answered",
           "Other"
           ), 
         true = NA_character_, 
-        false = as.character(dem.what_is_your_sexual_orientation),
+        false = as.character(dem.what_is_your_sexual_orientation_cop),
         missing = NA_character_
       ) %>% forcats::fct_infreq()
   )
@@ -457,12 +460,12 @@ dat %>%
 
 ```{r Highest education finegrained inspection}
 dat %>%
-  summarytools::freq(dem.highest_education_finegrained)
+  summarytools::freq(employ.highest_education_finegrained_cop)
 ```
 
 ```{r Highest education collapsed inspection}
 dat %>%
-  summarytools::freq(dem.highest_education_collapsed)
+  summarytools::freq(employ.highest_education_collapsed_cop)
 ```
 
 
@@ -471,8 +474,8 @@ dat %>%
 ```{r Cross table employment education}
 dat %>%
   gtsummary::tbl_cross(
-    row = dem.what_is_your_current_employment_status,
-    col = dem.highest_education_finegrained, percent = "row")
+    row = dem.what_is_your_current_employment_status_cop,
+    col = employ.highest_education_finegrained_cop, percent = "row")
 ```
 
 
@@ -513,7 +516,7 @@ Inspect phq9.dead_hurting_thoughts_numeric
 ```{r Inspect phq9.dead_hurting_thoughts_numeric}
 dat %>%
   summarytools::freq(
-    phq9.dead_hurting_thoughts_numeric
+    phq9.dead_hurting_thoughts_cop_numeric
   )
 ```
 
@@ -531,9 +534,9 @@ recoding -777 to NA as only 71 (90) GLAD participants have seen but not answered
 ```{r Create binary phq suicidality measure numeric}
 dat <- dat %>%
   mutate(
-    phq.Q9_suicidality_binary_numeric =
+    phq.Q9_suicidality_binary_cop_numeric =
       recode(
-        phq9.dead_hurting_thoughts_numeric,
+        phq9.dead_hurting_thoughts_cop_numeric,
         `-777` = NA_real_,
         `0` = 0,
         `1` = 1,
@@ -543,7 +546,7 @@ dat <- dat %>%
     )
 
 dat %>%
-  summarytools::freq(phq.Q9_suicidality_binary_numeric,
+  summarytools::freq(phq.Q9_suicidality_binary_cop_numeric,
     cumul = FALSE,
     round.digits = 1
     )
@@ -553,16 +556,16 @@ dat %>%
 ```{r PHQ9 suicidality binary factor}
 dat <- dat %>%
   mutate(
-    phq.Q9_suicidality_binary =
+    phq.Q9_suicidality_binary_cop =
       recode_factor(
-        phq.Q9_suicidality_binary_numeric,
+        phq.Q9_suicidality_binary_cop_numeric,
         `0` = "No suicidality",
         `1` = "Any suicidality"
         )
     )
 
 dat %>%
-  summarytools::freq(phq.Q9_suicidality_binary,
+  summarytools::freq(phq.Q9_suicidality_binary_cop,
     cumul = FALSE,
     round.digits = 1
     )
@@ -579,6 +582,7 @@ dat %>%
     contains("mhd.")
   ) %>%
   names
+
 ```
 
 
@@ -587,50 +591,43 @@ dat %>%
 Psychiatric disorders vectors
 ```{r Psychiatric disorders vectors}
 psy_dx_factors <- c(
-  "mhd.mdd",
-  "mhd.gad",
-  "mhd.social_anxiety",
-  "mhd.specific_phobia",
-  "mhd.agoraphobia",
+  "mhd.depressive_disorders_cop",
+  "mhd.gad_cop",
+  "mhd.social_anxiety_cop",
+  "mhd.specific_phobia_cop",
+  "mhd.agoraphobia_cop",
   "mhd.panic_disorder",
-  "mhd.panic_attacks",
-  "mhd.bipolar_disorder",
-  "mhd.ocd",
+  "mhd.panic_attacks_current_past_cop_numeric",
+  "mhd.bipolar_disorder_current_past_cop_numeric",
+  "mhd.obsessive_compulsive_disorders_cop",
   "mhd.bdd",
   "mhd.an",
   "mhd.atypical_an",
   "mhd.bn",
-  "mhd.bed",
-  "mhd.schizophrenia",
-  "mhd.ptsd",  
-  "mhd.addadhd",
+  "mhd.bed"
   
-  "mhd.perinatal_depression",
-  "mhd.depressive_disorders",
-  "mhd.anxiety_disorders"
-
 )
 
+
 psy_dx_numeric <- c(
-  "mhd.mdd_numeric",
-  "mhd.gad_numeric",
-  "mhd.social_anxiety_numeric",
-  "mhd.specific_phobia_numeric",
-  "mhd.agoraphobia_numeric",
-  "mhd.panic_disorder_numeric",
-  "mhd.panic_attacks_numeric",
-  "mhd.bipolar_disorder_numeric",
-  "mhd.ocd_numeric",
-  "mhd.bdd_numeric",
-  "mhd.an_numeric",
-  "mhd.atypical_an_numeric",
-  "mhd.bn_numeric",
-  "mhd.bed_numeric",
-  "mhd.schizophrenia_numeric",
-  "mhd.ptsd_numeric",
-  "mhd.addadhd_numeric",
-  
-   "mhd.perinatal_depression_numeric" 
+  "mhd.mdd_cop_numeric",
+  "mhd.gad_cop_numeric",
+  "mhd.social_anxiety_cop_numeric",
+  "mhd.specific_phobia_cop_numeric",
+  "mhd.agoraphobia_cop_numeric",
+  "mhd.panic_disorder_cop_numeric",
+  "mhd.panic_attacks_cop_numeric",
+  "mhd.bipolar_disorder_cop_numeric",
+  "mhd.ocd_cop_numeric",
+  "mhd.bdd_cop_numeric",
+  "mhd.an_cop_numeric",
+  "mhd.atypical_an_cop_numeric",
+  "mhd.bn_cop_numeric",
+  "mhd.atypical_bn_cop_numeric",
+  "mhd.bed_cop_numeric",     
+  "mhd.schizophrenia_cop_numeric",
+  "mhd.ptsd_cop_numeric",
+  "mhd.addadhd_cop_numeric"
 )
 ```
 
@@ -639,7 +636,7 @@ Drop empty levels
 ```{r Psy Dx Inspect }
 dat_psy_dx <- dat %>%
   select(
-    all_of(psy_dx_factors)
+    all_of(psy_dx_numeric)
   ) %>%
   mutate(across(where(is.factor), fct_drop))
 ```
@@ -648,28 +645,6 @@ dat_psy_dx <- dat %>%
 ```{r Psy Dx check}
 dat_psy_dx %>%
   summarytools::freq()
-```
-
-
-```{r Combine for just one Variable for mdd bzw. gad }
-dat <- dat %>%
-  mutate(
-    any_mdd_diagnosis = case_when(
-      mhd.mdd == "MDD" ~ "MDD",
-      cidid.mdd_diagnosis == "MDD diagnosis" ~ "MDD",
-      phq9.sum_score >= 10 ~ "MDD",
-      TRUE ~ "No MDD or NA"
-    ),
-    any_gad_diagnosis = case_when(
-      mhd.gad == "GAD" ~ "GAD",
-      cidia.diagnosis == "GAD diagnosis" ~ "GAD",
-      gad7.sum_score >= 10 ~ "GAD",
-      TRUE ~ "No GAD or NA"
-    )
-  )
-
-sum(dat$any_mdd_diagnosis == "MDD")
-sum(dat$any_gad_diagnosis == "GAD")
 ```
 
 
@@ -688,17 +663,11 @@ dat_rds <- dat %>%
     "gad7.sum_score",
     all_of(gad7_items_numeric),
     
-    "phq9.sum_score", 
-    "phq.Q9_suicidality_binary_numeric", # Suicidality
-    "phq.Q9_suicidality_binary",
+    "phq9.sum_score_baseline_cop", 
+    "phq.Q9_suicidality_binary_cop_numeric", # Suicidality
+    "phq.Q9_suicidality_binary_cop",
     all_of(phq9_items_numeric),
     all_of(phq9_items),
-    
-    "cidia.diagnosis",
-    "cidid.mdd_diagnosis",
-    
-    "any_mdd_diagnosis",
-    "any_gad_diagnosis",
     
     "gender",
     "sex",
@@ -707,8 +676,8 @@ dat_rds <- dat %>%
     "height_m",
     "ethnicity",
     "sexual_orientation",
-    "dem.highest_education_finegrained",
-    "dem.highest_education_collapsed",
+    "employ.highest_education_finegrained_cop",
+    "employ.highest_education_collapsed_cop",
   ) %>%
   bind_cols(
     dat_psy_dx
@@ -724,6 +693,6 @@ dat_rds %>%
 ```{r Write rds file after variable creation}
 write_rds(
   x = dat_rds,
-  file = paste0(filepath_cleaned_data,"dat_variable_creation", date, ".rds")
+  file = paste0(filepath_cleaned_data_coping_nbr,"dat_variable_creation_coping_nbr", date, ".rds")
                 )
 ```

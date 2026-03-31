@@ -28,6 +28,7 @@ Set current date
 
 ```{r current date}
 date <- Sys.Date()
+date <- "2026-03-22"
 ```
 
 Read in file with path to ilovedata channel on Teams 
@@ -82,7 +83,7 @@ dir.create(paste0(LGBTQ_folder, "tables/", date))
 
 ```{r read in raw_data}
 dat <- readRDS(
-  file = paste0(filepath_cleaned_data,"dat_after_exclusion_sexual_orientation", date, ".rds")
+  file = paste0(filepath_cleaned_data_coping_nbr,"dat_after_exclusion_gender_coping_nbr", date, ".rds")
   )
 ```
 
@@ -120,25 +121,25 @@ attrition_table <- dat %>%
     sexual_orientation,
     height_m,
     bmi,
-    dem.highest_education_collapsed,
-    phq9.sum_score,
-    mhd.mdd,
-    mhd.gad,
-    mhd.social_anxiety,
-    mhd.specific_phobia,
-    mhd.agoraphobia,
-    mhd.panic_disorder,
-    mhd.panic_attacks,
-    mhd.bipolar_disorder,
-    mhd.ocd,
-    mhd.bdd,
-    mhd.an,
-    mhd.atypical_an,
-    mhd.bn,
-    mhd.bed,
-    mhd.schizophrenia,
-    mhd.ptsd,  
-    mhd.addadhd,
+    employ.highest_education_collapsed_cop,
+    mhd.mdd_cop_numeric,
+    mhd.gad_cop_numeric,
+    mhd.social_anxiety_cop_numeric,
+    mhd.specific_phobia_cop_numeric,
+    mhd.agoraphobia_cop_numeric,
+    mhd.panic_disorder_cop_numeric,
+    mhd.panic_attacks_cop_numeric,
+    mhd.bipolar_disorder_cop_numeric,
+    mhd.ocd_cop_numeric,
+    mhd.bdd_cop_numeric,
+    mhd.an_cop_numeric,
+    mhd.atypical_an_cop_numeric,
+    mhd.bn_cop_numeric,
+    mhd.atypical_bn_cop_numeric,
+    mhd.bed_cop_numeric,
+    mhd.schizophrenia_cop_numeric,
+    mhd.ptsd_cop_numeric,
+    mhd.addadhd_cop_numeric,
     present
   ) %>%
   tbl_summary(
@@ -150,26 +151,26 @@ attrition_table <- dat %>%
       sexual_orientation = "Sexual orientation",
       height_m = "Height [m]",
       bmi = "BMI [kg/m2]",
-      dem.highest_education_collapsed = "Highest education",
+      employ.highest_education_collapsed = "Highest education",
       phq9.sum_score = "PHQ9 score",
       mhd.personality_disorder = "Personality disorder",
-      mhd.mdd = "Major depressive disorder",
-      mhd.gad = "Generalised anxiety disorder",
-      mhd.social_anxiety = "Social Anxiety",
-      mhd.specific_phobia_ = "Specific phobia",
-      mhd.agoraphobia = "Agoraphobia",
-      mhd.panic_disorder = "Panic disorder",
-      mhd.panic_attacks = "Panic attacks",
-      mhd.bipolar_disorder ="Bipolar disorder",
-      mhd.ocd = "Obsessive-compulsive disorder",
-      mhd.bdd = "Body dysmorphic disorder",
-      mhd.an = "Anorexia nervosa", 
-      mhd.atypical_an = "Atypical anorexia nervosa",
-      mhd.bn = "Bulimia nervosa",
-      mhd.bed = "Binge-eating disorder",
-      mhd.schizophrenia = "Schizophrenia",
-      mhd.ptsd = "PTSD",  
-      mhd.addadhd = "ADD or ADHD"
+      mhd.mdd_cop_numeric = "Major depressive disorder",
+      mhd.gad_cop_numeric = "Generalised anxiety disorder",
+      mhd.social_anxiety_cop_numeric = "Social Anxiety",
+      mhd.specific_phobia_cop_numeric = "Specific phobia",
+      mhd.agoraphobia_cop_numeric = "Agoraphobia",
+      mhd.panic_disorder_cop_numeric = "Panic disorder",
+      mhd.panic_attacks_cop_numeric = "Panic attacks",
+      mhd.bipolar_disorder_cop_numeric ="Bipolar disorder",
+      mhd.ocd_cop_numeric = "Obsessive-compulsive disorder",
+      mhd.bdd_cop_numeric = "Body dysmorphic disorder",
+      mhd.an_cop_numeric = "Anorexia nervosa", 
+      mhd.atypical_an_cop_numeric = "Atypical anorexia nervosa",
+      mhd.bn_cop_numeric = "Bulimia nervosa",
+      mhd.bed_cop_numeric = "Binge-eating disorder",
+      mhd.schizophrenia_cop_numeric = "Schizophrenia",
+      mhd.ptsd_cop_numeric = "PTSD",  
+      mhd.addadhd_cop_numeric = "ADD or ADHD"
     ),
     missing_text = "Not answered"
   ) %>%
@@ -197,7 +198,7 @@ attrition_table %>%
   gtsummary::as_flex_table() %>%
   flextable::save_as_docx(
     values = NULL,
-    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_attrition_", date, ".docx"),
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_attrition_coping_nbr", date, ".docx"),
     pr_section = sect_properties
       )
 ```

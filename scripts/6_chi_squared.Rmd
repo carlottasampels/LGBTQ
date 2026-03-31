@@ -53,7 +53,7 @@ library(officer)
 
 ```{r Recent date}
 date = Sys.Date()
-date
+date = "2026-03-22"
 ```
 
 ## Load data
@@ -72,7 +72,7 @@ dat_gender <- read_rds(
 )
 ```
 
-# Testing
+## labels
 
 ```{r labels}
 var_labels <- c(
@@ -92,9 +92,14 @@ var_labels <- c(
   "mhd.atypical_an" = "Atypical anorexia nervosa",
   "mhd.bn" = "Bulimia nervosa",
   "mhd.bed" = "Binge eating Disorder",
+  "mhd.schizophrenia" = "Schizophrenia",
+  "mhd.ptsd" = "PTSD",  
+  "mhd.addadhd" = "ADD or ADHD",
   "phq.Q9_suicidality_binary" = "Suicidality"
 )
 ```
+
+#chi squared and fisher test
 
 ```{r chi squared}
 pairwise.chisq.test <- function(A, B, p.adjust.method="bonferroni"){
@@ -271,8 +276,10 @@ pairwise.chisq.test <- function(A, B, p.adjust.method = "bonferroni") {
 }
 ```
 
+##sexual orientation
+
 ```{r chi squared test anwenden sexual_orientation}
-target_vars <- c("age", "sex", "gender", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
+target_vars <- c("age", "sex", "gender", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "mhd.schizophrenia", "mhd.ptsd", "mhd.addadhd", "phq.Q9_suicidality_binary")
 
 results_list <- list()
 
@@ -309,8 +316,19 @@ all_results_df$Variable <- var_labels[all_results_df$Variable]
 print(all_results_df)
 ```
 
+##safe
+
+```{r save all_results_df for sexual_orientation}
+write_xlsx(
+  all_results_df,
+  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_sexual_orientation", date, ".xlsx")
+)
+```
+
+##gender
+
 ```{r ch squared test anwenden gender}
-target_vars <- c("age", "sex", "sexual_orientation", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "phq.Q9_suicidality_binary")
+target_vars <- c("age", "sex", "sexual_orientation", "ethnicity", "dem.highest_education_collapsed", "mhd.social_anxiety", "mhd.specific_phobia",  "mhd.agoraphobia", "mhd.panic_attacks", "mhd.ocd", "mhd.bdd", "mhd.an", "mhd.atypical_an", "mhd.bn", "mhd.bed", "mhd.schizophrenia", "mhd.ptsd", "mhd.addadhd", "phq.Q9_suicidality_binary")
 
 results_list <- list()
 
@@ -346,13 +364,6 @@ print(all_results_df)
 ```
 
 ##safe
-
-```{r save all_results_df for sexual_orientation}
-write_xlsx(
-  all_results_df,
-  path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_chisquared_sexual_orientation", date, ".xlsx")
-)
-```
 
 ```{r save all_results_df for gender}
 write_xlsx(

@@ -1,0 +1,208 @@
+---
+title: "data_exclusion"
+author: ""
+date: ""
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Setup
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment=NA,
+                      prompt=FALSE,
+                      cache=FALSE)
+```
+
+## Clear workspace
+
+```{r Clear worksapce}
+rm(list = ls())
+```
+
+
+Read in file with path to ilovedata channel on Teams
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+
+Add the add_numeric function - used to convert character variables into numeric variables.
+Add the sumscores function - used to generate sumscores
+Add the package_check function - used to install and load dependencies
+```{r Read in functions}
+source(file = paste0(ilovedata_scripts, "functions/add_numeric.R"))
+source(file = paste0(ilovedata_scripts, "functions/remove_duplicates.R"))
+source(file = paste0(ilovedata_scripts, "functions/sumscores.R"))
+source(file = paste0(ilovedata_scripts, "functions/package_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/imp_check.R"))
+source(file = paste0(ilovedata_scripts, "functions/recode_check.R"))
+```
+
+
+## Install packages
+
+```{r Install packages}
+#install.packages("ggformula")
+#install.packages("tidyverse")
+```
+
+## Load packages
+
+```{r Load packages}
+library(gtsummary)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(rsvg)
+library(tidyverse)
+```
+
+## Retrieve the recent date
+
+```{r Recent date}
+date = Sys.Date()
+date = "2026-03-22"
+```
+
+## Read in data
+
+```{r Read in data}
+dat <- read_rds(
+  file = paste0(filepath_cleaned_data_coping_nbr,"dat_variable_creation_coping_nbr", date, ".rds"))
+```
+
+```{r view}
+dat %>% 
+  names
+```
+
+# Psychiatric diagnoses vector
+```{r Psychiatric diagnoses vector}
+psy_dx_numeric <- c(
+  "mhd.mdd_cop_numeric",
+  "mhd.gad_cop_numeric",
+  "mhd.social_anxiety_cop_numeric",
+  "mhd.specific_phobia_cop_numeric",
+  "mhd.agoraphobia_cop_numeric",
+  "mhd.panic_disorder_cop_numeric",
+  "mhd.panic_attacks_cop_numeric",
+  "mhd.bipolar_disorder_cop_numeric",
+  "mhd.ocd_cop_numeric",
+  "mhd.bdd_cop_numeric",
+  "mhd.an_cop_numeric",
+  "mhd.atypical_an_cop_numeric",
+  "mhd.bn_cop_numeric",
+  "mhd.atypical_bn_cop_numeric",
+  "mhd.bed_cop_numeric",     
+  "mhd.schizophrenia_cop_numeric",
+  "mhd.ptsd_cop_numeric",
+  "mhd.addadhd_cop_numeric"
+)
+```
+
+# Analysis variables vector
+
+```{r Analysis variables vector}
+analysis_variables_vector <- c(
+  "phq9.sum_score", 
+  "phq.Q9_suicidality_binary_numeric", # Suicidality
+  "phq.Q9_suicidality_binary",
+  "gender",
+  "sex",
+  "age",
+  "bmi",
+  "height_m",
+  "ethnicity",
+  "sexual_orientation",
+  "dem.highest_education_collapsed",
+  psy_dx_numeric
+)
+```
+
+
+# Exclusion criteria
+
+-555 'Not applicable' response from participant
+-666 Implausible response/value
+-777 Seen but not answered
+-888 Don't know
+-999 Prefer not to answer/Prefer not to say
+
+```{r table before exclusion}
+dat %>%
+  select(
+    age,
+    gender,
+    sex,
+    ethnicity,
+    #sexual_orientation,
+    height_m,
+    bmi,
+    employ.highest_education_collapsed_cop,
+  "mhd.mdd_cop_numeric",
+  "mhd.gad_cop_numeric",
+  "mhd.social_anxiety_cop_numeric",
+  "mhd.specific_phobia_cop_numeric",
+  "mhd.agoraphobia_cop_numeric",
+  "mhd.panic_disorder_cop_numeric",
+  "mhd.panic_attacks_cop_numeric",
+  "mhd.bipolar_disorder_cop_numeric",
+  "mhd.ocd_cop_numeric",
+  "mhd.bdd_cop_numeric",
+  "mhd.an_cop_numeric",
+  "mhd.atypical_an_cop_numeric",
+  "mhd.bn_cop_numeric",
+  "mhd.atypical_bn_cop_numeric",
+  "mhd.bed_cop_numeric",     
+  "mhd.schizophrenia_cop_numeric",
+  "mhd.ptsd_cop_numeric",
+  "mhd.addadhd_cop_numeric"
+) %>%
+  gtsummary::tbl_summary()
+```
+
+
+# Exclusion manually
+
+## gender
+
+```{r Exclusion gender}
+dim(dat)
+
+nogender <- dat %>%
+  drop_na(gender)
+
+missing_gender <- abs(nrow(nogender)-nrow(dat))
+missing_gender
+```
+
+## Final
+
+Final *n* = `r abs(nrow(nogender.nodisorder))`for gender
+
+```{r name}
+dat_after_exclusion_gender <- 
+  nogender
+nrow(dat_after_exclusion_gender)
+```
+
+# Write rds file
+
+```{r write rds file exclusion}
+dat_after_exclusion_gender %>%
+  write_rds(
+  file =  paste0(filepath_cleaned_data_coping_nbr,"dat_after_exclusion_gender_coping_nbr", date, ".rds")
+  )
+```
+
