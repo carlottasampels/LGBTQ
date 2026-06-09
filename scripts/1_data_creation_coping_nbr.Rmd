@@ -59,7 +59,7 @@ Retrieve the recent date
 
 ```{r Recent date}
 date = Sys.Date()
-date = "2026-03-22"
+#date = "2026-03-22"
 date
 ```
 
@@ -660,6 +660,7 @@ dat %>%
 dat_rds <- dat %>%
   select(
     "ID",
+    "sample",
     "gad7.sum_score",
     all_of(gad7_items_numeric),
     

@@ -1,0 +1,258 @@
+---
+title: "4_descriptives_glad_coping"
+author: "Carlotta Sampels"
+date: "2026-05-15"
+output: html_document
+---
+# Setup
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r clear global environment}
+rm(list = ls(all.names = TRUE)) 
+```
+
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+```{r Load packages}
+library(flextable)
+library(officer)
+library(tidyverse) 
+library(gtsummary)
+library(summarytools)
+```
+
+```{r set current date}
+date <- Sys.Date()
+date
+```
+
+```{r Load data}
+# Load datasets
+dat_coping <- read_rds(paste0(filepath_cleaned_data_coping_nbr, "dat_after_exclusion_gender_coping_nbr", date, ".rds"))
+dat_glad <- read_rds(paste0(filepath_cleaned_data, "dat_after_exclusion_gender", date, ".rds"))
+```
+
+```{r consistency}
+# 1. Namen in dat_coping reparieren (Suffixe entfernen)
+dat_coping_clean <- dat_coping %>%
+  rename_with(~ str_remove(., "_cop_numeric|_cop"), starts_with("mhd.")) %>%
+  rename(dem.highest_education_collapsed = any_of(c("employ.highest_education_collapsed", 
+                                                    "employ.highest_education_collapsed_cop")))
+
+# 2. Präzise Faktor-Labels vergeben (exakt wie in GLAD)
+dat_coping_clean <- dat_coping_clean %>%
+  mutate(across(starts_with("mhd."), ~ {
+    # Hol dir den sauberen Namen der aktuellen Spalte
+    col <- cur_column()
+    
+    # Bestimme das Label basierend auf dem Spaltennamen
+    label_pos <- case_when(
+      col == "mhd.mdd" ~ "MDD",
+      col == "mhd.gad" ~ "GAD",
+      col == "mhd.an"  ~ "AN",
+      col == "mhd.atypical_an" ~ "Atypical AN",
+      col == "mhd.bn"  ~ "BN",
+      col == "mhd.bed" ~ "BED",
+      col == "mhd.ocd" ~ "OCD",
+      col == "mhd.bdd" ~ "BDD",
+      col == "mhd.social_anxiety" ~ "Social anxiety",
+      col == "mhd.specific_phobia" ~ "Specific phobia",
+      col == "mhd.agoraphobia" ~ "Agoraphobia",
+      col == "mhd.panic_disorder" ~ "Panic disorder",
+      col == "mhd.panic_attacks" ~ "Panic attacks",
+      col == "mhd.ptsd" ~ "PTSD",
+      col == "mhd.bipolar_disorder" ~ "Bipolar disorder",
+      col == "mhd.addadhd" ~ "ADD/ADHD",
+      col == "mhd.schizophrenia" ~ "Schizophrenia",
+      TRUE ~ str_remove(col, "mhd\\.") # Fallback
+    )
+    
+    # Faktor erstellen
+    factor(.x, levels = c(0, 1), labels = c(paste("Not", label_pos), label_pos))
+  }))
+
+# 3. Zusammenführen
+dat_combined <- bind_rows(dat_glad, dat_coping_clean)
+
+
+head(dat_coping_clean%>% select(starts_with("mhd.")))
+```
+
+```{r Combine phenotypic datasets}
+dat_combined <- bind_rows(dat_glad, dat_coping_clean)
+
+head(dat_combined%>% select(starts_with("mhd.")))
+head(dat_combined)
+```
+
+```{r}
+# Define list of all PRS files
+prs_files <- list(
+  depression = filepath_prs_depression,
+  an         = filepath_prs_an,
+  anxiety    = filepath_prs_anxiety,
+  bipolar    = filepath_prs_bipolar,
+  ptsd       = filepath_prs_ptsd,
+  adhd       = filepath_prs_adhd,
+  cud        = filepath_prs_cud,
+  smkinit    = filepath_prs_smkinit,
+  sa         = filepath_prs_sa,
+  scz        = filepath_PRSCS_scz
+)
+
+# Function to read a single PRS file and rename its SCORE column
+load_and_rename_prs <- function(path, name) {
+  df <- read.table(path, header = TRUE, stringsAsFactors = FALSE)
+  df %>%
+    select(FID, SCORE) %>% 
+    rename(!!paste0("prs_", name) := SCORE)
+}
+
+# Read all files and join them by FID
+dat_prs_all <- imap(prs_files, ~ load_and_rename_prs(.x, .y)) %>%
+  reduce(full_join, by = "FID")
+
+# Merge phenotype data with PRS data (keep only individuals with genetic data)
+dat_all <- dat_combined %>%
+  inner_join(dat_prs_all, by = c("ID" = "FID"))
+
+nrow(dat_all)
+head(dat_all)
+```
+
+```{r Collapse transgender and self-defined categories}
+#dat_all <- dat_all %>%
+ # mutate(gender = case_when(
+  #  gender %in% c("Trans woman", "Trans man", "Self-define") ~ "Trans person or self-define",
+   # TRUE ~ gender 
+  #))
+```
+
+#Tables
+
+```{r}
+# Select variables for the table
+dat_table <- dat_all %>%
+  select(
+    sample, 
+    gender, 
+    sex, 
+    age, 
+    ethnicity, 
+    sexual_orientation, 
+    height_m, 
+    bmi,
+    dem.highest_education_collapsed, 
+    phq.Q9_suicidality_binary,
+    mhd.addadhd,    
+    mhd.agoraphobia,   
+    mhd.an,               
+    mhd.atypical_an,      
+    mhd.bed,              
+    mhd.bipolar_disorder,  
+    mhd.bdd,           
+    mhd.bn,         
+    mhd.gad,            
+    mhd.mdd,  
+    mhd.ocd,              
+    mhd.panic_attacks,    
+    mhd.ptsd,
+    mhd.schizophrenia,
+    mhd.social_anxiety,
+    mhd.specific_phobia
+  )
+```
+
+```{r}
+# Define variable labels
+var_labels <- list(
+  gender = "Gender",
+  sex = "Biological sex",
+  age = "Age [years]",
+  ethnicity = "Ethnicity",
+  sexual_orientation = "Sexual orientation",
+  height_m = "Height [m]",
+  bmi = "BMI [kg/m2]",
+  dem.highest_education_collapsed = "Highest education",
+  phq.Q9_suicidality_binary = "Suicidality",
+  mhd.addadhd = "ADD or ADHD",
+  mhd.agoraphobia = "Agoraphobia",
+  mhd.an = "Anorexia nervosa", 
+  mhd.atypical_an = "Atypical anorexia nervosa",
+  mhd.bed = "Binge-eating disorder",
+  mhd.bipolar_disorder = "Bipolar disorder",
+  mhd.bdd = "Body dysmorphic disorder",
+  mhd.bn = "Bulimia nervosa",
+  mhd.gad = "Generalised anxiety disorder",
+  mhd.mdd = "Major depressive disorder",
+  mhd.ocd = "Obsessive-compulsive disorder",
+  mhd.panic_attacks = "Panic attacks",
+  mhd.ptsd = "PTSD",
+  mhd.schizophrenia = "Schizophrenia",
+  mhd.social_anxiety = "Social anxiety",
+  mhd.specific_phobia = "Specific phobia"
+)
+```
+
+```{r}
+# Create summary table split by 'sample'
+summary_table_combined <- dat_table %>%
+  tbl_summary(
+    by = sample, 
+    label = var_labels,
+    missing_text = "Not answered",
+    type = list(
+      age ~ "continuous2",
+      height_m ~ "continuous2",
+      bmi ~ "continuous2"
+    ),
+    statistic = list(
+      all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})",  "{min} - {max}"),
+      all_categorical() ~ "{n} ({p}%)"
+    )
+  ) %>%
+  add_overall() %>% 
+  add_p() %>%       
+  bold_labels() %>%
+  # Replace "0 (NA%)" with "NA" for cohorts where a variable was not collected
+  modify_table_body(
+    ~ .x %>% mutate(across(starts_with("stat_"), ~ str_replace(.x, "0 \\(NA%\\)", "NA")))
+  )
+
+summary_table_combined
+```
+
+```{r}
+sect_properties_landscape <- officer::prop_section(
+  page_size = page_size(
+    orient = "landscape",
+    width = 11.7,
+    height = 8.3
+  ),
+  type = "continuous",
+  page_margins = page_mar()
+)
+```
+
+
+```{r}
+summary_table_combined %>%
+  as_flex_table() %>%
+  flextable::save_as_docx(
+    path = paste0(LGBTQ_folder, "tables/", date, "/LGBTQ_descriptives_glad_coping_nbr_", date, ".docx"),
+    pr_section = sect_properties_landscape
+  )
+```
+
+```{r write rds}
+write_rds(dat_all, paste0(filepath_cleaned_data, "dat_glad_coping_nbr_", date, ".rds"))
+```
+
+
+
+

@@ -72,7 +72,6 @@ library(tidyverse)
 
 ```{r Recent date}
 date = Sys.Date()
-date = "2026-03-22"
 ```
 
 ## Read in data

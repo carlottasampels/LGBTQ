@@ -82,16 +82,58 @@ dat_gender <- bind_rows(dat_gender_glad, dat_gender_coping_nbr)
 
 # Load and combine PRS data
 
-dat_prs_dep_comb     <- rbind(read.table(filepath_prs_depression, header = TRUE), read.table(filepath_prs_depression_no_mhd, header = TRUE))
-dat_prs_anxiety_comb <- rbind(read.table(filepath_prs_anxiety, header = TRUE), read.table(filepath_prs_anxiety_no_mhd, header = TRUE))
-dat_prs_an_comb      <- rbind(read.table(filepath_prs_an, header = TRUE), read.table(filepath_prs_an_no_mhd, header = TRUE))
-dat_prs_bipolar_comb <- rbind(read.table(filepath_prs_bipolar, header = TRUE), read.table(filepath_prs_bipolar_no_mhd, header = TRUE))
-dat_prs_ptsd_comb    <- rbind(read.table(filepath_prs_ptsd, header = TRUE), read.table(filepath_prs_ptsd_no_mhd, header = TRUE))
-dat_prs_scz_comb     <- rbind(read.table(filepath_PRSCS_scz, header = TRUE), read.table(filepath_prs_scz_no_mhd, header = TRUE))
-dat_prs_adhd_comb    <- rbind(read.table(filepath_prs_adhd, header = TRUE), read.table(filepath_prs_adhd_no_mhd, header = TRUE))
-dat_prs_cud_comb     <- rbind(read.table(filepath_prs_cud, header = TRUE), read.table(filepath_prs_cud_no_mhd, header = TRUE))
-dat_prs_smkinit_comb <- rbind(read.table(filepath_prs_smkinit, header = TRUE), read.table(filepath_prs_smkinit_no_mhd, header = TRUE))
-# dat_prs_sa_comb    <- rbind(read.table(filepath_prs_sa, header = TRUE), read.table(filepath_prs_sa_no_mhd, header = TRUE)) # Add later
+library(dplyr)
+
+# Depression
+dat_prs_dep_comb <- rbind(read.table(filepath_prs_depression, header = TRUE), 
+                          read.table(filepath_prs_depression_no_mhd, header = TRUE)) %>% 
+                    distinct(FID, .keep_all = TRUE)
+
+# Anxiety
+dat_prs_anxiety_comb <- rbind(read.table(filepath_prs_anxiety, header = TRUE), 
+                              read.table(filepath_prs_anxiety_no_mhd, header = TRUE)) %>% 
+                        distinct(FID, .keep_all = TRUE)
+
+# Anorexia Nervosa
+dat_prs_an_comb <- rbind(read.table(filepath_prs_an, header = TRUE), 
+                         read.table(filepath_prs_an_no_mhd, header = TRUE)) %>% 
+                   distinct(FID, .keep_all = TRUE)
+
+# Bipolar Disorder
+dat_prs_bipolar_comb <- rbind(read.table(filepath_prs_bipolar, header = TRUE), 
+                              read.table(filepath_prs_bipolar_no_mhd, header = TRUE)) %>% 
+                        distinct(FID, .keep_all = TRUE)
+
+# PTSD
+dat_prs_ptsd_comb <- rbind(read.table(filepath_prs_ptsd, header = TRUE), 
+                           read.table(filepath_prs_ptsd_no_mhd, header = TRUE)) %>% 
+                     distinct(FID, .keep_all = TRUE)
+
+# Schizophrenia
+dat_prs_scz_comb <- rbind(read.table(filepath_PRSCS_scz, header = TRUE), 
+                          read.table(filepath_prs_scz_no_mhd, header = TRUE)) %>% 
+                    distinct(FID, .keep_all = TRUE)
+
+# ADHD
+dat_prs_adhd_comb <- rbind(read.table(filepath_prs_adhd, header = TRUE), 
+                           read.table(filepath_prs_adhd_no_mhd, header = TRUE)) %>% 
+                     distinct(FID, .keep_all = TRUE)
+
+# Cannabis Use Disorder
+dat_prs_cud_comb <- rbind(read.table(filepath_prs_cud, header = TRUE), 
+                          read.table(filepath_prs_cud_no_mhd, header = TRUE)) %>% 
+                    distinct(FID, .keep_all = TRUE)
+
+# Smoking Initiation
+dat_prs_smkinit_comb <- rbind(read.table(filepath_prs_smkinit, header = TRUE), 
+                              read.table(filepath_prs_smkinit_no_mhd, header = TRUE)) %>% 
+                        distinct(FID, .keep_all = TRUE)
+
+# suicide attempt
+dat_prs_sa_comb    <- dat_prs_sa_comb <- rbind(read.table(filepath_prs_sa, header = TRUE), 
+                              read.table(filepath_prs_sa_no_mhd, header = TRUE)) %>% 
+                        distinct(FID, .keep_all = TRUE)
+
 ```
 
 ```{r data principal componance}
@@ -99,15 +141,53 @@ dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFa
 dat_prs_pc_subset <- dat_prs_pc[, c("FID", "batch", "pc1", "pc2", "pc3", "pc4", "pc5", "pc6")]
 ```
 
+```{r test merge solo}
+prs = read.table(filepath_prs_depression_no_mhd, header = TRUE)
+head(prs)
+head(prs2)
+dim(prs)
+dim(prs2)
+prs2 = read.table(filepath_prs_depression, header = TRUE)
+merged_test_coping_nbr_nomhd <- merge(merge(prs, dat_gender_coping_nbr, by.x = "FID", by.y = "ID"), dat_prs_pc_subset, by = "FID")
+merged_test_coping_nbr <- merge(merge(prs2, dat_gender_coping_nbr, by.x = "FID", by.y = "ID"), dat_prs_pc_subset, by = "FID")
+
+
+merged_test_glad_nomhd <- merge(merge(prs, dat_gender_glad, by.x = "FID", by.y = "ID"),dat_prs_pc_subset, by = "FID")
+merged_test_glad <- merge(merge(prs2, dat_gender_glad, by.x = "FID", by.y = "ID"),dat_prs_pc_subset, by = "FID")
+
+nrow(merged_test_coping_nbr)
+nrow(merged_test_glad)
+nrow(merged_test_coping_nbr_nomhd)
+nrow(merged_test_glad_nomhd)
+
+shared_rows <- intersect(prs$FID, prs2$FID)
+nrow(shared_rows)
+
+
+# Erstelle die Markierung nochmal kurz für den Check
+dat_gender_check <- bind_rows(
+  dat_gender_glad %>% mutate(source = "GLAD"),
+  dat_gender_coping_nbr %>% mutate(source = "COPING_NBR")
+)
+
+# Merge mit deinem kombinierten PRS
+check_merge <- merge(dat_prs_dep_comb, dat_gender_check, by.x = "FID", by.y = "ID")
+
+table(check_merge$source)
+```
+
 ```{r merge}
-# merge PRS with gender and PCs
 merge_all_data <- function(prs_data, gender_data, pc_data) {
   
-  # merge PRS-data (FID) with Gender-data (ID) 
-  merged_step1 <- merge(prs_data, gender_data, by.x = "FID", by.y = "ID")
+  # merge PRS-data (FID) mit Gender-data (ID) – inkl. Dubletten-Check
+  merged_step1 <- merge(distinct(prs_data, FID, .keep_all = TRUE), 
+                        distinct(gender_data, ID, .keep_all = TRUE), 
+                        by.x = "FID", by.y = "ID")
   
-  # merge with PCs (FID)
-  final_merged <- merge(merged_step1, pc_data, by = "FID")
+  # merge mit PCs (FID) – inkl. Dubletten-Check
+  final_merged <- merge(merged_step1, 
+                        distinct(pc_data, FID, .keep_all = TRUE), 
+                        by = "FID")
   
   return(final_merged)
 }
@@ -121,12 +201,24 @@ merged_scz_g      <- merge_all_data(dat_prs_scz_comb, dat_gender, dat_prs_pc_sub
 merged_adhd_g     <- merge_all_data(dat_prs_adhd_comb, dat_gender, dat_prs_pc_subset)
 merged_cud_g      <- merge_all_data(dat_prs_cud_comb, dat_gender, dat_prs_pc_subset)
 merged_smkinit_g  <- merge_all_data(dat_prs_smkinit_comb, dat_gender, dat_prs_pc_subset)
+merged_sa_g       <- merge_all_data(dat_prs_sa_comb, dat_gender, dat_prs_pc_subset)
+
+#test
+sum(duplicated(dat_prs_pc_subset$FID))
+sum(duplicated(dat_gender$ID))
+nrow(merged_dep_g)
 ```
+
+```{r }
+head(dat_gender)
+names(dat_gender)
+```
+
 
 # linear regressions
 
 ```{r linear regression}
-phenotypes <- c("dep", "anxiety", "an", "bipolar", "ptsd", "scz", "adhd", "cud", "smkinit")
+phenotypes <- c("dep", "anxiety", "an", "bipolar", "ptsd", "scz", "adhd", "cud", "smkinit", "sa")
 all_lm_results <- list()
 
 for (ph in phenotypes) {
@@ -178,6 +270,7 @@ clean_lm_results_gender <- final_lm_results %>%
     phenotype == "smkinit" ~ "Smoking Initiation",
     phenotype == "ptsd" ~ "PTSD",
     phenotype == "adhd" ~ "ADHD",
+    phenotype == "sa" ~ "Suicide Attempt",
     TRUE ~ phenotype
   )) %>%
   
@@ -212,6 +305,8 @@ reg_gender_adhd <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batc
     data = merged_adhd_g)
 reg_gender_smkinit <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + gender, 
     data = merged_smkinit_g)
+reg_gender_sa <- lm(formula = SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch + gender, 
+    data = merged_sa_g)
 
 summary(reg_gender_dep)
 summary(reg_gender_anxiety)
@@ -222,19 +317,19 @@ summary(reg_gender_ptsd)
 summary(reg_gender_adhd)
 summary(reg_gender_cud)
 summary(reg_gender_smkinit)
+summary(reg_gender_sa)
 ```
 
 # residuals
 
 ```{r residuals}
-phenotypes <- c("dep", "anxiety", "an", "bipolar", "ptsd", "scz", "adhd", "cud", "smkinit")
+phenotypes <- c("dep", "anxiety", "an", "bipolar", "ptsd", "scz", "adhd", "cud", "smkinit", "sa")
 
 # A) Für Gender (_g)
 for (ph in phenotypes) {
   df_name <- paste0("merged_", ph, "_g")
   if (exists(df_name)) {
     df <- get(df_name)
-    # Regression nur mit Kovariaten (ohne study_status wegen Collider Bias!)
     mod <- lm(SCORE ~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch, data = df, na.action = na.exclude)
     # Residuals als neue Spalte speichern
     df$residuals_score <- residuals(mod)
@@ -246,14 +341,19 @@ for (ph in phenotypes) {
 # Plots
 
 ```{r  ridge plots or gender}
-plot_ridge_en <- function(data, x_var, y_var, title, show_y_axis_text = FALSE, show_y_label = FALSE, show_x_labels = FALSE) {
+plot_ridge_en <- function(data, x_var, y_var, title, 
+                          show_y_axis_text = FALSE, 
+                          show_y_label = FALSE, 
+                          show_x_labels = FALSE, 
+                          show_x_label = FALSE) { # <--- WICHTIG: Das Argument muss hier stehen
+  
   ggplot(data, aes_string(x = x_var, y = y_var, fill = y_var)) +
     geom_density_ridges(
       alpha = 0.7, 
       scale = 1.5, 
       rel_min_height = 0.01, 
       color = "white", 
-      lwd = 0.5
+      lwd = 0.3
     ) +
     scale_fill_viridis_d(option = "mako", begin = 0.25, end = 0.90, guide = "none") +
     scale_x_continuous(
@@ -263,54 +363,58 @@ plot_ridge_en <- function(data, x_var, y_var, title, show_y_axis_text = FALSE, s
     coord_cartesian(xlim = c(-2.1e-6, 2.1e-6)) +
     labs(
       title = title,
-      x = NULL,
+      # Hier wird der Text nur angezeigt, wenn show_x_label = TRUE ist
+      x = if(show_x_label) expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)) else NULL,
       y = if(show_y_label) "Category" else NULL 
     ) +
     theme_minimal() +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-      axis.title.y = if(show_y_label) element_text(size = 14, face = "bold") else element_blank(),
+      plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
+      axis.title.y = if(show_y_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.title.x = if(show_x_label) element_text(size = 15, face = "bold") else element_blank(),
       axis.text.y = if(show_y_axis_text) element_text(size = 12) else element_blank(),
       axis.text.x = if(show_x_labels) element_text(size = 12) else element_blank(), 
       panel.grid.minor = element_blank(),
       panel.grid.major.y = element_blank(),
-      panel.spacing = unit(2, "lines")
+      panel.spacing = unit(1, "lines")
     )
 }
 
-p1_g <- plot_ridge_en(merged_dep_g, "residuals_score", "gender", "Depression", show_y_axis_text = TRUE)
-p2_g <- plot_ridge_en(merged_anxiety_g, "residuals_score", "gender", "Anxiety")
-p3_g <- plot_ridge_en(merged_an_g, "residuals_score", "gender", "Anorexia nervosa")
+# Reihe 1 (Obere Reihe)
+p1_g <- plot_ridge_en(merged_adhd_g, "residuals_score", "gender", "ADHD", show_y_axis_text = TRUE)
+p2_g <- plot_ridge_en(merged_an_g, "residuals_score", "gender", "Anorexia nervosa")
+p3_g <- plot_ridge_en(merged_anxiety_g, "residuals_score", "gender", "Anxiety")
+p4_g <- plot_ridge_en(merged_bipolar_g, "residuals_score", "gender", "Bipolar disorder")
+p5_g <- plot_ridge_en(merged_cud_g, "residuals_score", "gender", "Cannabis use")
 
-p4_g <- plot_ridge_en(merged_bipolar_g, "residuals_score", "gender", "Bipolar disorder", show_y_axis_text = TRUE, show_y_label = TRUE)
-p5_g <- plot_ridge_en(merged_ptsd_g, "residuals_score", "gender", "PTSD")
-p6_g <- plot_ridge_en(merged_adhd_g, "residuals_score", "gender", "ADHD")
-
-p7_g <- plot_ridge_en(merged_scz_g, "residuals_score", "gender", "Schizophrenia", show_y_axis_text = TRUE, show_x_labels = TRUE)
-p8_g <- plot_ridge_en(merged_cud_g, "residuals_score", "gender", "Cannabis use disorder", show_x_labels = TRUE)
+# Reihe 2 (Untere Reihe - mit X-Achsen-Beschriftung)
+p6_g <- plot_ridge_en(merged_dep_g, "residuals_score", "gender", "Depression", show_y_axis_text = TRUE, show_y_label = TRUE, show_x_labels = TRUE)
+p7_g <- plot_ridge_en(merged_ptsd_g, "residuals_score", "gender", "PTSD", show_x_labels = TRUE)
+p8_g <- plot_ridge_en(
+  merged_scz_g, "residuals_score", "gender", "Schizophrenia", show_x_labels = TRUE, show_x_label = TRUE)
 p9_g <- plot_ridge_en(merged_smkinit_g, "residuals_score", "gender", "Smoking initiation", show_x_labels = TRUE)
+p10_g <- plot_ridge_en(merged_sa_g, "residuals_score", "gender", "Suicide attempt", show_x_labels = TRUE)
 
-# combine plots
-all_gender_ridge <- (p1_g | p2_g | p3_g) / (p4_g | p5_g | p6_g) / (p7_g | p8_g | p9_g) + 
-  plot_annotation(
-    caption = expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)),
-    theme = theme(
-      plot.caption = element_text(size = 16, hjust = 0.5, margin = margin(t = 20))
-    )
-  )
+all_gender <- (p1_g | p2_g | p3_g | p4_g | p5_g) / 
+              (p6_g | p7_g | p8_g | p9_g | p10_g) 
 
-print(all_gender_ridge)
+print(all_gender)
 
 #safe
 ggsave(filename = file.path(filepath_plots, paste0("glad_coping_prs_residuen_gender_ridge_", date, ".png")), 
-       plot = all_gender_ridge, width = 12, height = 6, dpi = 300)
+       plot = all_gender, width = 12, height = 6, dpi = 300)
 ```
 
 ```{r  BOXPLOTS FÜR GENDER}
-plot_box_horizontal <- function(data, x_var, y_var, title, show_y_axis_text = FALSE, show_y_label = FALSE, show_x_labels = FALSE) {
+plot_box_horizontal <- function(data, x_var, y_var, title, 
+                                show_y_axis_text = FALSE, 
+                                show_y_label = FALSE, 
+                                show_x_labels = FALSE,
+                                show_x_label = FALSE) {
+  
   ggplot(data, aes_string(x = x_var, y = y_var, fill = y_var)) +
-    geom_boxplot(outlier.size = 0.5, alpha = 0.8) +
-    scale_fill_viridis_d(option = "mako", begin = 0.25, end = 0.90, guide = "none") +  
+    geom_boxplot(outlier.size = 0.5, alpha = 0.8) + # Breite bleibt Standard
+    scale_fill_viridis_d(option = "mako", begin = 0.25, end = 0.90, guide = "none") + 
     scale_x_continuous(
       breaks = c(-2e-06, -1e-06, 0, 1e-06, 2e-06),
       labels = c("-2", "-1", "0", "1", "2")
@@ -318,44 +422,45 @@ plot_box_horizontal <- function(data, x_var, y_var, title, show_y_axis_text = FA
     coord_cartesian(xlim = c(-3e-6, 3e-6)) + 
     labs(
       title = title,
-      x = NULL,
+      x = if(show_x_label) expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)) else NULL,
       y = if(show_y_label) "Category" else NULL
     ) +
     theme_minimal() +
     theme(
-      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-      axis.title.y = if(show_y_label) element_text(size = 14, face = "bold") else element_blank(),
+      plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
+      axis.title.y = if(show_y_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.title.x = if(show_x_label) element_text(size = 15, face = "bold") else element_blank(),
       axis.text.y = if(show_y_axis_text) element_text(size = 12) else element_blank(),
       axis.text.x = if(show_x_labels) element_text(size = 12) else element_blank(), 
       panel.grid.minor = element_blank(),
-      panel.grid.major.y = element_blank()
+      panel.grid.major.y = element_blank(),
+      # Verringert die Lücken zwischen den Panels
+      panel.spacing = unit(0.1, "lines"), 
+      # Minimiert die Ränder um jeden einzelnen Plot
+      plot.margin = margin(t = 5, r = 0, b = 5, l = 0) 
     )
 }
 
-p1_g_box <- plot_box_horizontal(merged_dep_g, "residuals_score", "gender", "Depression", show_y_axis_text = TRUE)
-p2_g_box <- plot_box_horizontal(merged_anxiety_g, "residuals_score", "gender", "Anxiety")
-p3_g_box <- plot_box_horizontal(merged_an_g, "residuals_score", "gender", "Anorexia nervosa")
+# Reihe 1
+p1_g_b <- plot_box_horizontal(merged_adhd_g, "residuals_score", "gender", "ADHD", show_y_axis_text = TRUE)
+p2_g_b <- plot_box_horizontal(merged_an_g, "residuals_score", "gender", "Anorexia nervosa")
+p3_g_b <- plot_box_horizontal(merged_anxiety_g, "residuals_score", "gender", "Anxiety")
+p4_g_b <- plot_box_horizontal(merged_bipolar_g, "residuals_score", "gender", "Bipolar disorder")
+p5_g_b <- plot_box_horizontal(merged_cud_g, "residuals_score", "gender", "Cannabis use")
 
-p4_g_box <- plot_box_horizontal(merged_bipolar_g, "residuals_score", "gender", "Bipolar disorder", show_y_axis_text = TRUE, show_y_label = TRUE)
-p5_g_box <- plot_box_horizontal(merged_ptsd_g, "residuals_score", "gender", "PTSD")
-p6_g_box <- plot_box_horizontal(merged_adhd_g, "residuals_score", "gender", "ADHD")
+# Reihe 2
+p6_g_b <- plot_box_horizontal(merged_dep_g, "residuals_score", "gender", "Depression", show_y_axis_text = TRUE, show_y_label = TRUE, show_x_labels = TRUE)
+p7_g_b <- plot_box_horizontal(merged_ptsd_g, "residuals_score", "gender", "PTSD", show_x_labels = TRUE)
+# Schizophrenie mit dem X-Achsen Titel
+p8_g_b <- plot_box_horizontal(merged_scz_g, "residuals_score", "gender", "Schizophrenia", show_x_labels = TRUE, show_x_label = TRUE)
+p9_g_b <- plot_box_horizontal(merged_smkinit_g, "residuals_score", "gender", "Smoking initiation", show_x_labels = TRUE)
+p10_g_b <- plot_box_horizontal(merged_sa_g, "residuals_score", "gender", "Suicide attempt", show_x_labels = TRUE)
 
-p7_g_box <- plot_box_horizontal(merged_scz_g, "residuals_score", "gender", "Schizophrenia", show_y_axis_text = TRUE, show_x_labels = TRUE)
-p8_g_box <- plot_box_horizontal(merged_cud_g, "residuals_score", "gender", "Cannabis use disorder", show_x_labels = TRUE)
-p9_g_box <- plot_box_horizontal(merged_smkinit_g, "residuals_score", "gender", "Smoking initiation", show_x_labels = TRUE)
-
-# combine plots
-all_gender_box <- (p1_g_box | p2_g_box | p3_g_box) / (p4_g_box | p5_g_box | p6_g_box) / (p7_g_box | p8_g_box | p9_g_box) + 
-  plot_annotation(
-    caption = expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)), 
-    theme = theme(
-      plot.caption = element_text(size = 16, hjust = 0.5, margin = margin(t = 20))
-    )
-  )
-
+all_gender_box <- (p1_g_b | p2_g_b | p3_g_b | p4_g_b | p5_g_b) / 
+                  (p6_g_b | p7_g_b | p8_g_b | p9_g_b | p10_g_b)
 print(all_gender_box)
 
 #safe
 ggsave(filename = file.path(filepath_plots, paste0("glad_coping_prs_residuen_gender_box_", date, ".png")), 
-       plot = all_gender_box, width = 12, height = 6, dpi = 300)
+       plot = all_gender_box, width = 10, height = 5, dpi = 300)
 ```

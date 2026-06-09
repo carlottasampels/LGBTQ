@@ -1,0 +1,180 @@
+---
+title: "Untitled"
+author: "Carlotta Sampels"
+date: "2026-05-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls(all.names = TRUE))
+```
+
+
+```{r}
+source(file = "credentials/paths.R")
+```
+
+
+```{r}
+library(tidyverse)
+library(broom)
+```
+
+
+```{r}
+date <- Sys.Date()
+
+date
+```
+
+# data preparation
+```{r load data}
+dat_all <- read_rds(paste0(filepath_cleaned_data, "dat_glad_coping_nbr_", date, ".rds"))
+
+dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t") %>%
+  select(FID, batch, pc1, pc2, pc3, pc4, pc5, pc6)
+
+dat_merged <- dat_all %>%
+  inner_join(dat_prs_pc, by = c("ID" = "FID"))
+```
+
+
+```{r}
+# Define pairs: which PRS predicts which clinical outcome
+analysis_map <- tribble(
+  ~phenotype,            ~prs_column,
+  "mhd.mdd",             "prs_depression",
+  "mhd.gad",             "prs_anxiety",
+  "mhd.an",              "prs_an",
+  "mhd.bipolar_disorder","prs_bipolar",
+  "mhd.ptsd",            "prs_ptsd",
+  "mhd.addadhd",         "prs_adhd",
+  "mhd.schizophrenia",   "prs_scz"
+)
+```
+
+```{r numeric phenotyp}
+outcomes_to_convert <- analysis_map$phenotype
+
+dat_merged <- dat_merged %>%
+  mutate(across(all_of(outcomes_to_convert), ~ as.numeric(.) - 1)) 
+```
+
+
+```{r}
+list_results <- list()
+list_metrics <- list()
+
+for (i in 1:nrow(analysis_map)) {
+  pheno <- analysis_map$phenotype[i]
+  prs   <- analysis_map$prs_column[i]
+  
+  # Linear Probability Model (LPM): Phenotype ~ PRS + Covariates
+  f <- as.formula(paste(pheno, "~", prs, "+ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch"))
+  
+  # Run regression
+  mod <- lm(f, data = dat_merged)
+  
+  # Extract coefficients WITH confidence intervals
+list_results[[pheno]] <- tidy(mod, conf.int = TRUE) %>% mutate(outcome = pheno, predictor_prs = prs)
+  
+  # Extract overall model fit metrics (R-squared, etc.)
+  list_metrics[[pheno]] <- glance(mod) %>% mutate(outcome = pheno, predictor_prs = prs)
+}
+```
+
+
+```{r}
+# Function to translate internal variables into clean, alphabetical presentation names
+clean_outcome_names <- function(x) {
+  case_when(
+    x == "mhd.addadhd" ~ "ADHD",
+    x == "mhd.an" ~ "Anorexia Nervosa",
+    x == "mhd.gad" ~ "Anxiety",
+    x == "mhd.bipolar_disorder" ~ "Bipolar Disorder",
+    x == "mhd.mdd" ~ "Depression",
+    x == "mhd.ptsd" ~ "PTSD",
+    x == "mhd.schizophrenia" ~ "Schizophrenia",
+    TRUE ~ x
+  )
+}
+```
+
+
+```{r}
+# 1. Format Model Fits (Alphabetical)
+prediction_metrics <- bind_rows(list_metrics) %>%
+  mutate(outcome_clean = clean_outcome_names(outcome)) %>%
+  arrange(outcome_clean) %>%
+  select(-outcome) %>%
+  rename(outcome = outcome_clean) %>%
+  relocate(outcome, predictor_prs)
+prediction_metrics
+```
+
+
+```{r}
+# 2. Format Coefficients (Alphabetical)
+prediction_results <- bind_rows(list_results) %>%
+  mutate(outcome_clean = clean_outcome_names(outcome)) %>%
+  arrange(outcome_clean, term) %>%
+  select(-outcome) %>%
+  rename(outcome = outcome_clean) %>%
+  relocate(outcome, predictor_prs)
+prediction_results
+```
+
+
+```{r Create Reduced Table}
+
+reduced_summary_table <- prediction_results %>%
+  filter(term == predictor_prs) %>%
+  mutate(
+    # Sternchen basierend auf dem p-Wert generieren
+    stars = case_when(
+      p.value < 0.001 ~ "***",
+      p.value < 0.01  ~ "**",
+      p.value < 0.05  ~ "*",
+      TRUE            ~ ""
+    ),
+    # Estimate und Konfidenzintervall zusammenfügen (OHNE Sternchen)
+    `Estimate [95% CI]` = paste0(
+      format(round(estimate, 2), nsmall = 2), " [", 
+      format(round(conf.low, 2), nsmall = 2), " - ", 
+      format(round(conf.high, 2), nsmall = 2), "]"
+    ),
+    `p-value` = ifelse(p.value < 0.001, "<.001", format(round(p.value, 3), nsmall = 3))
+  ) %>%
+  select(
+    `Psychiatric Disorder` = outcome,
+    `PRS Predictor` = predictor_prs,
+    `Estimate [95% CI]`,
+    `Significance` = stars,  # <-- Hier ist die neue, separate Spalte!
+    `p-value`
+  )
+
+# Tabelle anzeigen
+print(reduced_summary_table)
+```
+
+
+```{r save}
+write.csv2(reduced_summary_table, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_phenotype_prediction_", date, ".csv"), row.names = FALSE)
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+

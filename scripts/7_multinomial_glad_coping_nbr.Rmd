@@ -1,0 +1,202 @@
+---
+title: "multinomial regression "
+author: "Carlotta Sampels"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: '4'
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    df_print: paged
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: inline
+---
+
+# Setup
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Clear Global Environment
+
+```{r clear global environment}
+rm(list = ls(all.names = TRUE)) 
+```
+
+## Read in file paths
+Ensure that your credentials directory is correctly located.
+
+```{r Read in paths file}
+source(file = "credentials/paths.R")
+```
+
+## Load packages
+
+```{r Load packages}
+library(tidyverse)
+library(nnet)
+library(broom)
+library(performance)
+```
+
+## Set current date
+
+```{r current date}
+date <- Sys.Date()
+date <- "2026-05-15"
+date
+```
+
+#load data
+
+```{r}
+# load data
+dat_all <- read_rds(paste0(filepath_cleaned_data, "dat_glad_coping_nbr_", date, ".rds"))
+
+# Load Principal Components
+dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFactors = FALSE) %>%
+  select(FID, batch, pc1, pc2, pc3, pc4, pc5, pc6)
+
+# Merge main data with PCs
+dat_merged <- dat_all %>%
+  inner_join(dat_prs_pc, by = c("ID" = "FID"))
+
+# Set reference group for gender to "Cis woman"
+dat_merged$gender <- relevel(as.factor(dat_merged$gender), ref = "Cis woman")
+
+nrow(dat_merged)
+```
+
+# Multinominal Regressions
+
+```{r prepare}
+# Define PRS traits to analyze
+prs_traits <- c(
+  "prs_adhd",
+  "prs_an",
+  "prs_anxiety",
+  "prs_bipolar",
+  "prs_cud",
+  "prs_depression",
+  "prs_ptsd",
+  "prs_sa",
+  "prs_scz",
+  "prs_smkinit"
+)
+
+# Create lists to store results
+list_tidy_results <- list()
+list_model_stats <- list()
+```
+
+
+```{r run model}
+# Loop through each trait, run the model, and extract data
+for (trait in prs_traits) {
+  
+  # 1. Formula (adjusted for PCs and batch)
+  f <- as.formula(paste("gender ~", trait, "+ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch"))
+  
+  # 2. Run Model
+  mod <- multinom(f, data = dat_merged, trace = FALSE)
+  
+  # 3. Extract tidy coefficients
+  list_tidy_results[[trait]] <- tidy(mod, conf.int = TRUE, exponentiate = TRUE) %>%
+    mutate(Phenotype = trait)
+  
+  # 4. Extract model performance stats
+  list_model_stats[[trait]] <- data.frame(
+    Phenotype = trait,
+    AIC = AIC(mod),
+    LogLikelihood = as.numeric(logLik(mod)),
+    Residual_Deviance = deviance(mod),
+    N_Observations = nrow(mod$residuals)
+  )
+}
+```
+
+
+```{r Combine all results into clean dataframes}
+all_multinom_results <- bind_rows(list_tidy_results) %>% relocate(Phenotype, y.level)
+all_multinom_stats   <- bind_rows(list_model_stats)
+```
+
+```{r}
+# Clean Phenotype names for presentation
+clean_pheno_names <- function(x) {
+  case_when(
+    x == "prs_adhd"       ~ "ADHD",
+    x == "prs_an"         ~ "Anorexia Nervosa",
+    x == "prs_anxiety"    ~ "Anxiety",
+    x == "prs_bipolar"    ~ "Bipolar Disorder",
+    x == "prs_cud"        ~ "Cannabis Use Disorder",
+    x == "prs_depression" ~ "Depression",
+    x == "prs_ptsd"       ~ "PTSD",
+    x == "prs_scz"        ~ "Schizophrenia",
+    x == "prs_smkinit"    ~ "Smoking Initiation",
+    x == "prs_sa"         ~ "Suicide Attempt",
+    TRUE ~ x
+  )
+}
+
+all_multinom_results <- all_multinom_results %>%
+  mutate(Phenotype_Clean = clean_pheno_names(Phenotype))
+```
+
+```{r Table 1}
+# Main Effects (Only the PRS predictor effects)
+table_1_effects <- all_multinom_results %>%
+  filter(term == Phenotype) %>% # Filter to keep only the PRS predictor
+  arrange(Phenotype_Clean, y.level) %>%
+  select(
+    Phenotype = Phenotype_Clean, 
+    Level = y.level, 
+    Estimate = estimate, 
+    `95% CI low` = conf.low, 
+    `95% CI up` = conf.high, 
+    SE = std.error, 
+    `z score` = statistic, 
+    `p value` = p.value
+  )
+
+table_1_effects
+```
+
+
+```{r Table 2}
+# Clean formatting (OR + 95% CI in one column)
+supp_table_data <- table_1_effects %>%
+  mutate(
+    `OR [95% CI]` = paste0(
+      format(round(Estimate, 2), nsmall = 2), " [", 
+      format(round(`95% CI low`, 2), nsmall = 2), " - ", 
+      format(round(`95% CI up`, 2), nsmall = 2), "]"
+    ),
+    `p-value` = ifelse(`p value` < 0.001, "<.001", format(round(`p value`, 3), nsmall = 3))
+  ) %>%
+  select(
+    `Psychiatric Disorder` = Phenotype,
+    `Gender Identity` = Level,
+    `OR [95% CI]`,
+    `p-value`
+  )
+
+supp_table_data
+```
+```{r}
+write.csv2(supp_table_data, file = paste0(LGBTQ_folder, "tables/", date, "/multinominal_regression_gender_", date, ".csv"), row.names = FALSE)
+```
+
+
+
+
+

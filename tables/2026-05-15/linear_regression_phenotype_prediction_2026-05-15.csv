@@ -1,0 +1,8 @@
+"Psychiatric Disorder";"PRS Predictor";"Estimate [95% CI]";"Significance";"p-value"
+"ADHD";"prs_adhd";" 8125.13 [ 3224.36 - 13025.90]";"**";"0.001"
+"Anorexia Nervosa";"prs_an";"10916.78 [ 7048.94 - 14784.63]";"***";"<.001"
+"Anxiety";"prs_anxiety";"11753.39 [ 2515.07 - 20991.72]";"*";"0.013"
+"Bipolar Disorder";"prs_bipolar";" 7421.59 [ 4639.40 - 10203.77]";"***";"<.001"
+"Depression";"prs_depression";"45810.02 [31638.91 - 59981.13]";"***";"<.001"
+"PTSD";"prs_ptsd";"25875.53 [12265.74 - 39485.33]";"***";"<.001"
+"Schizophrenia";"prs_scz";"   22.47 [ -369.57 -   414.50]";"";"0.911"

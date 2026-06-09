@@ -685,6 +685,7 @@ dat %>%
 dat_rds <- dat %>%
   select(
     "ID",
+    "sample",
     "gad7.sum_score",
     all_of(gad7_items_numeric),
     

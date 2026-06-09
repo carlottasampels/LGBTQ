@@ -57,7 +57,7 @@ library(tidyverse)
 
 ```{r set current date}
 date <- Sys.Date()
-date <- "2026-03-22"
+#date <- "2026-03-22"
 date
 ```
 

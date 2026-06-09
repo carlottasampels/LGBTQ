@@ -34,7 +34,7 @@ filepath_prs_cud <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_canabis_reduced
 
 filepath_prs_smkinit <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_smkinit_reduced.profile"
 
-#filepath_prs_as <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_as_reduced.profile"
+filepath_prs_sa <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/PRS_suicide_reduced.profile"
 
 filepath_MegaPRS_scz <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/MegaPRS_SCZ2022_tab.tsv"
 
@@ -67,4 +67,6 @@ filepath_prs_adhd_no_mhd <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/coping_nbr/
 filepath_prs_cud_no_mhd <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/coping_nbr/PRS_canabis_reduced.profile"
 
 filepath_prs_smkinit_no_mhd <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/coping_nbr/PRS_smkinit_reduced.profile"
+
+filepath_prs_sa_no_mhd <- "C:/Users/carlo/Documents/work/LGBTQ/PRS/coping_nbr/PRS_suicide_reduced.profile"
 

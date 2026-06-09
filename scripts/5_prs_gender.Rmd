@@ -1,0 +1,296 @@
+---
+title: "5_prs_gender"
+author: "Carlotta Sampels"
+date: "2026-05-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls(all.names = TRUE))
+```
+
+```{r}
+source(file = "credentials/paths.R")
+```
+
+```{r}
+library(tidyverse)
+library(broom)
+library(patchwork)
+library(performance)
+library(viridis)
+library(ggridges)
+```
+
+
+```{r}
+date <- Sys.Date()
+# date = "2026-03-22"
+date
+```
+
+
+```{r}
+# load gender data
+dat_all <- read_rds(paste0(filepath_cleaned_data, "dat_glad_coping_nbr_", date, ".rds"))
+
+# Load PC and batch data
+dat_prs_pc <- read.table(filepath_prs_pc, header = TRUE, sep = "\t", stringsAsFactors = FALSE) %>%
+  select(FID, batch, pc1, pc2, pc3, pc4, pc5, pc6)
+```
+
+
+```{r Merge main data with PCs}
+dat_merged <- dat_all %>%
+  inner_join(dat_prs_pc, by = c("ID" = "FID"))
+
+nrow(dat_merged)
+```
+
+# Linear Regressions
+
+```{r run linear regressions}
+# Define all PRS column names present in the dataset
+prs_traits <- c("prs_depression", "prs_anxiety", "prs_an", "prs_bipolar", "prs_ptsd", "prs_scz", "prs_adhd", "prs_cud", "prs_smkinit", "prs_sa")
+
+# Create empty lists to store both coefficients and model fit metrics
+list_tidy <- list()
+list_glance <- list()
+
+# Loop over traits, run regression once per trait, and extract both metrics
+for (trait in prs_traits) {
+  # Create formula: trait ~ gender + pc1-6 + batch
+  f <- as.formula(paste(trait, "~ gender + pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch"))
+  mod <- lm(f, data = dat_merged)
+  
+  # Extract coefficients (Estimates, p-values for predictors)
+  list_tidy[[trait]] <- tidy(mod) %>% mutate(phenotype = trait)
+  
+  # Extract overall model fit (R-squared, Adjusted R-squared, overall p-value)
+  list_glance[[trait]] <- glance(mod) %>% mutate(phenotype = trait)
+}
+```
+
+```{r Combine lists}
+all_lm_results <- bind_rows(list_tidy) %>% relocate(phenotype)
+all_lm_metrics <- bind_rows(list_glance) %>% relocate(phenotype)
+
+all_lm_results
+all_lm_metrics
+```
+
+```{r safe}
+# Save uncleaned coefficient results
+write.csv2(all_lm_results, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_coefficients_", date, ".csv"), row.names = FALSE)
+
+# Save R-squared and overall model metrics
+write.csv2(all_lm_metrics, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_model_fits_", date, ".csv"), row.names = FALSE)
+```
+
+
+```{r clean_lm_results_gender}
+# Function to clean and standardize phenotype names
+clean_pheno_names <- function(x) {
+  case_when(
+    x == "prs_adhd" ~ "ADHD",
+    x == "prs_an" ~ "Anorexia Nervosa",
+    x == "prs_anxiety" ~ "Anxiety",
+    x == "prs_bipolar" ~ "Bipolar Disorder",
+    x == "prs_cud" ~ "Cannabis Use Disorder",
+    x == "prs_depression" ~ "Depression",
+    x == "prs_ptsd" ~ "PTSD",
+    x == "prs_sa" ~ "Suicide Attempt",
+    x == "prs_scz" ~ "Schizophrenia",
+
+x == "prs_smkinit" ~ "Smoking Initiation",
+    TRUE ~ x
+  )
+}
+```
+
+
+```{r Format Model Fits}
+all_lm_metrics <- bind_rows(list_glance) %>%
+  mutate(phenotype = clean_pheno_names(phenotype)) %>%
+  arrange(phenotype) %>% # Alphabetical sorting
+  relocate(phenotype)
+all_lm_metrics
+```
+
+
+```{r Format Coefficients}
+all_lm_results <- bind_rows(list_tidy) %>%
+  mutate(phenotype = clean_pheno_names(phenotype)) %>%
+  arrange(phenotype, term) %>% # Alphabetical sorting
+  relocate(phenotype)
+all_lm_results
+```
+
+
+
+```{r Save uncleaned results}
+write.csv2(all_lm_results, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_coefficients_", date, ".csv"), row.names = FALSE)
+write.csv2(all_lm_metrics, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_model_fits_", date, ".csv"), row.names = FALSE)
+```
+
+
+```{r clean_lm_results_gender}
+# Clean labels and remove PC/batch covariates
+clean_lm_results_gender <- all_lm_results %>%
+  filter(!grepl("^pc[1-6]", term), !grepl("^batch", term)) %>%
+  mutate(
+    term = str_remove(term, "^gender"),
+    term = str_replace(term, "\\(Intercept\\)", "Intercept")
+  )
+clean_lm_results_gender
+```
+
+
+```{r save cleaned coefficient results}
+write.csv2(clean_lm_results_gender, file = paste0(LGBTQ_folder, "tables/", date, "/Supp_Table_Linear_Regression_Gender_Clean_", date, ".csv"), row.names = FALSE)
+```
+
+# Residuals
+
+```{r}
+for (trait in prs_traits) {
+  f <- as.formula(paste(trait, "~ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch"))
+  mod <- lm(f, data = dat_merged, na.action = na.exclude)
+  
+  # Save residual scores as new columns
+  dat_merged[[paste0("res_", trait)]] <- residuals(mod)
+}
+```
+
+#Plots
+```{r Ridge Plots}
+plot_ridge_en <- function(data, x_var, y_var, title, 
+                          show_y_axis_text = FALSE, 
+                          show_y_label = FALSE, 
+                          show_x_labels = FALSE, 
+                          show_x_label = FALSE) {
+  
+  # Updated from aes_string() to aes(.data[[]]) as string is deprecated in modern ggplot
+  ggplot(data, aes(x = .data[[x_var]], y = .data[[y_var]], fill = .data[[y_var]])) +
+    geom_density_ridges(alpha = 0.7, scale = 1.5, rel_min_height = 0.01, color = "white", lwd = 0.3) +
+    scale_fill_viridis_d(option = "mako", begin = 0.25, end = 0.90, guide = "none") +
+    scale_x_continuous(
+      breaks = c(-2e-06, -1e-06, 0, 1e-06, 2e-06),
+      labels = c("-2", "-1", "0", "1", "2")
+    ) + 
+    coord_cartesian(xlim = c(-2.1e-6, 2.1e-6)) +
+    labs(
+      title = title,
+      x = if(show_x_label) expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)) else NULL,
+      y = if(show_y_label) "Category" else NULL 
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
+      axis.title.y = if(show_y_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.title.x = if(show_x_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.text.y = if(show_y_axis_text) element_text(size = 12) else element_blank(),
+      axis.text.x = if(show_x_labels) element_text(size = 12) else element_blank(), 
+      panel.grid.minor = element_blank(),
+      panel.grid.major.y = element_blank(),
+      panel.spacing = unit(1, "lines")
+    )
+}
+```
+
+```{r combine rige Plots}
+# Row 1
+p1_g <- plot_ridge_en(dat_merged, "res_prs_adhd", "gender", "ADHD", show_y_axis_text = TRUE)
+p2_g <- plot_ridge_en(dat_merged, "res_prs_an", "gender", "Anorexia nervosa")
+p3_g <- plot_ridge_en(dat_merged, "res_prs_anxiety", "gender", "Anxiety")
+p4_g <- plot_ridge_en(dat_merged, "res_prs_bipolar", "gender", "Bipolar disorder")
+p5_g <- plot_ridge_en(dat_merged, "res_prs_cud", "gender", "Cannabis use")
+
+# Row 2
+p6_g <- plot_ridge_en(dat_merged, "res_prs_depression", "gender", "Depression", show_y_axis_text = TRUE, show_y_label = TRUE, show_x_labels = TRUE)
+p7_g <- plot_ridge_en(dat_merged, "res_prs_ptsd", "gender", "PTSD", show_x_labels = TRUE)
+p8_g <- plot_ridge_en(dat_merged, "res_prs_scz", "gender", "Schizophrenia", show_x_labels = TRUE, show_x_label = TRUE)
+p9_g <- plot_ridge_en(dat_merged, "res_prs_smkinit", "gender", "Smoking initiation", show_x_labels = TRUE)
+p10_g <- plot_ridge_en(dat_merged, "res_prs_sa", "gender", "Suicide attempt", show_x_labels = TRUE)
+
+# Combine using patchwork
+all_gender <- (p1_g | p2_g | p3_g | p4_g | p5_g) / 
+              (p6_g | p7_g | p8_g | p9_g | p10_g) 
+
+print(all_gender)
+```
+
+
+```{r Boxplots}
+plot_box_horizontal <- function(data, x_var, y_var, title, 
+                                show_y_axis_text = FALSE, 
+                                show_y_label = FALSE, 
+                                show_x_labels = FALSE,
+                                show_x_label = FALSE) {
+  
+  ggplot(data, aes(x = .data[[x_var]], y = .data[[y_var]], fill = .data[[y_var]])) +
+    geom_boxplot(outlier.size = 0.5, alpha = 0.8) +
+    scale_fill_viridis_d(option = "mako", begin = 0.25, end = 0.90, guide = "none") + 
+    scale_x_continuous(
+      breaks = c(-2e-06, -1e-06, 0, 1e-06, 2e-06),
+      labels = c("-2", "-1", "0", "1", "2")
+    ) + 
+    coord_cartesian(xlim = c(-3e-6, 3e-6)) + 
+    labs(
+      title = title,
+      x = if(show_x_label) expression(bold("Adjusted PRS (Residuals) " %*% 10^-6)) else NULL,
+      y = if(show_y_label) "Category" else NULL
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 15, face = "bold"),
+      axis.title.y = if(show_y_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.title.x = if(show_x_label) element_text(size = 15, face = "bold") else element_blank(),
+      axis.text.y = if(show_y_axis_text) element_text(size = 12) else element_blank(),
+      axis.text.x = if(show_x_labels) element_text(size = 12) else element_blank(), 
+      panel.grid.minor = element_blank(),
+      panel.grid.major.y = element_blank(),
+      panel.spacing = unit(0.1, "lines"), 
+      plot.margin = margin(t = 5, r = 0, b = 5, l = 0) 
+    )
+}
+```
+
+```{r combine Boxplots}
+# Row 1
+p1_g_b <- plot_box_horizontal(dat_merged, "res_prs_adhd", "gender", "ADHD", show_y_axis_text = TRUE)
+p2_g_b <- plot_box_horizontal(dat_merged, "res_prs_an", "gender", "Anorexia nervosa")
+p3_g_b <- plot_box_horizontal(dat_merged, "res_prs_anxiety", "gender", "Anxiety")
+p4_g_b <- plot_box_horizontal(dat_merged, "res_prs_bipolar", "gender", "Bipolar disorder")
+p5_g_b <- plot_box_horizontal(dat_merged, "res_prs_cud", "gender", "Cannabis use")
+
+# Row 2
+p6_g_b <- plot_box_horizontal(dat_merged, "res_prs_depression", "gender", "Depression", show_y_axis_text = TRUE, show_y_label = TRUE, show_x_labels = TRUE)
+p7_g_b <- plot_box_horizontal(dat_merged, "res_prs_ptsd", "gender", "PTSD", show_x_labels = TRUE)
+p8_g_b <- plot_box_horizontal(dat_merged, "res_prs_scz", "gender", "Schizophrenia", show_x_labels = TRUE, show_x_label = TRUE)
+p9_g_b <- plot_box_horizontal(dat_merged, "res_prs_smkinit", "gender", "Smoking initiation", show_x_labels = TRUE)
+p10_g_b <- plot_box_horizontal(dat_merged, "res_prs_sa", "gender", "Suicide attempt", show_x_labels = TRUE)
+
+# Combine using patchwork
+all_gender_box <- (p1_g_b | p2_g_b | p3_g_b | p4_g_b | p5_g_b) / 
+                  (p6_g_b | p7_g_b | p8_g_b | p9_g_b | p10_g_b)
+
+print(all_gender_box)
+```
+```{r save plots}
+ggsave(filename = file.path(filepath_plots, paste0("glad_coping_prs_residuen_gender_ridge_", date, ".png")), 
+       plot = all_gender, width = 12, height = 6, dpi = 300)
+ggsave(filename = file.path(filepath_plots, paste0("glad_coping_prs_residuen_gender_box_", date, ".png")), 
+       plot = all_gender_box, width = 10, height = 5, dpi = 300)
+```
+
+
+
+
+
+
+
