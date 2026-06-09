@@ -43,8 +43,8 @@ dat_merged <- dat_all %>%
 ```
 
 
-```{r}
-# Define pairs: which PRS predicts which clinical outcome
+```{r Define pairs}
+# which PRS predicts which clinical outcome
 analysis_map <- tribble(
   ~phenotype,            ~prs_column,
   "mhd.mdd",             "prs_depression",
@@ -65,7 +65,7 @@ dat_merged <- dat_merged %>%
 ```
 
 
-```{r}
+```{r regression}
 list_results <- list()
 list_metrics <- list()
 
@@ -73,7 +73,7 @@ for (i in 1:nrow(analysis_map)) {
   pheno <- analysis_map$phenotype[i]
   prs   <- analysis_map$prs_column[i]
   
-  # Linear Probability Model (LPM): Phenotype ~ PRS + Covariates
+  # Linear Probability Model: Phenotype ~ PRS + Covariates
   f <- as.formula(paste(pheno, "~", prs, "+ pc1 + pc2 + pc3 + pc4 + pc5 + pc6 + batch"))
   
   # Run regression
@@ -88,8 +88,7 @@ list_results[[pheno]] <- tidy(mod, conf.int = TRUE) %>% mutate(outcome = pheno, 
 ```
 
 
-```{r}
-# Function to translate internal variables into clean, alphabetical presentation names
+```{r translate internal variables into clean}
 clean_outcome_names <- function(x) {
   case_when(
     x == "mhd.addadhd" ~ "ADHD",
@@ -105,8 +104,7 @@ clean_outcome_names <- function(x) {
 ```
 
 
-```{r}
-# 1. Format Model Fits (Alphabetical)
+```{r Format Model Fits}
 prediction_metrics <- bind_rows(list_metrics) %>%
   mutate(outcome_clean = clean_outcome_names(outcome)) %>%
   arrange(outcome_clean) %>%
@@ -117,8 +115,7 @@ prediction_metrics
 ```
 
 
-```{r}
-# 2. Format Coefficients (Alphabetical)
+```{r Format Coefficients}
 prediction_results <- bind_rows(list_results) %>%
   mutate(outcome_clean = clean_outcome_names(outcome)) %>%
   arrange(outcome_clean, term) %>%
@@ -134,14 +131,13 @@ prediction_results
 reduced_summary_table <- prediction_results %>%
   filter(term == predictor_prs) %>%
   mutate(
-    # Sternchen basierend auf dem p-Wert generieren
     stars = case_when(
       p.value < 0.001 ~ "***",
       p.value < 0.01  ~ "**",
       p.value < 0.05  ~ "*",
       TRUE            ~ ""
     ),
-    # Estimate und Konfidenzintervall zusammenfügen (OHNE Sternchen)
+    # combine estimate and CI
     `Estimate [95% CI]` = paste0(
       format(round(estimate, 2), nsmall = 2), " [", 
       format(round(conf.low, 2), nsmall = 2), " - ", 
@@ -153,28 +149,15 @@ reduced_summary_table <- prediction_results %>%
     `Psychiatric Disorder` = outcome,
     `PRS Predictor` = predictor_prs,
     `Estimate [95% CI]`,
-    `Significance` = stars,  # <-- Hier ist die neue, separate Spalte!
+    `Significance` = stars,
     `p-value`
   )
 
-# Tabelle anzeigen
 print(reduced_summary_table)
 ```
 
 
 ```{r save}
 write.csv2(reduced_summary_table, file = paste0(LGBTQ_folder, "tables/", date, "/linear_regression_phenotype_prediction_", date, ".csv"), row.names = FALSE)
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
 ```
 
